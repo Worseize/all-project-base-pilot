@@ -210,5 +210,26 @@ class VerifyTests(unittest.TestCase):
         self.assertEqual(gate.failed, 0)
 
 
+    def test_close_task_accepts_no_code(self):
+        self.assertIsNone(verify.close_task_violation(["docs/README.md"]))
+
+    def test_close_task_rejects_code_without_evidence(self):
+        self.assertIsNotNone(verify.close_task_violation(["cmd/app/main.go"]))
+        self.assertIsNotNone(verify.close_task_violation(["deploy/app.yaml"]))
+
+    def test_close_task_accepts_features(self):
+        files = ["cmd/app/main.go", "features/0001-feature.md"]
+        self.assertIsNone(verify.close_task_violation(files))
+
+    def test_close_task_accepts_adr_debt_journal(self):
+        for evidence in ("docs/adr/0003-x.md", "docs/DEBT.md", "JOURNAL.md"):
+            files = ["cmd/app/main.go", evidence]
+            self.assertIsNone(verify.close_task_violation(files))
+
+    def test_close_task_rejects_unrelated_docs(self):
+        files = ["cmd/app/main.go", "README.md"]
+        self.assertIsNotNone(verify.close_task_violation(files))
+
+
 if __name__ == "__main__":
     unittest.main()

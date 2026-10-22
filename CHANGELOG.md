@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.9.3 — 2026-10-22
+
+- `verify.py --close-task`: красный, если `cmd/**`/`deploy/**` изменены
+  без `features/**`, `docs/adr/**`, `docs/DEBT.md` или `JOURNAL.md`.
+- Добавлен `docs/DEBT.md`; CI запускает close-task.
+- Тесты на close-task; `fetch-depth: 0` для diff.
+
 ## 0.9.2 — 2026-10-22
 
 - PNG-схемы убраны из git: генерируются локально, `.gitignore`.

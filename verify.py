@@ -3,6 +3,7 @@
 """Red gate шаблона: один ненулевой код — и деплой запрещён.
 
     python verify.py
+    python verify.py --close-task [--base <ref>]
     python verify.py --update-schemes
 
 Проверки читают project.json: обязательные файлы, команды, ADR, схемы.
@@ -473,6 +474,94 @@ def check_commands(gate: Gate) -> None:
     gate.ok("commands", "build/test/vet/deadcode/fmt")
 
 
+CODE_ROOTS = ("cmd", "deploy")
+EVIDENCE_ROOTS = ("features", "docs/adr")
+EVIDENCE_FILES = {"docs/DEBT.md", "JOURNAL.md"}
+
+
+def path_in(path: str, roots: tuple[str, ...]) -> bool:
+    return any(path == root or path.startswith(root + "/") for root in roots)
+
+
+def close_task_violation(files: list[str]) -> str | None:
+    code = [name for name in files if path_in(name, CODE_ROOTS)]
+    evidence = [
+        name for name in files
+        if path_in(name, EVIDENCE_ROOTS) or name in EVIDENCE_FILES
+    ]
+    if code and not evidence:
+        return (
+            "изменён код (" + ", ".join(code[:5]) + ") без features/**, "
+            "docs/adr/**, docs/DEBT.md или JOURNAL.md"
+        )
+    return None
+
+
+def ref_exists(ref: str) -> bool:
+    result = subprocess.run(
+        ["git", "rev-parse", "--verify", "--quiet", ref],
+        cwd=ROOT, text=True, capture_output=True,
+    )
+    return result.returncode == 0
+
+
+def resolve_base(argv: list[str]) -> str:
+    if "--base" in argv:
+        index = argv.index("--base")
+        if index + 1 >= len(argv):
+            raise RuntimeError("--base требует ref")
+        return argv[index + 1]
+    for key in (
+        "GITHUB_BASE_SHA",
+        "CI_MERGE_REQUEST_DIFF_BASE_SHA",
+        "SYSTEM_PULLREQUEST_TARGETCOMMITID",
+    ):
+        value = os.environ.get(key)
+        if value:
+            return value
+    ref = os.environ.get("GITHUB_BASE_REF") or os.environ.get(
+        "CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
+    )
+    if ref:
+        for candidate in (f"origin/{ref}", ref):
+            if ref_exists(candidate):
+                return candidate
+    for candidate in ("origin/main", "main"):
+        if ref_exists(candidate):
+            return candidate
+    raise RuntimeError("не найден base; передай --base <ref>")
+
+
+def changed_files(base: str) -> list[str]:
+    if not shutil.which("git"):
+        raise RuntimeError("git не установлен")
+    result = subprocess.run(
+        ["git", "diff", "--name-only", f"{base}...HEAD"],
+        cwd=ROOT, text=True, capture_output=True,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(
+            result.stderr.strip() or f"git diff {base}...HEAD не удался"
+        )
+    return [line.strip() for line in result.stdout.splitlines() if line.strip()]
+
+
+def close_task(argv: list[str]) -> int:
+    try:
+        base = resolve_base(argv)
+        files = changed_files(base)
+    except RuntimeError as exc:
+        print(f"RED: {exc}")
+        return 1
+    print(f"close-task {VERSION}  ·  base={base}  ·  changed={len(files)}")
+    violation = close_task_violation(files)
+    if violation:
+        print(f"RED: {violation}")
+        return 1
+    print("GREEN: код не изменён без evidence-файла. Задача закрыта.")
+    return 0
+
+
 def update_schemes() -> int:
     if not CONFIG:
         print("RED: нет project.json")
@@ -506,6 +595,8 @@ def main() -> int:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
+    if "--close-task" in sys.argv:
+        return close_task(sys.argv)
     if "--update-schemes" in sys.argv:
         return update_schemes()
     if not CONFIG:

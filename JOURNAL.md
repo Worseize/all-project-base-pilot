@@ -3,6 +3,25 @@
 Одно решение — одна запись. Формат: дата, версия, решение, почему,
 что отвергли, последствия, ссылки.
 
+## 2026-10-22 · 0.9.3 · Close-task gate
+
+**Решение:** добавили `verify.py --close-task`: если diff трогает
+`cmd/**` или `deploy/**`, но не трогает `features/**`, `docs/adr/**`,
+`docs/DEBT.md` или `JOURNAL.md` — gate красный. Добавили `docs/DEBT.md`
+и шаг в CI.
+
+**Почему:** текст в AGENTS.md и PROJECT.md — не проверка. Долг можно
+забыть; close-task делает это физически невозможным на уровне пуша/PR.
+
+**Отвергли:** проверять только AGENTS.md; требовать все четыре evidence
+сразу; хранить долг в чате.
+
+**Последствия:** код без evidence не проходит CI. `--close-task` умеет
+base из GitHub/GitLab/Azure или `--base <ref>`. Тесты — unit.
+
+**Ссылки:** [verify.py](verify.py), [docs/DEBT.md](docs/DEBT.md),
+[PROCESS.md](PROCESS.md), [.github/workflows/verify.yml](.github/workflows/verify.yml).
+
 ## 2026-10-22 · 0.9.2 · AGENTS: обязательный старт и закрытие
 
 **Решение:** в `AGENTS.md` добавлены два жёстких блока: таблица
