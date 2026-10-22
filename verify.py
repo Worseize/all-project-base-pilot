@@ -201,6 +201,10 @@ def check_schemes(gate: Gate) -> None:
     if not SCHEMES:
         gate.fail("schemes", "в project.json нет схем")
         return
+    present = [image for image in SCHEMES if (ROOT / image).is_file()]
+    if not present:
+        gate.skip("schemes", "PNG не сгенерированы; запусти --update-schemes")
+        return
     bad = []
     for image in SCHEMES:
         path = ROOT / image

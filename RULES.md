@@ -5,8 +5,9 @@
 от предметной области и размера команды. Их читает агент перед каждым шагом
 и человек, когда принимает работу.
 
-**Картинка:** [docs/scheme-rules.png](docs/scheme-rules.png) ·
-**перерисовать:** `python docs/make_rules_scheme.py`.
+**Картинка:** генерируется локально:
+`python verify.py --update-schemes` → `docs/scheme-rules.png`
+(в git не хранится). **Перерисовать:** `python docs/make_rules_scheme.py`.
 
 ## Как пользоваться
 
@@ -137,7 +138,8 @@ npm, node_modules и обновлений пакетов. ООП — через 
 
 ## Процесс: красный не проходит
 
-Полный процесс — [PROCESS.md](PROCESS.md), схема — [docs/scheme-process.png](docs/scheme-process.png).
+Полный процесс — [PROCESS.md](PROCESS.md), схема — `docs/scheme-process.png`
+(генерируется локально).
 Правила → тест → изменение → verify → деплой только на 0 → ADR/журнал.
 
 `python verify.py` — единственный red gate. Ненулевой код запрещает merge
@@ -178,10 +180,10 @@ npm, node_modules и обновлений пакетов. ООП — через 
 ## Стратегия и улучшения
 
 Правила — первый слой. Видение, дорожная карта и очередь улучшений —
-в [STRATEGY.md](STRATEGY.md). Схемы: [strategy](docs/scheme-strategy.png),
-[roadmap](docs/scheme-roadmap.png).
+в [STRATEGY.md](STRATEGY.md). Схемы: `docs/scheme-strategy.png`,
+`docs/scheme-roadmap.png` — генерируются локально, в git не хранятся.
 
 Бюджет шаблона — десять правил: новое правило должно вобрать старое
 или доказать, что без него рвётся контур.
 
-Версия 0.9.1 · 22.10.2026
+Версия 0.9.2 · 22.10.2026
