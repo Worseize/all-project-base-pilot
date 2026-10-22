@@ -18,7 +18,9 @@
 
 **Последствия:** clean clone проходит `verify` без PNG; схемы можно
 создать командой `python verify.py --update-schemes`. CI проверяет,
-что lock соответствует источникам.
+что lock соответствует источникам. Репозиторий переведён в public;
+branch protection включён: PR + оба `verify`-чека, force push и удаление
+запрещены.
 
 ## 2026-10-22 · 0.9.1 · LF и Windows CI
 

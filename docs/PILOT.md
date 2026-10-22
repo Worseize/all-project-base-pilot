@@ -36,21 +36,31 @@
 
 ## Branch protection
 
-GitHub Free для private-репозитория вернул `403`:
+Репозиторий переведён в public, после чего protection включился:
 
-> Upgrade to GitHub Pro or make this repository public to enable this feature.
+- обязательный PR;
+- обязательные checks: `verify (ubuntu-latest)`, `verify (windows-latest)`;
+- force push и удаление `main` запрещены;
+- администраторы не обходят.
 
-Это касается и branch protection, и rulesets. Поэтому:
+Прямой push в `main` отклонён:
 
-- **remote branch protection не включён** — нужен public-репозиторий или GitHub Pro;
-- локально проверен эквивалент: bare-репозиторий + `pre-receive` + `denyDeletes`/`denyNonFastForwards`.
+```text
+GH006: Protected branch update failed
+- Changes must be made through a pull request.
+- 2 of 2 required status checks are expected.
+```
+
+Локально также проверен эквивалент: bare-репозиторий + `pre-receive` +
+`denyDeletes`/`denyNonFastForwards`.
 
 | Сценарий | Результат |
 | --- | --- |
-| Зелёный push в `main` | принят, 3.20 с |
-| Красный push в `main` | отклонён, 1.96 с |
-| Удаление `main` | отклонено |
-| Force push в `main` | отклонён |
+| Зелёный push в `main` (local) | принят, 3.20 с |
+| Красный push в `main` (local) | отклонён, 1.96 с |
+| Удаление `main` (local) | отклонено |
+| Force push в `main` (local) | отклонён |
+| Прямой push в GitHub `main` | отклонён GH006 |
 
 ## Наблюдения
 
@@ -59,11 +69,9 @@ GitHub Free для private-репозитория вернул `403`:
 - Drift-проверка сработала ровно один раз и с понятным сообщением;
   после `--update-schemes` gate позеленел.
 - CI `github` реально запущен: оба job’а зелёные после LF-фикса.
-- Remote branch protection заблокирован тарифом GitHub Free; локальный
-  серверный gate доказал, что красный push, удаление и force push
-  действительно отсекаются.
-- Деплой для шаблона — сборка `bin/deadcode.exe`; продуктового сервиса
+- Remote branch protection включён после перевода репозитория в public;
+  прямой push отклоняется, локальный серверный gate тоже проверен.
+- Деплой для шаблона — сборка `bin/deadcode.exe`; публичного сервиса
   и реального стенда нет.
-- Итог: процесс и gate проходят; для remote protection нужно решение
-  по видимости репозитория или GitHub Pro.
+- Итог: процесс и gate проходят; остался реальный продуктовый сервис.
 
