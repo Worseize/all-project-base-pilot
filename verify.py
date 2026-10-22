@@ -361,6 +361,21 @@ def check_logs(gate: Gate) -> None:
         )
 
 
+def check_debt(gate: Gate) -> None:
+    path = ROOT / "docs" / "DEBT.md"
+    if not path.is_file():
+        gate.fail("debt", "нет docs/DEBT.md")
+        return
+    text = path.read_text(encoding="utf-8", errors="replace")
+    if "## Закрытый долг" in text or "## Закрытые долги" in text:
+        gate.fail("debt", "закрытый долг остался в DEBT.md — удали его")
+        return
+    if "## Открытый долг" not in text:
+        gate.fail("debt", "нет раздела «Открытый долг»")
+        return
+    gate.ok("debt", "закрытые долги удаляются")
+
+
 def check_adr(gate: Gate) -> None:
     adr = ROOT / "docs" / "adr"
     base = {"README.md", "0000-template.md"}
@@ -674,6 +689,7 @@ def main() -> int:
         check_readme,
         check_journal,
         check_logs,
+        check_debt,
         check_adr,
         check_process,
         check_ci,

@@ -1,6 +1,6 @@
 # Процесс: красный не проходит
 
-Версия 0.9.5 · 22.10.2026
+Версия 0.9.6 · 22.10.2026
 
 Схема: `docs/scheme-process.png` (генерируется локально) ·
 Правила: [RULES.md](RULES.md) · Стратегия: [STRATEGY.md](STRATEGY.md)
@@ -59,6 +59,7 @@
 | rules | в `RULES.md` не десять правил, AGENTS-протокол неполный |
 | close-task | `cmd/**`/`deploy/**` изменены без features/ADR/DEBT/JOURNAL |
 | logs | тестовый/прод-лог не разделён, не в `.gitignore`, >100 КБ или >5 страниц |
+| debt | закрытый долг остался в `docs/DEBT.md` |
 | profile | `PROJECT.md` или `FEATURE.md` без обязательных разделов |
 | readme | нет быстрого старта |
 | journal | журнал решений пуст или без «почему» |
