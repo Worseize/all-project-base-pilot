@@ -1,6 +1,6 @@
 {
   "name": "all-project-base",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "date": "22.10.2026",
   "stack": "go",
   "commands": {
@@ -34,6 +34,7 @@
     "docs/BRANCH_PROTECTION.md",
     "docs/DEPENDENCIES.md",
     "docs/PILOT.md",
+    "docs/DEBT.md",
     "features/README.md",
     "features/0001-deadcode-json.md",
     "docs/RELEASE.md",

@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.9.3 — 2026-10-22
+
+- `verify.py --close-task`: красный, если `cmd/**`/`deploy/**` изменены
+  без `features/**`, `docs/adr/**`, `docs/DEBT.md` или `JOURNAL.md`.
+- Добавлен `docs/DEBT.md`; CI запускает close-task.
+- Тесты на close-task; `fetch-depth: 0` для diff.
+
 ## 0.9.2 — 2026-10-22
 
 - PNG-схемы убраны из git: генерируются локально, `.gitignore`.
@@ -7,6 +14,8 @@
 - CI генерирует схемы и проверяет drift `docs/schemes.lock.json`.
 - Ссылки на PNG заменены на команду генерации.
 - Репозиторий public; branch protection включён: PR + два `verify`-чека.
+- AGENTS: обязательная таблица «правило → как выполнено» до первой правки
+  и отчёт по DoD с доказательствами перед «готово».
 
 ## 0.9.1 — 2026-10-22
 

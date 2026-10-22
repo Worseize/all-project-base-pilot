@@ -109,6 +109,7 @@ zero-dep стек:
 
 ```bash
 python verify.py                 # red gate
+python verify.py --close-task    # код без features/ADR/DEBT/JOURNAL — красный
 python verify.py --update-schemes  # перерисовать схемы и обновить lock
 python -m unittest discover -s tests
 go run ./cmd/deadcode            # unexported func/type/var/const
