@@ -290,6 +290,28 @@ class VerifyTests(unittest.TestCase):
         verify.check_logs(gate)
         self.assertEqual(gate.failed, 1)
 
+    def test_debt_accepts_open_only(self):
+        docs = verify.ROOT / "docs"
+        docs.mkdir()
+        (docs / "DEBT.md").write_text(
+            "# DEBT\n\n## Открытый долг\n\nНет открытого долга.\n",
+            encoding="utf-8",
+        )
+        gate = verify.Gate()
+        verify.check_debt(gate)
+        self.assertEqual(gate.failed, 0)
+
+    def test_debt_rejects_closed_section(self):
+        docs = verify.ROOT / "docs"
+        docs.mkdir()
+        (docs / "DEBT.md").write_text(
+            "# DEBT\n\n## Открытый долг\n\n## Закрытый долг\n",
+            encoding="utf-8",
+        )
+        gate = verify.Gate()
+        verify.check_debt(gate)
+        self.assertEqual(gate.failed, 1)
+
     def test_close_task_accepts_no_code(self):
         self.assertIsNone(verify.close_task_violation(["docs/README.md"]))
 
