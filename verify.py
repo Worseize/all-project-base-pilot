@@ -250,7 +250,19 @@ def check_rules(gate: Gate) -> None:
     if f"{expected}. " not in agents:
         gate.fail("rules", "AGENTS.md не содержит полный индекс")
         return
-    gate.ok("rules", f"{expected} правил")
+    required_agents = [
+        "## Обязательный старт сессии",
+        "## Обязательное закрытие",
+        "## Определение готовности",
+    ]
+    missing_agents = [token for token in required_agents if token not in agents]
+    if missing_agents:
+        gate.fail("rules", "AGENTS.md: нет " + ", ".join(missing_agents))
+        return
+    if "## Определение готовности" not in text:
+        gate.fail("rules", "RULES.md: нет раздела «Определение готовности»")
+        return
+    gate.ok("rules", f"{expected} правил + AGENTS-протокол")
 
 
 def check_sections(gate: Gate, path: str, sections: list[str], name: str) -> None:
