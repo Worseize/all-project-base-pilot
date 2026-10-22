@@ -3,6 +3,9 @@ __pycache__/
 .venv/
 venv/
 bin/
+tests/test.log
+var/log/
+*.log
 docs/scheme-*.png
 github-secret.txt
 githubkey.txt

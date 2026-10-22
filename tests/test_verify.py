@@ -210,6 +210,48 @@ class VerifyTests(unittest.TestCase):
         self.assertEqual(gate.failed, 0)
 
 
+    def test_logs_are_separate(self):
+        (verify.ROOT / "JOURNAL.md").write_text("decisions", encoding="utf-8")
+        (verify.ROOT / ".gitignore").write_text("*.log\nvar/log/\n", encoding="utf-8")
+        verify.CONFIG = {
+            "logs": {
+                "test": "tests/test.log",
+                "app": "var/log/app.log",
+                "decisions": "JOURNAL.md",
+            }
+        }
+        gate = verify.Gate()
+        verify.check_logs(gate)
+        self.assertEqual(gate.failed, 0)
+
+    def test_logs_cannot_use_journal(self):
+        (verify.ROOT / "JOURNAL.md").write_text("decisions", encoding="utf-8")
+        (verify.ROOT / ".gitignore").write_text("*.log\n", encoding="utf-8")
+        verify.CONFIG = {
+            "logs": {
+                "test": "JOURNAL.md",
+                "app": "var/log/app.log",
+                "decisions": "JOURNAL.md",
+            }
+        }
+        gate = verify.Gate()
+        verify.check_logs(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_logs_must_be_ignored(self):
+        (verify.ROOT / "JOURNAL.md").write_text("decisions", encoding="utf-8")
+        (verify.ROOT / ".gitignore").write_text("", encoding="utf-8")
+        verify.CONFIG = {
+            "logs": {
+                "test": "tests/test.log",
+                "app": "var/log/app.log",
+                "decisions": "JOURNAL.md",
+            }
+        }
+        gate = verify.Gate()
+        verify.check_logs(gate)
+        self.assertEqual(gate.failed, 1)
+
     def test_close_task_accepts_no_code(self):
         self.assertIsNone(verify.close_task_violation(["docs/README.md"]))
 

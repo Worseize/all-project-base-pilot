@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.9.4 — 2026-10-22
+
+- Логи разделены: `tests/test.log`, `var/log/app.log`, `JOURNAL.md` — решения.
+- `verify.py` проверяет разные пути и `.gitignore`.
+- `docs/LOGGING.md`; тесты на `check_logs`.
+- Правило 10 и схема правил обновлены.
+
 ## 0.9.3 — 2026-10-22
 
 - `verify.py --close-task`: красный, если `cmd/**`/`deploy/**` изменены

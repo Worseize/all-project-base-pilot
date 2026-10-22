@@ -63,6 +63,8 @@ Go, только стандартная библиотека. Никаких npm
 `python verify.py --update-schemes`.
 
 Стратегия, дорожная карта и очередь улучшений — `STRATEGY.md`.
+Логи: `tests/test.log` — тесты, `var/log/app.log` — прод,
+`JOURNAL.md` — только решения; код и тесты в журнал не пишут.
 Схемы: `docs/scheme-strategy.png`, `docs/scheme-roadmap.png` — генерируются
 локально, в git не хранятся.
 

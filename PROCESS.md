@@ -1,6 +1,6 @@
 # Процесс: красный не проходит
 
-Версия 0.9.3 · 22.10.2026
+Версия 0.9.4 · 22.10.2026
 
 Схема: `docs/scheme-process.png` (генерируется локально) ·
 Правила: [RULES.md](RULES.md) · Стратегия: [STRATEGY.md](STRATEGY.md)
@@ -58,6 +58,7 @@
 | schemes lock | источники изменились, схемы не перерисованы |
 | rules | в `RULES.md` не десять правил, AGENTS-протокол неполный |
 | close-task | `cmd/**`/`deploy/**` изменены без features/ADR/DEBT/JOURNAL |
+| logs | тестовый/прод-лог не разделён или не в `.gitignore` |
 | profile | `PROJECT.md` или `FEATURE.md` без обязательных разделов |
 | readme | нет быстрого старта |
 | journal | журнал решений пуст или без «почему» |

@@ -86,6 +86,7 @@ zero-dep стек:
 - [Backup и restore](docs/BACKUP.md)
 - [Миграции](docs/MIGRATIONS.md)
 - [Секреты](docs/SECRETS.md)
+- [Логи](docs/LOGGING.md)
 - [Branch protection](docs/BRANCH_PROTECTION.md)
 
 ## CI

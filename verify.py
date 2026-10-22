@@ -304,6 +304,32 @@ def check_journal(gate: Gate) -> None:
         gate.ok("journal", f"{len(entries)} записей")
 
 
+def check_logs(gate: Gate) -> None:
+    logs = CONFIG.get("logs", {})
+    test_log = str(logs.get("test", "")).strip()
+    app_log = str(logs.get("app", "")).strip()
+    decisions = str(logs.get("decisions", "")).strip()
+    if not test_log or not app_log or not decisions:
+        gate.fail("logs", "в project.json нет logs.test/app/decisions")
+        return
+    if len({test_log, app_log, decisions}) != 3:
+        gate.fail("logs", "тестовый, прод- и рабочий журнал должны быть разными")
+        return
+    if not (ROOT / decisions).is_file():
+        gate.fail("logs", f"нет журнала решений: {decisions}")
+        return
+    ignore = (ROOT / ".gitignore").read_text(encoding="utf-8", errors="replace")
+    missing = []
+    for path in (test_log, app_log):
+        parent = str(Path(path).parent).replace("\\", "/") + "/"
+        if path not in ignore and "*.log" not in ignore and parent not in ignore:
+            missing.append(path)
+    if missing:
+        gate.fail("logs", "логи не в .gitignore: " + ", ".join(missing))
+    else:
+        gate.ok("logs", f"test -> {test_log}, app -> {app_log}, decisions -> {decisions}")
+
+
 def check_adr(gate: Gate) -> None:
     adr = ROOT / "docs" / "adr"
     base = {"README.md", "0000-template.md"}
@@ -616,6 +642,7 @@ def main() -> int:
         check_project,
         check_readme,
         check_journal,
+        check_logs,
         check_adr,
         check_process,
         check_ci,
