@@ -1,18 +1,18 @@
 {
-  "version": "0.9.3",
+  "version": "0.9.5",
   "date": "22.10.2026",
   "schemes": {
     "docs/scheme-rules.png": {
-      "source_sha": "50d7b3db1a3c974b61e380f0e1c7d93da1899cc0e6e9faee09fdf2c0b95f05f5"
+      "source_sha": "92bc8a9f93d7714780dc95f03c01461b7043ce43b89d57588f49a2a06ca9895a"
     },
     "docs/scheme-strategy.png": {
-      "source_sha": "26955dadb3d8137796a8881e02630315a809de3e6e2088b5b3be1574ec5d6e49"
+      "source_sha": "5c4f420d78525eb3f69a061b98ecbfed67106d3eeec5f2aac6182d2de5a441ce"
     },
     "docs/scheme-roadmap.png": {
-      "source_sha": "26955dadb3d8137796a8881e02630315a809de3e6e2088b5b3be1574ec5d6e49"
+      "source_sha": "5c4f420d78525eb3f69a061b98ecbfed67106d3eeec5f2aac6182d2de5a441ce"
     },
     "docs/scheme-process.png": {
-      "source_sha": "60f26599b88f5b35e8c8ea98c3c7d754de81b169d660836b35542b7c3aae9eb1"
+      "source_sha": "378f0edd966544c711f466477a5e2f061d3f3955941f60ae147a215222768ba8"
     }
   }
 }
