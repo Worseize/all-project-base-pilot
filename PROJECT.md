@@ -62,8 +62,8 @@ python -m unittest discover -s tests
 
 - Фича: [features/0001-deadcode-json.md](features/0001-deadcode-json.md).
 - CI: `github`; workflow готов.
-- Branch protection: **не включён** — нужен удалённый репозиторий и права
-  администратора. Локальный gate — `python verify.py`.
+- Branch protection: **remote не включён** — GitHub Free private отдаёт
+  `403`; локальный серверный gate проверен. Нужен public или GitHub Pro.
 - Метрики: [docs/PILOT.md](docs/PILOT.md).
 
 ## Локальные правила

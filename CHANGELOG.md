@@ -5,6 +5,8 @@
 - `.gitattributes`: LF для текста, binary для изображений/архивов.
 - Исправлен Windows CI: CRLF ломал `schemes lock`, `gofmt` и `fmt`.
 - `.gitattributes` добавлен в обязательные файлы.
+- GitHub Actions: Ubuntu + Windows success; local pre-receive gate
+  отклоняет красный push, удаление и force push.
 
 ## 0.9.0 — 2026-10-22
 

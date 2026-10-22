@@ -17,6 +17,26 @@
 **Последствия:** текст всегда LF на всех платформах; схемы и lock
 стабильны. Версия 0.9.1.
 
+## 2026-10-22 · 0.9.1 · Hosted CI и локальный gate
+
+**Решение:** проверили GitHub Actions на Ubuntu/Windows и локальный
+серверный gate на bare-репозитории.
+
+**Почему:** первый Windows-run упал на CRLF; после `.gitattributes`
+оба job’а зелёные. Branch protection на GitHub Free private недоступен,
+поэтому эквивалент проверен локально через `pre-receive`.
+
+**Отвергли:** делать репозиторий public без согласия пользователя;
+покупать GitHub Pro; считать зелёный локальный `verify.py` достаточным
+доказательством серверного запрета.
+
+**Последствия:** зелёный push принят за 3.20 с; красный отклонён за 1.96 с;
+удаление и force push запрещены. Remote protection требует public
+или GitHub Pro.
+
+**Ссылки:** [docs/PILOT.md](docs/PILOT.md),
+[.github/workflows/verify.yml](.github/workflows/verify.yml).
+
 **Ссылки:** [.gitattributes](.gitattributes), [PROCESS.md](PROCESS.md).
 
 ## 2026-10-22 · 0.9.0 · Пилот deadcode -json
