@@ -5,6 +5,7 @@ venv/
 bin/
 docs/scheme-*.png
 github-secret.txt
+githubkey.txt
 .env
 .env.*
 !.env.example
