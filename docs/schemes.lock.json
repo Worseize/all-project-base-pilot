@@ -1,22 +1,22 @@
 {
-  "version": "0.9.0",
+  "version": "0.9.1",
   "date": "22.10.2026",
   "schemes": {
     "docs/scheme-rules.png": {
-      "source_sha": "a246ffffab8cafc02c5c8bb31c8cf412f10f10670c26c16cb00a8aaea50f9fb7",
-      "image_sha": "ff665442b10f3a0412b5700bc7de5a44122568e77299a0a733e83d4a2b97d4d9"
+      "source_sha": "d38f86f45d44f92f66336d08330da388affc87bdbdf8ba457c9397153108bc29",
+      "image_sha": "282f767df6675515ad16e9f85e2f8b168f00ed8a8148a8b6ba28b9ee6758af8d"
     },
     "docs/scheme-strategy.png": {
-      "source_sha": "1ce7340dbca9a740d202d20edfeaff1168ebd10bc3273b9c861c0803b4bdfa98",
-      "image_sha": "1a58857efb45d661c92f04cca1f9b839a79763d77095ed29db7916908f1e1e89"
+      "source_sha": "1d3a647790340909bce5edd8b03d40fa1a75c01c6476320be71c2185c7d38b3a",
+      "image_sha": "8bef96ac22172f2ffae058b9c1466c1ff83194f8bf7a5c73956a49180f35337d"
     },
     "docs/scheme-roadmap.png": {
-      "source_sha": "1ce7340dbca9a740d202d20edfeaff1168ebd10bc3273b9c861c0803b4bdfa98",
-      "image_sha": "e2cdcdb81b553c4f8b3f08f5ff2b66c918c9ae004152b34f2a8d553a94071507"
+      "source_sha": "1d3a647790340909bce5edd8b03d40fa1a75c01c6476320be71c2185c7d38b3a",
+      "image_sha": "37a57e0d08711518bd77b0346721149d4193a4c68855710612866f0e6cd421e0"
     },
     "docs/scheme-process.png": {
-      "source_sha": "a244f4d32de9ebb3fef9f9391f03cdb7b12c7b717c385dedd40e09720cb66ef0",
-      "image_sha": "2d24dbc1e023e59df0eecf820d5e177f8503b0724524e101a996e41259ef5c47"
+      "source_sha": "123ee7d284ceb78d148454095c43b723a9f420d681754d657fcf55fe859d3be4",
+      "image_sha": "d13f35a84926e6002c5b17e69ec1222218140d6bd9f12ca7312afa7a2b1cbecf"
     }
   }
 }

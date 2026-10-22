@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.9.1 — 2026-10-22
+
+- `.gitattributes`: LF для текста, binary для изображений/архивов.
+- Исправлен Windows CI: CRLF ломал `schemes lock`, `gofmt` и `fmt`.
+- `.gitattributes` добавлен в обязательные файлы.
+
 ## 0.9.0 — 2026-10-22
 
 - Пилотная фича `deadcode -json`: машиночитаемый вывод, тест JSON.

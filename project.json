@@ -1,6 +1,6 @@
 {
   "name": "all-project-base",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "date": "22.10.2026",
   "stack": "go",
   "commands": {
@@ -22,6 +22,7 @@
     "CHANGELOG.md",
     "LICENSE",
     ".env.example",
+    ".gitattributes",
     "go.mod",
     "verify.py",
     "project.json",
