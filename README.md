@@ -38,7 +38,7 @@ python verify.py --update-schemes
 | `verify.py` | red gate: 0 — зелёный, иначе деплой запрещён |
 | `JOURNAL.md` | короткие решения с «почему» |
 | `docs/adr/` | значимые архитектурные решения |
-| `docs/scheme-*.png` | схемы правил, стратегии, дорожной карты и процесса |
+| `docs/scheme-*.png` | схемы генерируются локально, в git не хранятся |
 
 ## Зависимости
 
@@ -55,6 +55,10 @@ python verify.py --update-schemes
   `python -m pip install pillow`.
 - **Шрифт** — `docs/fonts/DejaVuSans.ttf` или системный Arial/DejaVu.
   Подробнее: [docs/fonts/README.md](docs/fonts/README.md).
+
+PNG не коммитятся: `python verify.py --update-schemes` создаёт их локально,
+они перечислены в `.gitignore`. Без PNG `verify.py` пропускает проверку
+схем; CI генерирует их и проверяет drift lock.
 
 ## Другой стек
 

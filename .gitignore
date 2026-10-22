@@ -3,6 +3,7 @@ __pycache__/
 .venv/
 venv/
 bin/
+docs/scheme-*.png
 github-secret.txt
 .env
 .env.*

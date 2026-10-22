@@ -1,8 +1,8 @@
 # Процесс: красный не проходит
 
-Версия 0.9.1 · 22.10.2026
+Версия 0.9.2 · 22.10.2026
 
-Схема: [docs/scheme-process.png](docs/scheme-process.png) ·
+Схема: `docs/scheme-process.png` (генерируется локально) ·
 Правила: [RULES.md](RULES.md) · Стратегия: [STRATEGY.md](STRATEGY.md)
 
 ## Цепочка

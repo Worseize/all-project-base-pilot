@@ -1,6 +1,6 @@
 {
   "name": "all-project-base",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "date": "22.10.2026",
   "stack": "go",
   "commands": {
@@ -28,10 +28,6 @@
     "project.json",
     "cmd/deadcode/main.go",
     "cmd/deadcode/main_test.go",
-    "docs/scheme-rules.png",
-    "docs/scheme-strategy.png",
-    "docs/scheme-roadmap.png",
-    "docs/scheme-process.png",
     "docs/schemes.lock.json",
     "docs/adr/README.md",
     "docs/adr/0000-template.md",

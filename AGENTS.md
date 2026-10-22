@@ -23,10 +23,11 @@ Go, только стандартная библиотека. Никаких npm
 `python verify.py --update-schemes`.
 
 Стратегия, дорожная карта и очередь улучшений — `STRATEGY.md`.
-Схемы: `docs/scheme-strategy.png`, `docs/scheme-roadmap.png`.
+Схемы: `docs/scheme-strategy.png`, `docs/scheme-roadmap.png` — генерируются
+локально, в git не хранятся.
 
 Профиль проекта — `PROJECT.md`, карточка фичи — `FEATURE.md`,
 быстрый старт — `README.md`. Процесс и red gate — `PROCESS.md`,
-схема — `docs/scheme-process.png`.
+схема — `docs/scheme-process.png` (генерируется).
 Перед закрытием: `python verify.py` — только зелёный; мёртвый код —
 `go run ./cmd/deadcode`; запись в `JOURNAL.md` или `docs/adr/`.

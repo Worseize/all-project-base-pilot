@@ -1,22 +1,18 @@
 {
-  "version": "0.9.1",
+  "version": "0.9.2",
   "date": "22.10.2026",
   "schemes": {
     "docs/scheme-rules.png": {
-      "source_sha": "d38f86f45d44f92f66336d08330da388affc87bdbdf8ba457c9397153108bc29",
-      "image_sha": "282f767df6675515ad16e9f85e2f8b168f00ed8a8148a8b6ba28b9ee6758af8d"
+      "source_sha": "f0a5c0b24e0ed5a836c24a4734842a30f1e1aed3e6e82b8a3b87b9e54d8ed421"
     },
     "docs/scheme-strategy.png": {
-      "source_sha": "1d3a647790340909bce5edd8b03d40fa1a75c01c6476320be71c2185c7d38b3a",
-      "image_sha": "8bef96ac22172f2ffae058b9c1466c1ff83194f8bf7a5c73956a49180f35337d"
+      "source_sha": "86530ce37c8e8aaace950538114132bcd5b729f879085fd3250fca533fa4432a"
     },
     "docs/scheme-roadmap.png": {
-      "source_sha": "1d3a647790340909bce5edd8b03d40fa1a75c01c6476320be71c2185c7d38b3a",
-      "image_sha": "37a57e0d08711518bd77b0346721149d4193a4c68855710612866f0e6cd421e0"
+      "source_sha": "86530ce37c8e8aaace950538114132bcd5b729f879085fd3250fca533fa4432a"
     },
     "docs/scheme-process.png": {
-      "source_sha": "123ee7d284ceb78d148454095c43b723a9f420d681754d657fcf55fe859d3be4",
-      "image_sha": "d13f35a84926e6002c5b17e69ec1222218140d6bd9f12ca7312afa7a2b1cbecf"
+      "source_sha": "18eb5a5b9f9239d39de6f24eb3bffb8fc9462cffbe33d4a893cd7ab76c18b27c"
     }
   }
 }
