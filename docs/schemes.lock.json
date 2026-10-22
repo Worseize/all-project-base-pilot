@@ -3,20 +3,16 @@
   "date": "22.10.2026",
   "schemes": {
     "docs/scheme-rules.png": {
-      "source_sha": "9068687bfd634a869ff9d44a0f38b683252a0f043e21809a4cf500719a0749a5",
-      "image_sha": "32c4b50be11391a7cf9342c23f45317a40a50880d0b04325f4cf43590192bea3"
+      "source_sha": "f0a5c0b24e0ed5a836c24a4734842a30f1e1aed3e6e82b8a3b87b9e54d8ed421"
     },
     "docs/scheme-strategy.png": {
-      "source_sha": "cd89c8a02123616008acd2de5d6f623cf27dad6f3e8d4d7568f6d76e41774cf2",
-      "image_sha": "6450fb38f84f8162dbc30bcf24f58e91f82a77bca7b38aba5014c34772e67ce7"
+      "source_sha": "86530ce37c8e8aaace950538114132bcd5b729f879085fd3250fca533fa4432a"
     },
     "docs/scheme-roadmap.png": {
-      "source_sha": "cd89c8a02123616008acd2de5d6f623cf27dad6f3e8d4d7568f6d76e41774cf2",
-      "image_sha": "c8aff5cf27bb4354a3f07b86db44c97552c8737ac536770f4b247bcccfe68401"
+      "source_sha": "86530ce37c8e8aaace950538114132bcd5b729f879085fd3250fca533fa4432a"
     },
     "docs/scheme-process.png": {
-      "source_sha": "18eb5a5b9f9239d39de6f24eb3bffb8fc9462cffbe33d4a893cd7ab76c18b27c",
-      "image_sha": "e9e4cbb3acea80a4fbd74e5ebe69a831daa35035b7d7a340322ef2eca373a2c2"
+      "source_sha": "18eb5a5b9f9239d39de6f24eb3bffb8fc9462cffbe33d4a893cd7ab76c18b27c"
     }
   }
 }

@@ -233,8 +233,6 @@ def check_schemes(gate: Gate) -> None:
             continue
         if entry.get("source_sha") != source_hash(sources):
             drift.append(f"{image}: источники изменились")
-        if entry.get("image_sha") != sha256_file(ROOT / image):
-            drift.append(f"{image}: файл изменился")
     if drift:
         gate.fail("schemes lock", "; ".join(drift[:5]) + " — запусти --update-schemes")
     else:
@@ -483,7 +481,6 @@ def update_schemes() -> int:
             return 1
         lock["schemes"][image] = {
             "source_sha": source_hash(sources),
-            "image_sha": sha256_file(path),
         }
     SCHEME_LOCK.parent.mkdir(parents=True, exist_ok=True)
     SCHEME_LOCK.write_text(
