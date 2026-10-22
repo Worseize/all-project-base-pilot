@@ -304,13 +304,26 @@ def check_journal(gate: Gate) -> None:
         gate.ok("journal", f"{len(entries)} записей")
 
 
+def log_pages(path: Path) -> list[Path]:
+    if path.name == "JOURNAL.md":
+        candidates = [path] + sorted(path.parent.glob("JOURNAL.*.md"))
+    else:
+        candidates = [path] + sorted(path.parent.glob(path.name + ".*"))
+    return [item for item in candidates if item.is_file()]
+
+
 def check_logs(gate: Gate) -> None:
     logs = CONFIG.get("logs", {})
     test_log = str(logs.get("test", "")).strip()
     app_log = str(logs.get("app", "")).strip()
     decisions = str(logs.get("decisions", "")).strip()
+    max_bytes = int(logs.get("max_bytes", 102400))
+    max_pages = int(logs.get("max_pages", 5))
     if not test_log or not app_log or not decisions:
         gate.fail("logs", "в project.json нет logs.test/app/decisions")
+        return
+    if max_bytes <= 0 or max_pages <= 0:
+        gate.fail("logs", "max_bytes и max_pages должны быть больше нуля")
         return
     if len({test_log, app_log, decisions}) != 3:
         gate.fail("logs", "тестовый, прод- и рабочий журнал должны быть разными")
@@ -326,8 +339,26 @@ def check_logs(gate: Gate) -> None:
             missing.append(path)
     if missing:
         gate.fail("logs", "логи не в .gitignore: " + ", ".join(missing))
+        return
+    over_pages = []
+    over_size = []
+    for path in (test_log, app_log, decisions):
+        pages = log_pages(ROOT / path)
+        if len(pages) > max_pages:
+            over_pages.append(f"{path}: {len(pages)} > {max_pages}")
+        for page in pages:
+            if page.stat().st_size > max_bytes:
+                over_size.append(
+                    f"{page.relative_to(ROOT)}: {page.stat().st_size} > {max_bytes}"
+                )
+    if over_pages or over_size:
+        gate.fail("logs", "; ".join(over_pages + over_size))
     else:
-        gate.ok("logs", f"test -> {test_log}, app -> {app_log}, decisions -> {decisions}")
+        gate.ok(
+            "logs",
+            f"test -> {test_log}, app -> {app_log}, decisions -> {decisions}; "
+            f"≤{max_bytes} Б, ≤{max_pages} страниц",
+        )
 
 
 def check_adr(gate: Gate) -> None:

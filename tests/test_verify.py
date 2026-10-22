@@ -252,6 +252,44 @@ class VerifyTests(unittest.TestCase):
         verify.check_logs(gate)
         self.assertEqual(gate.failed, 1)
 
+    def test_logs_size_limit(self):
+        (verify.ROOT / "JOURNAL.md").write_text("decisions", encoding="utf-8")
+        (verify.ROOT / ".gitignore").write_text("*.log\n", encoding="utf-8")
+        (verify.ROOT / "tests").mkdir()
+        (verify.ROOT / "tests" / "test.log").write_bytes(b"x" * 11)
+        verify.CONFIG = {
+            "logs": {
+                "test": "tests/test.log",
+                "app": "var/log/app.log",
+                "decisions": "JOURNAL.md",
+                "max_bytes": 10,
+                "max_pages": 5,
+            }
+        }
+        gate = verify.Gate()
+        verify.check_logs(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_logs_page_limit(self):
+        (verify.ROOT / "JOURNAL.md").write_text("decisions", encoding="utf-8")
+        (verify.ROOT / ".gitignore").write_text("*.log\n", encoding="utf-8")
+        (verify.ROOT / "tests").mkdir()
+        for index in range(6):
+            name = "test.log" if index == 0 else f"test.log.{index}"
+            (verify.ROOT / "tests" / name).write_text("x", encoding="utf-8")
+        verify.CONFIG = {
+            "logs": {
+                "test": "tests/test.log",
+                "app": "var/log/app.log",
+                "decisions": "JOURNAL.md",
+                "max_bytes": 102400,
+                "max_pages": 5,
+            }
+        }
+        gate = verify.Gate()
+        verify.check_logs(gate)
+        self.assertEqual(gate.failed, 1)
+
     def test_close_task_accepts_no_code(self):
         self.assertIsNone(verify.close_task_violation(["docs/README.md"]))
 
