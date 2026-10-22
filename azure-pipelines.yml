@@ -1,0 +1,24 @@
+trigger:
+  - main
+
+pr:
+  - main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: "3.12"
+    displayName: Python 3.12
+  - task: GoTool@0
+    inputs:
+      version: "1.27"
+    displayName: Go 1.27
+  - script: python verify.py
+    displayName: red gate
+  - script: python -m unittest discover -s tests -v
+    displayName: gate tests
+  - script: cd examples/minimal-go && go test ./...
+    displayName: example microblock

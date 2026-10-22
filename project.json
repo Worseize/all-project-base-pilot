@@ -1,0 +1,87 @@
+{
+  "name": "all-project-base",
+  "version": "0.9.0",
+  "date": "22.10.2026",
+  "stack": "go",
+  "commands": {
+    "build": "go build -o bin/ ./...",
+    "test": "go test ./...",
+    "vet": "go vet ./...",
+    "fmt": "gofmt -l .",
+    "deadcode": "go run ./cmd/deadcode"
+  },
+  "required": [
+    "README.md",
+    "RULES.md",
+    "AGENTS.md",
+    "PROJECT.md",
+    "FEATURE.md",
+    "STRATEGY.md",
+    "PROCESS.md",
+    "JOURNAL.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    ".env.example",
+    "go.mod",
+    "verify.py",
+    "project.json",
+    "cmd/deadcode/main.go",
+    "cmd/deadcode/main_test.go",
+    "docs/scheme-rules.png",
+    "docs/scheme-strategy.png",
+    "docs/scheme-roadmap.png",
+    "docs/scheme-process.png",
+    "docs/schemes.lock.json",
+    "docs/adr/README.md",
+    "docs/adr/0000-template.md",
+    "docs/BRANCH_PROTECTION.md",
+    "docs/DEPENDENCIES.md",
+    "docs/PILOT.md",
+    "features/README.md",
+    "features/0001-deadcode-json.md",
+    "docs/RELEASE.md",
+    "docs/BACKUP.md",
+    "docs/MIGRATIONS.md",
+    "docs/SECRETS.md",
+    "docs/fonts/README.md",
+    "tests/test_verify.py",
+    "examples/minimal-go/README.md",
+    "examples/minimal-go/go.mod",
+    "examples/minimal-go/microblock.go",
+    "examples/minimal-go/microblock_test.go"
+  ],
+  "rules_count": 10,
+  "adr_min": 2,
+  "forbid_npm": true,
+  "ci": ["github"],
+  "project_sections": ["Назначение", "Стек", "Команды", "Границы", "Данные", "Окружения", "Исключения"],
+  "feature_sections": ["Цель", "Схема плана", "Контракт", "Тесты", "Откат", "Готовность"],
+  "schemes": {
+    "docs/scheme-rules.png": ["RULES.md", "docs/make_rules_scheme.py", "docs/scheme_config.py", "project.json#render"],
+    "docs/scheme-strategy.png": ["STRATEGY.md", "docs/make_strategy_schemes.py", "docs/scheme_config.py", "project.json#render"],
+    "docs/scheme-roadmap.png": ["STRATEGY.md", "docs/make_strategy_schemes.py", "docs/scheme_config.py", "project.json#render"],
+    "docs/scheme-process.png": ["PROCESS.md", "docs/make_process_scheme.py", "docs/scheme_config.py", "project.json#render"]
+  },
+  "scheme_generators": {
+    "docs/make_rules_scheme.py": ["docs/scheme-rules.png"],
+    "docs/make_strategy_schemes.py": ["docs/scheme-strategy.png", "docs/scheme-roadmap.png"],
+    "docs/make_process_scheme.py": ["docs/scheme-process.png"]
+  },
+  "scheme_lock": "docs/schemes.lock.json",
+  "fonts": {
+    "regular": [
+      "docs/fonts/DejaVuSans.ttf",
+      "C:/Windows/Fonts/arial.ttf",
+      "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+      "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+      "/System/Library/Fonts/Supplemental/Arial.ttf"
+    ],
+    "bold": [
+      "docs/fonts/DejaVuSans-Bold.ttf",
+      "C:/Windows/Fonts/arialbd.ttf",
+      "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+      "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+      "/System/Library/Fonts/Supplemental/Arial Bold.ttf"
+    ]
+  }
+}

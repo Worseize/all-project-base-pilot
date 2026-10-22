@@ -1,0 +1,14 @@
+stages:
+  - verify
+
+verify:
+  stage: verify
+  image: golang:1.27
+  before_script:
+    - apt-get update
+    - apt-get install -y --no-install-recommends python3
+  script:
+    - python3 verify.py
+    - python3 -m unittest discover -s tests
+    - cd examples/minimal-go
+    - go test ./...
