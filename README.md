@@ -38,27 +38,23 @@ python verify.py --update-schemes
 | `verify.py` | red gate: 0 — зелёный, иначе деплой запрещён |
 | `JOURNAL.md` | короткие решения с «почему» |
 | `docs/adr/` | значимые архитектурные решения |
-| `docs/scheme-*.png` | схемы генерируются локально, в git не хранятся |
+| `docs/scheme-*.svg` | схемы в git, текст; генерируются Go |
 
 ## Зависимости
 
-Продукт — ноль сторонних зависимостей. Go toolchain, Python, Pillow, Git
-и CI — отдельные контуры: инструменты и инфраструктура, не поставка.
+Продукт — ноль сторонних зависимостей. Go toolchain, Python (только gate),
+Git и CI — отдельные контуры. Схемы — Go stdlib + SVG, без Pillow.
 Подробно: [docs/DEPENDENCIES.md](docs/DEPENDENCIES.md). Git и CI не обязательны.
 
 ## Требования
 
 - **Go** — для продукта; `verify.py` запускает `go vet`, `go test`, `go build`,
   `gofmt`, если есть `go.mod`.
-- **Python 3.11+** — для `verify.py` и генераторов схем.
-- **Pillow** — только для перерисовки схем, не для продукта:
-  `python -m pip install pillow`.
-- **Шрифт** — `docs/fonts/DejaVuSans.ttf` или системный Arial/DejaVu.
-  Подробнее: [docs/fonts/README.md](docs/fonts/README.md).
+- **Python 3.11+** — только для `verify.py`.
+- **Go** — также генератор SVG: `go run ./cmd/schemes -write`.
 
-PNG не коммитятся: `python verify.py --update-schemes` создаёт их локально,
-они перечислены в `.gitignore`. Без PNG `verify.py` пропускает проверку
-схем; CI генерирует их и проверяет drift lock.
+SVG лежат в git как текст. `verify.py` запускает `go run ./cmd/schemes -check`
+и сравнивает содержимое; lock-файл схем не нужен.
 
 ## Другой стек
 
@@ -134,7 +130,7 @@ go run ./cmd/deadcode -json      # то же в JSON для CI/отчётов
 - `python -m unittest discover -s tests` — зелёный.
 - `go run ./cmd/deadcode` — зелёный.
 - `examples/minimal-go` проходит `go test`.
-- Схемы перерисованы, `docs/schemes.lock.json` обновлён.
+- Схемы SVG обновлены: `go run ./cmd/schemes -write`.
 - Branch protection требует `verify`: [docs/BRANCH_PROTECTION.md](docs/BRANCH_PROTECTION.md).
 
 Версия шаблона — `project.json.version`.

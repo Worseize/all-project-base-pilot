@@ -67,11 +67,11 @@ Go, только стандартная библиотека. Никаких npm
 Логи: `tests/test.log` — тесты, `var/log/app.log` — прод,
 `JOURNAL.md` — только решения; код и тесты в журнал не пишут.
 Лимит: 100 КБ на страницу, максимум 5 страниц на поток.
-Схемы: `docs/scheme-strategy.png`, `docs/scheme-roadmap.png` — генерируются
-локально, в git не хранятся.
+Схемы: `docs/scheme-strategy.svg`, `docs/scheme-roadmap.svg` — текст в git,
+генерируются Go.
 
 Профиль проекта — `PROJECT.md`, карточка фичи — `FEATURE.md`,
 быстрый старт — `README.md`. Процесс и red gate — `PROCESS.md`,
-схема — `docs/scheme-process.png` (генерируется).
+схема — `docs/scheme-process.svg`.
 Перед закрытием: `python verify.py` — только зелёный; мёртвый код —
 `go run ./cmd/deadcode`; запись в `JOURNAL.md` или `docs/adr/`.

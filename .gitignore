@@ -6,7 +6,6 @@ bin/
 tests/test.log
 var/log/
 *.log
-docs/scheme-*.png
 github-secret.txt
 githubkey.txt
 githubapikey.txt

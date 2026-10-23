@@ -12,7 +12,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 import math
 import os
@@ -29,10 +28,9 @@ VERSION = str(CONFIG.get("version", "0.0.0"))
 DATE = str(CONFIG.get("date", ""))
 REQUIRED = list(CONFIG.get("required", []))
 SCHEMES = dict(CONFIG.get("schemes", {}))
-SCHEME_LOCK = ROOT / CONFIG.get("scheme_lock", "docs/schemes.lock.json")
 
 TEXT_EXT = {
-    ".md", ".py", ".go", ".yml", ".yaml", ".json",
+    ".md", ".py", ".go", ".yml", ".yaml", ".json", ".svg",
     ".ps1", ".sh", ".txt", ".mod", ".sum", ".toml",
 }
 SKIP_DIRS = {".git", "__pycache__", ".venv", "node_modules", "dist", "build", "bin", "vendor"}
@@ -70,32 +68,6 @@ def walk_files():
         dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
         for name in filenames:
             yield Path(dirpath) / name
-
-
-def sha256_file(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
-def source_hash(sources: list[str]) -> str:
-    digest = hashlib.sha256()
-    for source in sources:
-        digest.update(source.encode("utf-8"))
-        digest.update(b"\0")
-        if source == "project.json#render":
-            render = {key: CONFIG.get(key) for key in ("version", "date", "fonts")}
-            digest.update(json.dumps(render, ensure_ascii=False, sort_keys=True).encode("utf-8"))
-        else:
-            path = ROOT / source
-            if path.is_file():
-                digest.update(path.read_bytes())
-            else:
-                digest.update(b"<missing>")
-        digest.update(b"\0")
-    return digest.hexdigest()
 
 
 def check_required(gate: Gate) -> None:
@@ -202,42 +174,23 @@ def check_schemes(gate: Gate) -> None:
     if not SCHEMES:
         gate.fail("schemes", "в project.json нет схем")
         return
-    present = [image for image in SCHEMES if (ROOT / image).is_file()]
-    if not present:
-        gate.skip("schemes", "PNG не сгенерированы; запусти --update-schemes")
+    missing = [image for image in SCHEMES if not (ROOT / image).is_file()]
+    if missing:
+        gate.fail("schemes", "нет SVG: " + ", ".join(missing))
         return
-    bad = []
-    for image in SCHEMES:
-        path = ROOT / image
-        if not path.is_file():
-            bad.append(f"{image}: нет файла")
-        elif path.stat().st_size < 10_000:
-            bad.append(f"{image}: меньше 10 КБ")
-        elif path.read_bytes()[:8] != b"\x89PNG\r\n\x1a\n":
-            bad.append(f"{image}: не PNG")
-    if bad:
-        gate.fail("schemes", ", ".join(bad))
+    go = shutil.which("go")
+    if not go:
+        gate.skip("schemes", "go не установлен")
         return
-
-    if not SCHEME_LOCK.is_file():
-        gate.fail("schemes lock", "нет lock; запусти python verify.py --update-schemes")
-        return
-    lock = json.loads(SCHEME_LOCK.read_text(encoding="utf-8"))
-    if lock.get("version") != VERSION:
-        gate.fail("schemes lock", f"lock версии {lock.get('version')}, шаблон {VERSION}")
-        return
-    drift = []
-    for image, sources in SCHEMES.items():
-        entry = lock.get("schemes", {}).get(image)
-        if not entry:
-            drift.append(f"{image}: нет в lock")
-            continue
-        if entry.get("source_sha") != source_hash(sources):
-            drift.append(f"{image}: источники изменились")
-    if drift:
-        gate.fail("schemes lock", "; ".join(drift[:5]) + " — запусти --update-schemes")
+    result = subprocess.run(
+        [go, "run", "./cmd/schemes", "-check"],
+        cwd=ROOT, text=True, capture_output=True, timeout=180,
+    )
+    if result.returncode != 0:
+        tail = (result.stdout + result.stderr).strip().splitlines()
+        gate.fail("schemes", " | ".join(tail[-4:]))
     else:
-        gate.ok("schemes lock", f"{len(SCHEMES)} схем")
+        gate.ok("schemes", f"{len(SCHEMES)} SVG")
 
 
 def check_rules(gate: Gate) -> None:
@@ -638,28 +591,21 @@ def update_schemes() -> int:
     if not CONFIG:
         print("RED: нет project.json")
         return 1
-    for script in CONFIG.get("scheme_generators", {}):
-        print(f"  генерирую: {script}")
-        result = subprocess.run([sys.executable, script], cwd=ROOT, text=True, capture_output=True)
-        if result.returncode != 0:
-            print(result.stdout)
-            print(result.stderr)
-            print(f"RED: генератор {script} упал")
-            return 1
-    lock = {"version": VERSION, "date": DATE, "schemes": {}}
-    for image, sources in SCHEMES.items():
-        path = ROOT / image
-        if not path.is_file():
-            print(f"RED: нет схемы {image}")
-            return 1
-        lock["schemes"][image] = {
-            "source_sha": source_hash(sources),
-        }
-    SCHEME_LOCK.parent.mkdir(parents=True, exist_ok=True)
-    SCHEME_LOCK.write_text(
-        json.dumps(lock, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    go = shutil.which("go")
+    if not go:
+        print("RED: go не установлен")
+        return 1
+    result = subprocess.run(
+        [go, "run", "./cmd/schemes", "-write"],
+        cwd=ROOT, text=True, capture_output=True, timeout=180,
     )
-    print(f"GREEN: схемы и lock обновлены ({SCHEME_LOCK.relative_to(ROOT)})")
+    if result.returncode != 0:
+        print(result.stdout)
+        print(result.stderr)
+        print("RED: генератор SVG упал")
+        return 1
+    print(result.stdout.strip())
+    print("GREEN: SVG обновлены; lock не нужен")
     return 0
 
 

@@ -1,0 +1,219 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="5322" viewBox="0 0 1400 5322">
+<rect width="1400" height="100%" fill="#f7f9fc"/>
+<style>text{font-family:'DejaVu Sans',Arial,sans-serif;fill:#172033}.title{font-size:32px;font-weight:700}.sub{font-size:14px;fill:#667085}.h2{font-size:22px;font-weight:700;fill:#1d4ed8}.h3{font-size:18px;font-weight:700;fill:#172033}.p{font-size:15px}.bullet{font-size:15px}.table{font-family:'DejaVu Sans Mono',monospace;font-size:13px}</style>
+<text x="60" y="64" class="title">Стратегия</text>
+<text x="60" y="92" class="sub">Source: STRATEGY.md · v0.9.7 · 22.10.2026</text>
+<text x="60" y="144" class="h2">Стратегия шаблона и очередь улучшений</text>
+<text x="60" y="168" class="p">Версия 0.9.7 · 22.10.2026</text>
+<text x="60" y="192" class="p">Шаблон уже отвечает на вопрос «как работать». Этот блок — про</text>
+<text x="60" y="216" class="p">другое:</text>
+<text x="60" y="240" class="p">как он развивается, что улучшать дальше и по какому признаку</text>
+<text x="60" y="264" class="p">понять,</text>
+<text x="60" y="288" class="p">что очередной слой получился.</text>
+<text x="60" y="312" class="p">Схемы: docs/scheme-strategy.svg, docs/scheme-roadmap.svg.</text>
+<text x="60" y="336" class="p">Текст в git; генерируются Go-генератором.</text>
+<text x="60" y="360" class="p">Обновить: go run ./cmd/schemes -write или</text>
+<text x="60" y="384" class="p">python verify.py --update-schemes.</text>
+<text x="60" y="408" class="p">Связанные документы: правила · агент.</text>
+<text x="60" y="444" class="h2">Видение</text>
+<text x="60" y="468" class="p">Шаблон — не папка правил, а операционная система проекта.</text>
+<text x="60" y="492" class="p">Правило превращается</text>
+<text x="60" y="516" class="p">в артефакт, артефакт — в проверку, проверка — в</text>
+<text x="60" y="540" class="p">доказательство. Чем меньше</text>
+<text x="60" y="564" class="p">ручных шагов в этом контуре, тем дольше шаблон живёт.</text>
+<text x="60" y="588" class="p">Главная ставка — прослеживаемость: для каждого правила</text>
+<text x="60" y="612" class="p">видно, где оно</text>
+<text x="60" y="636" class="p">применяется, чем проверяется и какое доказательство</text>
+<text x="60" y="660" class="p">оставляет. Правило без</text>
+<text x="60" y="684" class="p">артефакта и проверки — лозунг.</text>
+<text x="60" y="720" class="h2">Выбор языка</text>
+<text x="60" y="744" class="p">Критерии продукта: ноль сторонних зависимостей, отсутствие</text>
+<text x="60" y="768" class="p">обновлений</text>
+<text x="60" y="792" class="p">пакетов, отсутствие npm-уязвимостей. JS/Node.js этим критериям не</text>
+<text x="60" y="816" class="p">удовлетворяет: npm — это транзитивные зависимости, регулярные</text>
+<text x="60" y="840" class="p">обновления</text>
+<text x="60" y="864" class="p">и CVE, которые не зависят от нашего кода.</text>
+<text x="60" y="888" class="p">Решение: Go + стандартная библиотека.</text>
+<text x="60" y="912" class="bullet">• один статический бинарник, без runtime и node_modules;</text>
+<text x="60" y="936" class="bullet">• go.mod без сторонних require, сборка с -mod=readonly;</text>
+<text x="60" y="960" class="bullet">• HTTP, JSON, crypto, шаблоны и тесты уже в stdlib;</text>
+<text x="60" y="984" class="bullet">• ООП — структуры, интерфейсы, композиция; классы не</text>
+<text x="60" y="1008" class="p">обязательны;</text>
+<text x="60" y="1032" class="bullet">• домен не знает про БД, HTTP и UI, зависимости идут внутрь.</text>
+<text x="60" y="1056" class="p">Go stdlib обновляется вместе с toolchain — это один контролируемый</text>
+<text x="60" y="1080" class="p">артефакт,</text>
+<text x="60" y="1104" class="p">а не сотни транзитивных пакетов.</text>
+<text x="60" y="1128" class="p">Границы: SVG-схемы — build-time инструмент на Go stdlib; Python нужен</text>
+<text x="60" y="1152" class="p">только</text>
+<text x="60" y="1176" class="p">для verify.py. Ни Pillow, ни шрифтов, ни lock-файла схем нет.</text>
+<text x="60" y="1212" class="h2">Принципы</text>
+<text x="60" y="1236" class="p">1. Сначала замкнутый контур, потом детали. Лучше один полный</text>
+<text x="60" y="1260" class="p">цикл</text>
+<text x="60" y="1284" class="p">«фича → тест → карта → проверка», чем десять красивых слоёв</text>
+<text x="60" y="1308" class="p">без связи.</text>
+<text x="60" y="1332" class="p">2. У каждого правила есть артефакт и проверка. Правило без</text>
+<text x="60" y="1356" class="p">места</text>
+<text x="60" y="1380" class="p">в процессе и без способа проверки не считается правилом.</text>
+<text x="60" y="1404" class="p">3. Бюджет правил — десять. Новое правило должно вобрать</text>
+<text x="60" y="1428" class="p">старое или</text>
+<text x="60" y="1452" class="p">доказать, что без него рвётся контур. Иначе через месяц</text>
+<text x="60" y="1476" class="p">правил будет</text>
+<text x="60" y="1500" class="p">сорок, и их перестанут читать.</text>
+<text x="60" y="1524" class="p">4. Карты — производные. Где можно, схемы генерируются из кода</text>
+<text x="60" y="1548" class="p">и данных;</text>
+<text x="60" y="1572" class="p">расхождение карты и кода (drift) ловит автоматика, а не память.</text>
+<text x="60" y="1596" class="p">5. Пилот решает. Любое улучшение проверяется на одной</text>
+<text x="60" y="1620" class="p">реальной фиче.</text>
+<text x="60" y="1644" class="p">Без пилота это не стратегия, а гипотеза.</text>
+<text x="60" y="1668" class="p">6. Шаблон развивается по своим правилам. Каждое изменение</text>
+<text x="60" y="1692" class="p">шаблона</text>
+<text x="60" y="1716" class="p">проходит те же семь ворот и отражается на схемах (правило 5):</text>
+<text x="60" y="1740" class="p">план, тест, факт, живая проверка, запись.</text>
+<text x="60" y="1764" class="p">7. Ноль зависимостей — архитектура, а не настройка. Go stdlib;</text>
+<text x="60" y="1788" class="p">сторонняя зависимость — это решение уровня продукта, а не</text>
+<text x="60" y="1812" class="p">строка</text>
+<text x="60" y="1836" class="p">в go.mod.</text>
+<text x="60" y="1860" class="p">8. Пять минут — стоп. Затянувшееся обдумывание — это не</text>
+<text x="60" y="1884" class="p">прогресс,</text>
+<text x="60" y="1908" class="p">а потеря контекста. Остановись, зафиксируй «сделано / не</text>
+<text x="60" y="1932" class="p">сделано»</text>
+<text x="60" y="1956" class="p">и вернись к шагу позже.</text>
+<text x="60" y="1980" class="p">9. Микроблоки, а не монолит. Маленький блок с одним контрактом</text>
+<text x="60" y="2004" class="p">можно понять, заменить и протестировать отдельно. ООП — база:</text>
+<text x="60" y="2028" class="p">инкапсуляция, интерфейсы, композиция.</text>
+<text x="60" y="2064" class="h2">Слои шаблона</text>
+<text x="60" y="2088" class="table"># Слой Что даёт Артефакт Статус</text>
+<text x="60" y="2112" class="table">1 Инварианты десять правил, которые не обсуждаются RULES.md,</text>
+<text x="60" y="2136" class="p">docs/scheme-rules.svg готово</text>
+<text x="60" y="2160" class="table">2 Профиль проекта Go stdlib, команды, границы модулей, владельцы</text>
+<text x="60" y="2184" class="p">данных, окружения PROJECT.md готово</text>
+<text x="60" y="2208" class="table">3 Карты схема факта, схема плана, карточка фичи docs/architecture/</text>
+<text x="60" y="2232" class="p">следующий</text>
+<text x="60" y="2256" class="table">4 Контур проверки тесты на фичу, живая проверка, откат, DoD verify +</text>
+<text x="60" y="2280" class="p">PROCESS.md в работе</text>
+<text x="60" y="2304" class="table">5 Память ADR, журнал, changelog решений docs/adr/, JOURNAL.md в работе</text>
+<text x="60" y="2328" class="table">6 Развитие автоматизация, версии, метрики, пилот CI + отчёт</text>
+<text x="60" y="2352" class="p">позже</text>
+<text x="60" y="2376" class="p">Слои не выстраиваются в жёсткую очередь: пока контур</text>
+<text x="60" y="2400" class="p">проверки дозревает,</text>
+<text x="60" y="2424" class="p">профиль и карты можно делать параллельно. Но перескакивать</text>
+<text x="60" y="2448" class="p">через слой</text>
+<text x="60" y="2472" class="p">нельзя: карта без профиля не знает границ, автоматизация без</text>
+<text x="60" y="2496" class="p">карты</text>
+<text x="60" y="2520" class="p">проверяет не то.</text>
+<text x="60" y="2556" class="h2">Рабочий цикл</text>
+<text x="60" y="2580" class="p">1. Правила. Выбрать применимые инварианты и проверить</text>
+<text x="60" y="2604" class="p">исключения.</text>
+<text x="60" y="2628" class="p">2. Профиль. Взять команды, границы и владельцев из PROJECT.md.</text>
+<text x="60" y="2652" class="p">3. План. Поставить фичу на схему плана: где она живёт и что</text>
+<text x="60" y="2676" class="p">меняет.</text>
+<text x="60" y="2700" class="p">4. Фича + тест. Минимальный диф и тест на поведение и запреты.</text>
+<text x="60" y="2724" class="p">5. Факт. Обновить схему факта тем же шагом.</text>
+<text x="60" y="2748" class="p">6. Проверка. Тесты, живая проверка, откат, определение</text>
+<text x="60" y="2772" class="p">готовности.</text>
+<text x="60" y="2796" class="p">7. Память. ADR, журнал, метрики. Вернуться к правилам.</text>
+<text x="60" y="2820" class="p">Цикл замкнут: память меняет правила, правила меняют</text>
+<text x="60" y="2844" class="p">следующую фичу.</text>
+<text x="60" y="2868" class="p">Разрыв в любом узле означает, что шаблон работает вполсилы.</text>
+<text x="60" y="2892" class="p">Если шаг</text>
+<text x="60" y="2916" class="p">затянулся больше пяти минут — стоп, отчёт «сделано / не</text>
+<text x="60" y="2940" class="p">сделано» и пауза</text>
+<text x="60" y="2964" class="p">(правило 8).</text>
+<text x="60" y="3000" class="h2">Дорожная карта</text>
+<text x="60" y="3024" class="table">Версия Шаг Что делаем Критерий выхода</text>
+<text x="60" y="3048" class="table">0.5 Правила десять инвариантов, схема, AGENTS.md правила читаются</text>
+<text x="60" y="3072" class="p">за 10 минут</text>
+<text x="60" y="3096" class="table">0.6 Стратегия видение, слои, очередь улучшений, две схемы</text>
+<text x="60" y="3120" class="p">понятен следующий слой</text>
+<text x="60" y="3144" class="table">0.7 Профиль PROJECT.md (Go stdlib), definition of ready новый агент стартует без</text>
+<text x="60" y="3168" class="p">вопросов</text>
+<text x="60" y="3192" class="table">0.8 Карты генераторы факта и плана, карточка фичи, ADR, журнал</text>
+<text x="60" y="3216" class="p">карта не врёт</text>
+<text x="60" y="3240" class="table">0.9 Автоматизация CI, hooks, branch protection проверка одной командой</text>
+<text x="60" y="3264" class="table">1.0 Пилот реальная фича, замеры, публикация контур доказан на</text>
+<text x="60" y="3288" class="p">практике</text>
+<text x="60" y="3312" class="p">Definition of ready — что должно быть до старта: цель, границы, место</text>
+<text x="60" y="3336" class="p">на схеме плана, план теста и отката.</text>
+<text x="60" y="3372" class="h2">Очередь улучшений</text>
+<text x="60" y="3396" class="p">Приоритеты: P0 — делать сейчас, P1 — следом, P2 — после пилота.</text>
+<text x="60" y="3420" class="p">Усилие: S — до дня, M — до недели, L — больше недели.</text>
+<text x="60" y="3444" class="table"># Приоритет Предложение Зачем Усилие</text>
+<text x="60" y="3468" class="table">1 P0 PROJECT.md без профиля правила некуда применить S</text>
+<text x="60" y="3492" class="table">2 P0 FEATURE.md фича без брифа, теста и отката — импровизация S</text>
+<text x="60" y="3516" class="table">3 P0 verify правила без проверки остаются лозунгами M</text>
+<text x="60" y="3540" class="table">4 P0 ADR + журнал решения теряются быстрее, чем код S</text>
+<text x="60" y="3564" class="table">5 P1 генераторы карт ручная карта устаревает молча L</text>
+<text x="60" y="3588" class="table">6 P1 матрица «правило → проверка» видно, где у контура дыры S</text>
+<text x="60" y="3612" class="table">7 P1 плейбуки агента старт фичи, баг, рефакторинг, релиз M</text>
+<text x="60" y="3636" class="table">8 P1 CI + drift check контур не держится на памяти M</text>
+<text x="60" y="3660" class="table">9 P2 метрики без чисел нет улучшений M</text>
+<text x="60" y="3684" class="table">10 P2 версии и онбординг шаблон должен передаваться S</text>
+<text x="60" y="3708" class="p">Статус 0.9.7: verify, ADR/журнал, PROCESS.md, бюджеты 400/80,</text>
+<text x="60" y="3732" class="p">PROJECT.md, FEATURE.md, README.md — сделаны.</text>
+<text x="60" y="3756" class="p">Схемы — SVG на Go stdlib, без Pillow, шрифтов и lock.</text>
+<text x="60" y="3780" class="p">Добавлены entropy secret scan, branch protection, CI GitHub/GitLab/Azure</text>
+<text x="60" y="3804" class="p">(по выбору), мультистек-команды, AST-детектор мёртвых unexported</text>
+<text x="60" y="3828" class="p">func/type/var/const/method, операционные процедуры и MIT LICENSE.</text>
+<text x="60" y="3852" class="p">Пилот deadcode -json проведён; docs/PILOT.md содержит метрики.</text>
+<text x="60" y="3876" class="p">Close-task запрещает код без features/ADR/DEBT/JOURNAL.</text>
+<text x="60" y="3900" class="p">Логи разделены: tests/test.log, var/log/app.log, JOURNAL.md.</text>
+<text x="60" y="3924" class="p">Лимит: 100 КБ на страницу, 5 страниц на поток.</text>
+<text x="60" y="3948" class="p">Закрытый долг удаляется из DEBT.md.</text>
+<text x="60" y="3972" class="p">examples/minimal-go проверяет Go-путь. PROJECT.md и FEATURE.md теперь</text>
+<text x="60" y="3996" class="p">шаблоны: заполняются под проект и фичу.</text>
+<text x="60" y="4020" class="h3">Матрица impact / effort</text>
+<text x="60" y="4044" class="bullet">• P0 — верхний левый угол: высокий эффект, низкое усилие. Делать</text>
+<text x="60" y="4068" class="p">сейчас.</text>
+<text x="60" y="4092" class="bullet">• P1 — верхний правый: высокий эффект, высокое усилие.</text>
+<text x="60" y="4116" class="p">Планировать.</text>
+<text x="60" y="4140" class="bullet">• P2 — нижняя половина: эффект ниже. После пилота.</text>
+<text x="60" y="4164" class="bullet">• Нижний правый: высокое усилие при низком эффекте — только</text>
+<text x="60" y="4188" class="p">после пилота и с причиной.</text>
+<text x="60" y="4224" class="h2">Метрики успеха</text>
+<text x="60" y="4248" class="bullet">• Время до первой правильной правки у нового агента: меньше 30</text>
+<text x="60" y="4272" class="p">минут.</text>
+<text x="60" y="4296" class="bullet">• Доля фич с планом, тестом и фактом: 100%.</text>
+<text x="60" y="4320" class="bullet">• Пропущенные дефекты на фичу: меньше одного.</text>
+<text x="60" y="4344" class="bullet">• Доля откатов: меньше 10%.</text>
+<text x="60" y="4368" class="bullet">• Drift, пойманный автоматикой: 100% известных расхождений.</text>
+<text x="60" y="4392" class="bullet">• verify зелёный до merge: 100%.</text>
+<text x="60" y="4416" class="bullet">• Файлов больше 400 строк или функций больше 80: 0.</text>
+<text x="60" y="4440" class="bullet">• Моделей на map вместо структур: 0.</text>
+<text x="60" y="4464" class="bullet">• Бэкапов без проверки восстановления: 0.</text>
+<text x="60" y="4488" class="bullet">• Удалённых шагов миграций: 0.</text>
+<text x="60" y="4512" class="bullet">• Число правил: не больше десяти.</text>
+<text x="60" y="4536" class="bullet">• Сторонних зависимостей в продукте: 0.</text>
+<text x="60" y="4560" class="bullet">• Время на пересмотр правил: до 30 минут в месяц.</text>
+<text x="60" y="4584" class="p">Числа «900 тестов / 64 группы / 71% документации» — не KPI. Это</text>
+<text x="60" y="4608" class="p">следствие</text>
+<text x="60" y="4632" class="p">дисциплины. KPI — красный gate, покрытие инвариантов и</text>
+<text x="60" y="4656" class="p">отсутствие долгов.</text>
+<text x="60" y="4692" class="h2">Риски и анти-паттерны</text>
+<text x="60" y="4716" class="table">Риск Признак Ответ</text>
+<text x="60" y="4740" class="table">Бюрократия правила есть, проверок нет бюджет 10 +</text>
+<text x="60" y="4764" class="p">автоматизация</text>
+<text x="60" y="4788" class="table">Мёртвые карты схема не менялась три фичи генерация + drift check</text>
+<text x="60" y="4812" class="table">Стек-лок «иначе не умеем» без причины исключение только с</text>
+<text x="60" y="4836" class="p">записью</text>
+<text x="60" y="4860" class="table">Зависимость протащена в go.mod появился сторонний require удалить</text>
+<text x="60" y="4884" class="p">или остановить шаг</text>
+<text x="60" y="4908" class="table">Затянувшееся обдумывание больше 5 минут без отчёта стоп и</text>
+<text x="60" y="4932" class="p">«сделано / не сделано»</text>
+<text x="60" y="4956" class="table">Идеальный шаблон слои растут, пилота нет сначала одна</text>
+<text x="60" y="4980" class="p">реальная фича</text>
+<text x="60" y="5004" class="table">Правила ради правил одиннадцатое правило вобрать старое или</text>
+<text x="60" y="5028" class="p">отклонить</text>
+<text x="60" y="5052" class="table">Один носитель знаний «спроси у автора» ADR, журнал, онбординг</text>
+<text x="60" y="5088" class="h2">Ближайшие три шага</text>
+<text x="60" y="5112" class="p">1. PROJECT.md. Одна страница: Go stdlib, команды, границы, владельцы,</text>
+<text x="60" y="5136" class="p">окружения. Без неё правило 4 остаётся пожеланием.</text>
+<text x="60" y="5160" class="p">2. FEATURE.md + verify. Шаблон фичи и одна команда проверки:</text>
+<text x="60" y="5184" class="p">линт, тесты, секреты, мёртвый код, drift.</text>
+<text x="60" y="5208" class="p">3. Пилот. Провести одну реальную фичу по всему циклу и</text>
+<text x="60" y="5232" class="p">замерить:</text>
+<text x="60" y="5256" class="p">время, ошибки, откаты, расхождения карты.</text>
+<text x="60" y="5280" class="p">После пилота очередь пересматривается: то, что не дало</text>
+<text x="60" y="5304" class="p">эффекта, уходит</text>
+<text x="60" y="5328" class="p">в «не брать», а не в «когда-нибудь».</text>
+<text x="60" y="5352" class="p">Версия 0.9.7 · 22.10.2026</text>
+</svg>

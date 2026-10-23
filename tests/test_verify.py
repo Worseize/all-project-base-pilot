@@ -1,4 +1,3 @@
-import json
 import sys
 import tempfile
 import unittest
@@ -17,14 +16,12 @@ class VerifyTests(unittest.TestCase):
         self.old_version = verify.VERSION
         self.old_required = verify.REQUIRED
         self.old_schemes = verify.SCHEMES
-        self.old_lock = verify.SCHEME_LOCK
         self.tmp = tempfile.TemporaryDirectory()
         verify.ROOT = Path(self.tmp.name)
         verify.CONFIG = {"stack": "go", "forbid_npm": True, "rules_count": 10}
         verify.VERSION = "0.7.9"
         verify.REQUIRED = []
         verify.SCHEMES = {}
-        verify.SCHEME_LOCK = verify.ROOT / "docs" / "schemes.lock.json"
 
     def tearDown(self):
         verify.ROOT = self.old_root
@@ -32,7 +29,6 @@ class VerifyTests(unittest.TestCase):
         verify.VERSION = self.old_version
         verify.REQUIRED = self.old_required
         verify.SCHEMES = self.old_schemes
-        verify.SCHEME_LOCK = self.old_lock
         self.tmp.cleanup()
 
     def test_required_fails_on_missing(self):
@@ -163,52 +159,6 @@ class VerifyTests(unittest.TestCase):
             "project",
         )
         self.assertEqual(gate.failed, 0)
-
-    def _scheme_fixture(self) -> tuple[Path, Path]:
-        docs = verify.ROOT / "docs"
-        docs.mkdir()
-        image = docs / "scheme.png"
-        image.write_bytes(b"\x89PNG\r\n\x1a\n" + b"0" * 10000)
-        source = verify.ROOT / "RULES.md"
-        source.write_text("rules", encoding="utf-8")
-        return image, source
-
-    def test_scheme_lock_detects_drift(self):
-        image, _ = self._scheme_fixture()
-        verify.SCHEMES = {"docs/scheme.png": ["RULES.md"]}
-        lock = {
-            "version": verify.VERSION,
-            "schemes": {
-                "docs/scheme.png": {
-                    "source_sha": "wrong",
-                    "image_sha": verify.sha256_file(image),
-                }
-            },
-        }
-        verify.SCHEME_LOCK.parent.mkdir(parents=True, exist_ok=True)
-        verify.SCHEME_LOCK.write_text(json.dumps(lock), encoding="utf-8")
-        gate = verify.Gate()
-        verify.check_schemes(gate)
-        self.assertEqual(gate.failed, 1)
-
-    def test_scheme_lock_passes(self):
-        image, _ = self._scheme_fixture()
-        verify.SCHEMES = {"docs/scheme.png": ["RULES.md"]}
-        lock = {
-            "version": verify.VERSION,
-            "schemes": {
-                "docs/scheme.png": {
-                    "source_sha": verify.source_hash(["RULES.md"]),
-                    "image_sha": verify.sha256_file(image),
-                }
-            },
-        }
-        verify.SCHEME_LOCK.parent.mkdir(parents=True, exist_ok=True)
-        verify.SCHEME_LOCK.write_text(json.dumps(lock), encoding="utf-8")
-        gate = verify.Gate()
-        verify.check_schemes(gate)
-        self.assertEqual(gate.failed, 0)
-
 
     def test_logs_are_separate(self):
         (verify.ROOT / "JOURNAL.md").write_text("decisions", encoding="utf-8")

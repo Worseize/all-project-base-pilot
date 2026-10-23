@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.9.7 — 2026-10-22
+
+- Схемы переведены на SVG, генератор — Go stdlib `cmd/schemes`.
+- Удалены Python-генераторы, Pillow, шрифты и `schemes.lock.json`.
+- `verify.py` сравнивает SVG с docs через `go run ./cmd/schemes -check`.
+- `--update-schemes` запускает Go-генератор; lock не нужен.
+
 ## 0.9.6 — 2026-10-22
 
 - Закрытый долг удаляется из `docs/DEBT.md`, а не хранится в «Закрытом».

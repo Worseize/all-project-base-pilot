@@ -12,8 +12,8 @@
 ## Стек
 
 - Go, только стандартная библиотека; `go.mod` без сторонних `require`.
-- Python 3.11+ и Pillow — только build-time инструменты для `verify.py`
-  и генераторов схем; в продукт не входят.
+- Python 3.11+ — только `verify.py`.
+- SVG-схемы — Go stdlib, `go run ./cmd/schemes -write`; без Pillow/шрифтов.
 - npm, Node.js, `node_modules` не используются.
 
 ## Команды
@@ -60,8 +60,7 @@ python -m unittest discover -s tests
 
 ## Исключения
 
-- Генераторы схем — Python/Pillow, build-time; их зависимости не попадают
-  в продукт.
+- SVG-схемы — Go stdlib, build-time; без Pillow и внешних шрифтов.
 - Другой язык продукта — только если он даёт ноль зависимостей и это
   записано в ADR.
 
