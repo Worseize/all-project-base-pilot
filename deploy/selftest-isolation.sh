@@ -1,19 +1,23 @@
 #!/usr/bin/env bash
-# Canary checks between two project users. Run as root on the Linux host.
-# Usage: sudo deploy/selftest-isolation.sh proj-a proj-b
+# Canary checks for one or two project users. Run as root on the Linux host.
+# Usage: sudo deploy/selftest-isolation.sh proj-a [proj-b]
 set -u
 
 if [ "$(id -u)" -ne 0 ]; then
   echo "run as root" >&2
   exit 1
 fi
-if [ "$#" -ne 2 ] || [ "$1" = "$2" ]; then
-  echo "usage: $0 <project-a> <project-b>" >&2
+if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
+  echo "usage: $0 <project-a> [project-b]" >&2
   exit 2
 fi
 
 A="$1"
-B="$2"
+B="${2:-}"
+if [ -n "$B" ] && [ "$A" = "$B" ]; then
+  echo "project-a and project-b must differ" >&2
+  exit 2
+fi
 FAILED=0
 fail() { printf 'FAIL: %s\n' "$*" >&2; FAILED=1; }
 ok() { printf 'ok: %s\n' "$*"; }
@@ -23,12 +27,22 @@ if ! command -v runuser >/dev/null 2>&1; then
   exit 2
 fi
 
-if [ ! -f "/srv/$B/CANARY" ]; then
-  fail "missing /srv/$B/CANARY"
-elif runuser -u "$A" -- test -r "/srv/$B/CANARY" 2>/dev/null; then
-  fail "$A can read $B CANARY"
+if [ ! -f "/srv/$A/CANARY" ]; then
+  fail "missing /srv/$A/CANARY"
+elif runuser -u "$A" -- test -r "/srv/$A/CANARY" 2>/dev/null; then
+  ok "$A can read own CANARY"
 else
-  ok "$A cannot read $B CANARY"
+  fail "$A cannot read own CANARY"
+fi
+
+if [ -n "$B" ]; then
+  if [ ! -f "/srv/$B/CANARY" ]; then
+    fail "missing /srv/$B/CANARY"
+  elif runuser -u "$A" -- test -r "/srv/$B/CANARY" 2>/dev/null; then
+    fail "$A can read $B CANARY"
+  else
+    ok "$A cannot read $B CANARY"
+  fi
 fi
 
 if runuser -u "$A" -- sudo -n true 2>/dev/null; then
@@ -37,22 +51,34 @@ else
   ok "$A has no sudo"
 fi
 
-if command -v ss >/dev/null 2>&1; then
-  UID_A="$(id -u "$A")"
-  PORTS="$(ss -ltnp 2>/dev/null | grep "uid:$UID_A" || true)"
-  if printf '%s\n' "$PORTS" | grep -Eq '0\.0\.0\.0|\[::\]|\*:'; then
-    fail "$A listens on a public port"
-  else
-    ok "$A has no public listening port"
-  fi
+if command -v ss >/dev/null 2>&1 && command -v pgrep >/dev/null 2>&1; then
+  for pid in $(pgrep -u "$A" 2>/dev/null || true); do
+    if ss -ltnp 2>/dev/null | grep -q "pid=$pid,"; then
+      fail "$A listens on a socket (pid $pid)"
+    fi
+  done
+  ok "$A has no listening socket"
 else
-  ok "ss not installed; port check skipped"
+  ok "ss/pgrep not installed; port check skipped"
 fi
 
 if [ "$(stat -c '%U:%G %a' "/etc/git-hooks/$A" 2>/dev/null)" = "root:root 755" ]; then
   ok "hooks directory root:root 755"
 else
   fail "hooks directory is not root:root 755"
+fi
+
+LOG="/var/log/git/$A.log"
+if [ -f "$LOG" ] && [ "$(stat -c '%U:%G %a' "$LOG" 2>/dev/null)" = "root:$A 640" ]; then
+  ok "acceptance log root:$A 640"
+else
+  fail "acceptance log missing or wrong mode (root:$A 640)"
+fi
+
+if getent passwd "$A" | grep -q 'nologin$\|git-shell$'; then
+  ok "$A has no interactive shell"
+else
+  fail "$A still has an interactive shell"
 fi
 
 REPO="/srv/$A/repo.git"

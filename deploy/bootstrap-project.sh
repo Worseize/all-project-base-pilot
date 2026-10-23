@@ -24,11 +24,14 @@ REPO="$PROJECT_ROOT/repo.git"
 HOOKS="/etc/git-hooks/$PROJECT"
 SECRETS="/etc/$PROJECT"
 AUTH="$PROJECT_ROOT/.ssh/authorized_keys"
+NOLOGIN="$(command -v nologin || true)"
+[ -n "$NOLOGIN" ] || NOLOGIN="/usr/sbin/nologin"
 
 install -d -m 0711 -o root -g root /srv
 if ! id -u "$PROJECT" >/dev/null 2>&1; then
-  useradd --system --home-dir "$PROJECT_ROOT" --shell /bin/bash --create-home "$PROJECT"
+  useradd --system --home-dir "$PROJECT_ROOT" --shell "$NOLOGIN" --create-home "$PROJECT"
 fi
+usermod --shell "$NOLOGIN" "$PROJECT"
 install -d -m 0750 -o "$PROJECT" -g "$PROJECT" "$PROJECT_ROOT"
 install -d -m 0700 -o "$PROJECT" -g "$PROJECT" "$PROJECT_ROOT/.ssh"
 
@@ -49,7 +52,21 @@ git -c safe.directory="$REPO" --git-dir="$REPO" config receive.denyNonFastForwar
 install -d -m 0755 -o root -g root "$HOOKS"
 install -m 0755 -o root -g root "$SCRIPT_DIR/git/pre-receive" "$HOOKS/pre-receive"
 
+install -d -m 0750 -o root -g "$PROJECT" /var/log/git
+LOG="/var/log/git/$PROJECT.log"
+if [ ! -f "$LOG" ]; then
+  install -m 0640 -o root -g "$PROJECT" /dev/null "$LOG"
+fi
+if command -v setfacl >/dev/null 2>&1; then
+  setfacl -m "u:$PROJECT:rw-" "$LOG"
+else
+  chmod 0660 "$LOG"
+  echo "warning: setfacl missing; $LOG is 0660, not 0640" >&2
+fi
+
 install -m 0644 -o root -g root "$SCRIPT_DIR/systemd/proj@.service" /etc/systemd/system/proj@.service
+sed "s/%i/$PROJECT/g" "$SCRIPT_DIR/logrotate/proj" > "/etc/logrotate.d/proj-$PROJECT"
+chmod 0644 "/etc/logrotate.d/proj-$PROJECT"
 
 install -d -m 0750 -o root -g "$PROJECT" "$SECRETS"
 if [ ! -f "$SECRETS/app.env" ]; then
@@ -77,3 +94,4 @@ fi
 
 printf 'ready: project=%s user=%s repo=%s hooks=%s\n' \
   "$PROJECT" "$PROJECT" "$REPO" "$HOOKS"
+echo "next: root must push the initial main before agents push review" >&2

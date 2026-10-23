@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 0.9.9 — 2026-10-22
+
+- Доверенный gate: `pre-receive` запускает `verify.py` из main; gate-файлы
+  менять нельзя.
+- `PATH` с Go; `nologin`; журнал приёмки с ACL и logrotate.
+- Проверка портов через pid; selftest для одного проекта; `run` в unit.
+- ADR-0005; обновлены ISOLATION/LOGGING/SCHEME.
+
 ## 0.9.8 — 2026-10-22
 
 - Многопроектная изоляция: один хост, несколько агентов, root — ограничитель.
