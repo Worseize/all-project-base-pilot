@@ -9,6 +9,7 @@ var/log/
 github-secret.txt
 githubkey.txt
 githubapikey.txt
+projects.json
 .env
 .env.*
 !.env.example

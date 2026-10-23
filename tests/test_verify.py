@@ -1,3 +1,4 @@
+import json
 import sys
 import tempfile
 import unittest
@@ -260,6 +261,75 @@ class VerifyTests(unittest.TestCase):
         )
         gate = verify.Gate()
         verify.check_debt(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def _projects(self):
+        return {
+            "projects": {
+                "proj-a": {
+                    "display": "Project A",
+                    "agent": "agent-a",
+                    "domain": "proj-a.example.org",
+                    "port": 8011,
+                    "status": "active",
+                },
+                "proj-b": {
+                    "display": "Project B",
+                    "agent": "agent-b",
+                    "domain": "",
+                    "port": 8012,
+                    "status": "planned",
+                },
+            }
+        }
+
+    def _write_projects(self, data, ignore="projects.json\n"):
+        (verify.ROOT / "projects.example.json").write_text(json.dumps(data), encoding="utf-8")
+        (verify.ROOT / ".gitignore").write_text(ignore, encoding="utf-8")
+
+    def test_projects_valid(self):
+        self._write_projects(self._projects())
+        gate = verify.Gate()
+        verify.check_projects(gate)
+        self.assertEqual(gate.failed, 0)
+
+    def test_projects_invalid_id(self):
+        data = self._projects()
+        data["projects"]["proj-a"].pop("display")
+        data["projects"]["proj-a"]["extra"] = "x"
+        self._write_projects(data)
+        gate = verify.Gate()
+        verify.check_projects(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_projects_duplicate_domain(self):
+        data = self._projects()
+        data["projects"]["proj-b"]["domain"] = "proj-a.example.org"
+        self._write_projects(data)
+        gate = verify.Gate()
+        verify.check_projects(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_projects_duplicate_port(self):
+        data = self._projects()
+        data["projects"]["proj-b"]["port"] = 8011
+        self._write_projects(data)
+        gate = verify.Gate()
+        verify.check_projects(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_projects_bad_status(self):
+        data = self._projects()
+        data["projects"]["proj-a"]["status"] = "unknown"
+        self._write_projects(data)
+        gate = verify.Gate()
+        verify.check_projects(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_projects_registry_must_be_ignored(self):
+        self._write_projects(self._projects(), ignore="")
+        gate = verify.Gate()
+        verify.check_projects(gate)
         self.assertEqual(gate.failed, 1)
 
     def test_isolation_matrix_complete(self):

@@ -22,6 +22,22 @@ FAILED=0
 fail() { printf 'FAIL: %s\n' "$*" >&2; FAILED=1; }
 ok() { printf 'ok: %s\n' "$*"; }
 
+REGISTRY="${REGISTRY:-projects.json}"
+if [ ! -f "$REGISTRY" ]; then
+  echo "registry not found: $REGISTRY" >&2
+  exit 2
+fi
+python3 - "$REGISTRY" "$A" "$B" <<'PY'
+import json
+import sys
+registry, first, second = sys.argv[1:4]
+with open(registry, encoding="utf-8") as handle:
+    projects = json.load(handle).get("projects", {})
+for name in filter(None, (first, second)):
+    if name not in projects:
+        raise SystemExit(f"project not in registry: {name}")
+PY
+
 if ! command -v runuser >/dev/null 2>&1; then
   echo "runuser not found; cannot test as another user" >&2
   exit 2

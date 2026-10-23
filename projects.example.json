@@ -1,0 +1,18 @@
+{
+  "projects": {
+    "proj-a": {
+      "display": "Project A",
+      "agent": "agent-a",
+      "domain": "proj-a.example.org",
+      "port": 8011,
+      "status": "active"
+    },
+    "proj-b": {
+      "display": "Project B",
+      "agent": "agent-b",
+      "domain": "",
+      "port": 8012,
+      "status": "planned"
+    }
+  }
+}

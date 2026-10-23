@@ -13,10 +13,17 @@ if [ "$#" -ne 1 ]; then
 fi
 
 PROJECT="$1"
-if ! [[ "$PROJECT" =~ ^[a-z][a-z0-9-]{0,30}$ ]]; then
-  echo "invalid project name: $PROJECT" >&2
+if ! [[ "$PROJECT" =~ ^[a-z][a-z0-9-]{2,19}$ ]]; then
+  echo "invalid project id: $PROJECT" >&2
   exit 2
 fi
+if [[ "$PROJECT" == *--* || "$PROJECT" == *- ]]; then
+  echo "invalid project id (double/trailing dash): $PROJECT" >&2
+  exit 2
+fi
+case " root app caddy watchdog admin system debian ubuntu nobody daemon bin sys mail www git ssh " in
+  *" $PROJECT "*) echo "reserved project id: $PROJECT" >&2; exit 2 ;;
+esac
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="/srv/$PROJECT"
@@ -26,9 +33,17 @@ SECRETS="/etc/$PROJECT"
 AUTH="$PROJECT_ROOT/.ssh/authorized_keys"
 NOLOGIN="$(command -v nologin || true)"
 [ -n "$NOLOGIN" ] || NOLOGIN="/usr/sbin/nologin"
+USER_EXISTED=0
+if id -u "$PROJECT" >/dev/null 2>&1; then
+  USER_EXISTED=1
+  if [ ! -f "$PROJECT_ROOT/CANARY" ] || [ "$(cat "$PROJECT_ROOT/CANARY")" != "$PROJECT" ]; then
+    echo "user $PROJECT already exists and is not this project" >&2
+    exit 1
+  fi
+fi
 
 install -d -m 0711 -o root -g root /srv
-if ! id -u "$PROJECT" >/dev/null 2>&1; then
+if [ "$USER_EXISTED" -eq 0 ]; then
   useradd --system --home-dir "$PROJECT_ROOT" --shell "$NOLOGIN" --create-home "$PROJECT"
 fi
 usermod --shell "$NOLOGIN" "$PROJECT"

@@ -5,6 +5,45 @@
 Один хост — несколько проектов — несколько агентов. Root — единственный,
 у кого полные права. Агент проекта получает только git-push в `review`.
 
+## Имена и реестр
+
+`id` — полный токен проекта, например `proj-a`. Он один раз задаёт все
+артефакты; второй префикс не добавляется.
+
+```text
+^[a-z][a-z0-9-]{2,19}$
+```
+
+Без `--`, без дефиса в конце, 3–20 символов. Кириллица и `_` запрещены.
+Зарезервированы: `root`, `app`, `caddy`, `watchdog`, `admin`, `system`,
+`debian`, `ubuntu`, `nobody`, `daemon`, `bin`, `sys`, `mail`, `www`,
+`git`, `ssh`.
+
+| Артефакт | Из `id` |
+| --- | --- |
+| Unix-пользователь | `<id>` |
+| Каталог | `/srv/<id>` |
+| Репозиторий | `/srv/<id>/repo.git` |
+| Хуки | `/etc/git-hooks/<id>` |
+| Секреты | `/etc/<id>/*.env` |
+| Юнит | `proj@<id>.service` |
+| Лог приёмки | `/var/log/git/<id>.log` |
+| Поддомен | `<id>.<BASE_DOMAIN>` |
+
+Два поля: `id` — пути/юниты/домены, неизменяем; `display` — сообщения и
+документация, 1–64 символа, никогда не становится путём.
+
+## Реестр
+
+- `projects.example.json` — коммитится, только `proj-a` и `proj-b`.
+- `projects.json` — рабочий реестр хоста, в `.gitignore`, не в публичном
+  репозитории.
+- Поля проекта: `display`, `agent`, `domain`, `port`, `status`;
+  лишние поля — ошибка.
+- `domain` пустой или валидный поддомен; уникален.
+- `port` 0 или 1024–65535; уникален среди ненулевых.
+- `status`: `active`, `paused`, `planned`.
+
 ## Модель
 
 - Каждый проект — отдельный пользователь `proj-*`, каталог `/srv/proj-*`,
@@ -102,8 +141,10 @@ sudo deploy/bootstrap-project.sh proj-a
 sudo AGENT_PUBKEY="ssh-ed25519 AAAA... agent-a" deploy/bootstrap-project.sh proj-a
 # root сначала создаёт main с проверенным шаблоном:
 git push origin main
+# рабочий реестр — вне git:
+cp projects.example.json projects.json
 # проверить изоляцию:
-sudo deploy/selftest-isolation.sh proj-a proj-b
+sudo REGISTRY=projects.json deploy/selftest-isolation.sh proj-a proj-b
 ```
 
 Пока `refs/heads/main` нет, `pre-receive` отклоняет любой `review`:
@@ -179,6 +220,9 @@ sudo deploy/selftest-isolation.sh proj-a
   - `git push origin HEAD:review` → accepted после trusted verify;
   - подмена `verify.py` в review → rejected;
   - удаление/force push → rejected.
+- `deploy/audit-drift.sh projects.json` — сироты в обе стороны:
+  каталог без записи и запись без каталога.
+- `selftest-isolation.sh` принимает только id из `projects.json`.
 
 ## Границы
 
