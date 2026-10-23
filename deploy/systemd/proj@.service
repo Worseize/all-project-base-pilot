@@ -1,0 +1,25 @@
+[Unit]
+Description=Project %i
+After=network.target
+
+[Service]
+Type=simple
+User=%i
+Group=%i
+WorkingDirectory=/srv/%i
+ExecStart=/srv/%i/app
+EnvironmentFile=-/etc/%i/app.env
+Restart=on-failure
+
+ProtectSystem=strict
+ProtectHome=yes
+ProtectProc=invisible
+PrivateTmp=yes
+NoNewPrivileges=yes
+MemoryMax=512M
+CPUQuota=50%
+TasksMax=64
+ReadWritePaths=/srv/%i
+
+[Install]
+WantedBy=multi-user.target

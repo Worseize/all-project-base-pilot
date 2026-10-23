@@ -83,6 +83,7 @@ zero-dep стек:
 - [Миграции](docs/MIGRATIONS.md)
 - [Секреты](docs/SECRETS.md)
 - [Логи](docs/LOGGING.md)
+- [Изоляция проектов и агентов](docs/ISOLATION.md)
 - [Branch protection](docs/BRANCH_PROTECTION.md)
 
 ## CI

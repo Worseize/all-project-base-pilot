@@ -262,6 +262,47 @@ class VerifyTests(unittest.TestCase):
         verify.check_debt(gate)
         self.assertEqual(gate.failed, 1)
 
+    def test_isolation_matrix_complete(self):
+        docs = verify.ROOT / "docs"
+        docs.mkdir()
+        rows = "\n".join(f"| {action} | да | да |" for action in verify.ISOLATION_ACTIONS)
+        (docs / "ISOLATION.md").write_text(
+            "| Действие | Агент проекта | Root |\n| --- | --- | --- |\n" + rows,
+            encoding="utf-8",
+        )
+        verify.CONFIG = {
+            "isolation": {
+                "projects_root": "/srv",
+                "hooks_root": "/etc/git-hooks",
+                "secrets_root": "/etc",
+                "review_ref": "refs/heads/review",
+                "main_ref": "refs/heads/main",
+            }
+        }
+        gate = verify.Gate()
+        verify.check_isolation(gate)
+        self.assertEqual(gate.failed, 0)
+
+    def test_isolation_missing_action(self):
+        docs = verify.ROOT / "docs"
+        docs.mkdir()
+        (docs / "ISOLATION.md").write_text(
+            "| Действие | Агент проекта | Root |\n| --- | --- | --- |\n",
+            encoding="utf-8",
+        )
+        verify.CONFIG = {
+            "isolation": {
+                "projects_root": "/srv",
+                "hooks_root": "/etc/git-hooks",
+                "secrets_root": "/etc",
+                "review_ref": "refs/heads/review",
+                "main_ref": "refs/heads/main",
+            }
+        }
+        gate = verify.Gate()
+        verify.check_isolation(gate)
+        self.assertEqual(gate.failed, 1)
+
     def test_close_task_accepts_no_code(self):
         self.assertIsNone(verify.close_task_violation(["docs/README.md"]))
 

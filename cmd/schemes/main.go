@@ -232,6 +232,8 @@ func titleFor(path string) string {
 		return "Дорожная карта"
 	case "scheme-process.svg":
 		return "Процесс"
+	case "scheme-isolation.svg":
+		return "Изоляция"
 	default:
 		return strings.TrimSuffix(base, filepath.Ext(base))
 	}

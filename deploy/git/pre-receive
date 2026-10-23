@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Server-side gate. Installed at /etc/git-hooks/<proj>/pre-receive,
+# root:root 0755. Accepts only refs/heads/review, rejects delete/force,
+# runs verify.py on the pushed tree.
+set -euo pipefail
+
+ZERO=0000000000000000000000000000000000000000
+PROJECT="$(basename "$(dirname "$0")")"
+REPO="/srv/$PROJECT/repo.git"
+
+reject() {
+  printf 'review rejected: %s\n' "$*" >&2
+  exit 1
+}
+
+while read -r old new ref; do
+  [ "$ref" = "refs/heads/review" ] || reject "only refs/heads/review is allowed (got $ref)"
+  [ "$new" != "$ZERO" ] || reject "deleting review is forbidden"
+
+  if [ "$old" != "$ZERO" ]; then
+    git --git-dir="$REPO" merge-base --is-ancestor "$old" "$new" ||
+      reject "force push to review is forbidden"
+  fi
+
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' EXIT
+  git --git-dir="$REPO" archive "$new" | tar -x -C "$tmp"
+  if ! (cd "$tmp" && python3 verify.py); then
+    reject "verify.py failed for $new"
+  fi
+  rm -rf "$tmp"
+  trap - EXIT
+done
+
+printf 'review accepted; root must merge to main\n'

@@ -58,6 +58,13 @@ python -m unittest discover -s tests
 - `ci` — GitHub Actions, Ubuntu, Python 3.12, Go stable.
 - `prod` — появляется вместе с продуктом; деплой только на зелёном `verify`.
 
+## Изоляция
+
+- Один хост — несколько проектов; у каждого свой пользователь и `/srv/<proj>`.
+- Агент пушит только в `review`; `main` двигает root через `update-ref`.
+- Хуки — `/etc/git-hooks/<proj>` (root:root), не в репозитории.
+- Матрица прав и canary — [docs/ISOLATION.md](docs/ISOLATION.md).
+
 ## Исключения
 
 - SVG-схемы — Go stdlib, build-time; без Pillow и внешних шрифтов.
