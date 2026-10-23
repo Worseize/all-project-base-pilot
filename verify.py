@@ -343,6 +343,101 @@ ISOLATION_ACTIONS = [
 ]
 
 
+PROJECT_ID_RE = re.compile(r"^[a-z][a-z0-9-]{2,19}$")
+RESERVED_PROJECTS = {
+    "root", "app", "caddy", "watchdog", "admin", "system", "debian",
+    "ubuntu", "nobody", "daemon", "bin", "sys", "mail", "www", "git", "ssh",
+}
+PROJECT_FIELDS = {"display", "agent", "domain", "port", "status"}
+DOMAIN_RE = re.compile(
+    r"^(?=.{1,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$"
+)
+
+
+def validate_projects(data, allowed_ids=None) -> list[str]:
+    errors = []
+    if not isinstance(data, dict) or set(data) != {"projects"}:
+        return ["верхний уровень должен содержать только projects"]
+    projects = data["projects"]
+    if not isinstance(projects, dict):
+        return ["projects должен быть объектом"]
+    if allowed_ids is not None and set(projects) != set(allowed_ids):
+        errors.append("пример должен содержать только proj-a и proj-b")
+    domains = set()
+    ports = set()
+    for project_id, item in projects.items():
+        if not PROJECT_ID_RE.fullmatch(project_id):
+            errors.append(f"{project_id}: id не соответствует ^[a-z][a-z0-9-]{{2,19}}$")
+        if "--" in project_id or project_id.endswith("-"):
+            errors.append(f"{project_id}: недопустимые дефисы")
+        if project_id in RESERVED_PROJECTS:
+            errors.append(f"{project_id}: зарезервированное имя")
+        if not isinstance(item, dict):
+            errors.append(f"{project_id}: должен быть объектом")
+            continue
+        if set(item) != PROJECT_FIELDS:
+            errors.append(f"{project_id}: поля должны быть ровно {sorted(PROJECT_FIELDS)}")
+            continue
+        display = item["display"]
+        agent = item["agent"]
+        domain = item["domain"]
+        port = item["port"]
+        status = item["status"]
+        if not isinstance(display, str) or not 1 <= len(display) <= 64:
+            errors.append(f"{project_id}: display 1–64")
+        if not isinstance(agent, str) or not 1 <= len(agent) <= 64:
+            errors.append(f"{project_id}: agent 1–64")
+        if not isinstance(domain, str) or (domain and not DOMAIN_RE.fullmatch(domain)):
+            errors.append(f"{project_id}: domain пустой или поддомен")
+        elif domain:
+            if domain in domains:
+                errors.append(f"{project_id}: domain повторяется")
+            domains.add(domain)
+        if isinstance(port, bool) or not isinstance(port, int):
+            errors.append(f"{project_id}: port должен быть числом")
+        elif port != 0 and not 1024 <= port <= 65535:
+            errors.append(f"{project_id}: port 0 или 1024–65535")
+        elif port != 0:
+            if port in ports:
+                errors.append(f"{project_id}: port повторяется")
+            ports.add(port)
+        if status not in {"active", "paused", "planned"}:
+            errors.append(f"{project_id}: status active/paused/planned")
+    return errors
+
+
+def check_projects(gate: Gate) -> None:
+    path = ROOT / "projects.example.json"
+    if not path.is_file():
+        gate.fail("projects", "нет projects.example.json")
+        return
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        gate.fail("projects", f"projects.example.json: {exc}")
+        return
+    errors = validate_projects(data, {"proj-a", "proj-b"})
+    if errors:
+        gate.fail("projects", "; ".join(errors[:5]))
+        return
+    ignore = (ROOT / ".gitignore").read_text(encoding="utf-8", errors="replace")
+    if "projects.json" not in {line.strip() for line in ignore.splitlines()}:
+        gate.fail("projects", "projects.json не в .gitignore")
+        return
+    working = ROOT / "projects.json"
+    if working.is_file():
+        try:
+            working_data = json.loads(working.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            gate.fail("projects", f"projects.json: {exc}")
+            return
+        errors = validate_projects(working_data)
+        if errors:
+            gate.fail("projects", "; ".join(errors[:5]))
+            return
+    gate.ok("projects", "пример валиден, projects.json игнорируется")
+
+
 def check_isolation(gate: Gate) -> None:
     path = ROOT / "docs" / "ISOLATION.md"
     if not path.is_file():
@@ -672,6 +767,7 @@ def main() -> int:
         check_logs,
         check_debt,
         check_isolation,
+        check_projects,
         check_adr,
         check_process,
         check_ci,
