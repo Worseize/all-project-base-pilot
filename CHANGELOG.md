@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 0.9.8 — 2026-10-22
+
+- Многопроектная изоляция: один хост, несколько агентов, root — ограничитель.
+- `docs/ISOLATION.md`, `docs/scheme-isolation.svg`, ADR-0004.
+- `deploy/`: systemd unit, pre-receive, bootstrap, selftest.
+- `verify.py` проверяет матрицу прав; тесты на неё.
+- Агент пушит только в `review`; main двигает root.
+
 ## 0.9.7 — 2026-10-22
 
 - Схемы переведены на SVG, генератор — Go stdlib `cmd/schemes`.

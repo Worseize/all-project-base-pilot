@@ -1,6 +1,6 @@
 # Процесс: красный не проходит
 
-Версия 0.9.7 · 22.10.2026
+Версия 0.9.8 · 22.10.2026
 
 Схема: `docs/scheme-process.svg` ·
 Правила: [RULES.md](RULES.md) · Стратегия: [STRATEGY.md](STRATEGY.md)
@@ -44,6 +44,16 @@
 3. Записать решение в `JOURNAL.md` или `docs/adr/`.
 4. Обновить схему факта (правило 5).
 5. Только теперь задача закрыта.
+
+## Ветка внешнего агента
+
+1. Агент пушит в `refs/heads/review`; серверный `pre-receive` запускает
+   `verify.py` и отклоняет delete/force.
+2. Root смотрит diff и мержит `review` в `main` через `git update-ref`
+   (хуки не запускаются — это акт одобрения).
+3. Root деплоит и перезапускает `proj@<proj>.service`.
+4. Агент не имеет shell, sudo, main и доступа к чужим проектам.
+   Матрица — [docs/ISOLATION.md](docs/ISOLATION.md).
 
 ## Что проверяет verify
 

@@ -329,6 +329,41 @@ def check_debt(gate: Gate) -> None:
     gate.ok("debt", "закрытые долги удаляются")
 
 
+ISOLATION_ACTIONS = [
+    "Читать свой код",
+    "Читать чужой проект",
+    "Писать в свой каталог",
+    "Писать в `/etc`, юниты, хуки",
+    "Пушить в `review`",
+    "Пушить в `main`",
+    "Деплоить и перезапускать",
+    "Секреты своего проекта",
+    "Секреты чужого проекта",
+    "Порты наружу",
+]
+
+
+def check_isolation(gate: Gate) -> None:
+    path = ROOT / "docs" / "ISOLATION.md"
+    if not path.is_file():
+        gate.fail("isolation", "нет docs/ISOLATION.md")
+        return
+    text = path.read_text(encoding="utf-8", errors="replace")
+    if "| Действие | Агент проекта | Root |" not in text:
+        gate.fail("isolation", "нет заголовка матрицы прав")
+        return
+    missing = [action for action in ISOLATION_ACTIONS if action not in text]
+    if missing:
+        gate.fail("isolation", "нет действий: " + ", ".join(missing))
+        return
+    keys = ("projects_root", "hooks_root", "secrets_root", "review_ref", "main_ref")
+    absent = [key for key in keys if key not in CONFIG.get("isolation", {})]
+    if absent:
+        gate.fail("isolation", "в project.json нет isolation: " + ", ".join(absent))
+        return
+    gate.ok("isolation", f"{len(ISOLATION_ACTIONS)} действий, матрица полная")
+
+
 def check_adr(gate: Gate) -> None:
     adr = ROOT / "docs" / "adr"
     base = {"README.md", "0000-template.md"}
@@ -636,6 +671,7 @@ def main() -> int:
         check_journal,
         check_logs,
         check_debt,
+        check_isolation,
         check_adr,
         check_process,
         check_ci,

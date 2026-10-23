@@ -1,6 +1,6 @@
 {
   "name": "all-project-base",
-  "version": "0.9.7",
+  "version": "0.9.8",
   "date": "22.10.2026",
   "stack": "go",
   "commands": {
@@ -34,6 +34,12 @@
     "docs/scheme-strategy.svg",
     "docs/scheme-roadmap.svg",
     "docs/scheme-process.svg",
+    "docs/scheme-isolation.svg",
+    "docs/ISOLATION.md",
+    "deploy/systemd/proj@.service",
+    "deploy/git/pre-receive",
+    "deploy/bootstrap-project.sh",
+    "deploy/selftest-isolation.sh",
     "docs/adr/README.md",
     "docs/adr/0000-template.md",
     "docs/BRANCH_PROTECTION.md",
@@ -66,10 +72,18 @@
   },
   "project_sections": ["Назначение", "Стек", "Команды", "Границы", "Данные", "Окружения", "Исключения"],
   "feature_sections": ["Цель", "Схема плана", "Контракт", "Тесты", "Откат", "Готовность"],
+  "isolation": {
+    "projects_root": "/srv",
+    "hooks_root": "/etc/git-hooks",
+    "secrets_root": "/etc",
+    "review_ref": "refs/heads/review",
+    "main_ref": "refs/heads/main"
+  },
   "schemes": {
     "docs/scheme-rules.svg": ["RULES.md"],
     "docs/scheme-strategy.svg": ["STRATEGY.md"],
     "docs/scheme-roadmap.svg": ["STRATEGY.md"],
-    "docs/scheme-process.svg": ["PROCESS.md"]
+    "docs/scheme-process.svg": ["PROCESS.md"],
+    "docs/scheme-isolation.svg": ["docs/ISOLATION.md"]
   }
 }
