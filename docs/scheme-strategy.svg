@@ -1,10 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="5346" viewBox="0 0 1400 5346">
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="5370" viewBox="0 0 1400 5370">
 <rect width="1400" height="100%" fill="#f7f9fc"/>
 <style>text{font-family:'DejaVu Sans',Arial,sans-serif;fill:#172033}.title{font-size:32px;font-weight:700}.sub{font-size:14px;fill:#667085}.h2{font-size:22px;font-weight:700;fill:#1d4ed8}.h3{font-size:18px;font-weight:700;fill:#172033}.p{font-size:15px}.bullet{font-size:15px}.table{font-family:'DejaVu Sans Mono',monospace;font-size:13px}</style>
 <text x="60" y="64" class="title">Стратегия</text>
-<text x="60" y="92" class="sub">Source: STRATEGY.md · v0.9.8 · 22.10.2026</text>
+<text x="60" y="92" class="sub">Source: STRATEGY.md · v0.9.9 · 22.10.2026</text>
 <text x="60" y="144" class="h2">Стратегия шаблона и очередь улучшений</text>
-<text x="60" y="168" class="p">Версия 0.9.8 · 22.10.2026</text>
+<text x="60" y="168" class="p">Версия 0.9.9 · 22.10.2026</text>
 <text x="60" y="192" class="p">Шаблон уже отвечает на вопрос «как работать». Этот блок — про</text>
 <text x="60" y="216" class="p">другое:</text>
 <text x="60" y="240" class="p">как он развивается, что улучшать дальше и по какому признаку</text>
@@ -148,7 +148,7 @@
 <text x="60" y="3636" class="table">8 P1 CI + drift check контур не держится на памяти M</text>
 <text x="60" y="3660" class="table">9 P2 метрики без чисел нет улучшений M</text>
 <text x="60" y="3684" class="table">10 P2 версии и онбординг шаблон должен передаваться S</text>
-<text x="60" y="3708" class="p">Статус 0.9.8: verify, ADR/журнал, PROCESS.md, бюджеты 400/80,</text>
+<text x="60" y="3708" class="p">Статус 0.9.9: verify, ADR/журнал, PROCESS.md, бюджеты 400/80,</text>
 <text x="60" y="3732" class="p">PROJECT.md, FEATURE.md, README.md — сделаны.</text>
 <text x="60" y="3756" class="p">Схемы — SVG на Go stdlib, без Pillow, шрифтов и lock.</text>
 <text x="60" y="3780" class="p">Добавлены entropy secret scan, branch protection, CI GitHub/GitLab/Azure</text>
@@ -159,62 +159,63 @@
 <text x="60" y="3900" class="p">Логи разделены: tests/test.log, var/log/app.log, JOURNAL.md.</text>
 <text x="60" y="3924" class="p">Лимит: 100 КБ на страницу, 5 страниц на поток.</text>
 <text x="60" y="3948" class="p">Закрытый долг удаляется из DEBT.md.</text>
-<text x="60" y="3972" class="p">Многопроектная изоляция: docs/ISOLATION.md, deploy/*, ADR-0004.</text>
-<text x="60" y="3996" class="p">examples/minimal-go проверяет Go-путь. PROJECT.md и FEATURE.md теперь</text>
-<text x="60" y="4020" class="p">шаблоны: заполняются под проект и фичу.</text>
-<text x="60" y="4044" class="h3">Матрица impact / effort</text>
-<text x="60" y="4068" class="bullet">• P0 — верхний левый угол: высокий эффект, низкое усилие. Делать</text>
-<text x="60" y="4092" class="p">сейчас.</text>
-<text x="60" y="4116" class="bullet">• P1 — верхний правый: высокий эффект, высокое усилие.</text>
-<text x="60" y="4140" class="p">Планировать.</text>
-<text x="60" y="4164" class="bullet">• P2 — нижняя половина: эффект ниже. После пилота.</text>
-<text x="60" y="4188" class="bullet">• Нижний правый: высокое усилие при низком эффекте — только</text>
-<text x="60" y="4212" class="p">после пилота и с причиной.</text>
-<text x="60" y="4248" class="h2">Метрики успеха</text>
-<text x="60" y="4272" class="bullet">• Время до первой правильной правки у нового агента: меньше 30</text>
-<text x="60" y="4296" class="p">минут.</text>
-<text x="60" y="4320" class="bullet">• Доля фич с планом, тестом и фактом: 100%.</text>
-<text x="60" y="4344" class="bullet">• Пропущенные дефекты на фичу: меньше одного.</text>
-<text x="60" y="4368" class="bullet">• Доля откатов: меньше 10%.</text>
-<text x="60" y="4392" class="bullet">• Drift, пойманный автоматикой: 100% известных расхождений.</text>
-<text x="60" y="4416" class="bullet">• verify зелёный до merge: 100%.</text>
-<text x="60" y="4440" class="bullet">• Файлов больше 400 строк или функций больше 80: 0.</text>
-<text x="60" y="4464" class="bullet">• Моделей на map вместо структур: 0.</text>
-<text x="60" y="4488" class="bullet">• Бэкапов без проверки восстановления: 0.</text>
-<text x="60" y="4512" class="bullet">• Удалённых шагов миграций: 0.</text>
-<text x="60" y="4536" class="bullet">• Число правил: не больше десяти.</text>
-<text x="60" y="4560" class="bullet">• Сторонних зависимостей в продукте: 0.</text>
-<text x="60" y="4584" class="bullet">• Время на пересмотр правил: до 30 минут в месяц.</text>
-<text x="60" y="4608" class="p">Числа «900 тестов / 64 группы / 71% документации» — не KPI. Это</text>
-<text x="60" y="4632" class="p">следствие</text>
-<text x="60" y="4656" class="p">дисциплины. KPI — красный gate, покрытие инвариантов и</text>
-<text x="60" y="4680" class="p">отсутствие долгов.</text>
-<text x="60" y="4716" class="h2">Риски и анти-паттерны</text>
-<text x="60" y="4740" class="table">Риск Признак Ответ</text>
-<text x="60" y="4764" class="table">Бюрократия правила есть, проверок нет бюджет 10 +</text>
-<text x="60" y="4788" class="p">автоматизация</text>
-<text x="60" y="4812" class="table">Мёртвые карты схема не менялась три фичи генерация + drift check</text>
-<text x="60" y="4836" class="table">Стек-лок «иначе не умеем» без причины исключение только с</text>
-<text x="60" y="4860" class="p">записью</text>
-<text x="60" y="4884" class="table">Зависимость протащена в go.mod появился сторонний require удалить</text>
-<text x="60" y="4908" class="p">или остановить шаг</text>
-<text x="60" y="4932" class="table">Затянувшееся обдумывание больше 5 минут без отчёта стоп и</text>
-<text x="60" y="4956" class="p">«сделано / не сделано»</text>
-<text x="60" y="4980" class="table">Идеальный шаблон слои растут, пилота нет сначала одна</text>
-<text x="60" y="5004" class="p">реальная фича</text>
-<text x="60" y="5028" class="table">Правила ради правил одиннадцатое правило вобрать старое или</text>
-<text x="60" y="5052" class="p">отклонить</text>
-<text x="60" y="5076" class="table">Один носитель знаний «спроси у автора» ADR, журнал, онбординг</text>
-<text x="60" y="5112" class="h2">Ближайшие три шага</text>
-<text x="60" y="5136" class="p">1. PROJECT.md. Одна страница: Go stdlib, команды, границы, владельцы,</text>
-<text x="60" y="5160" class="p">окружения. Без неё правило 4 остаётся пожеланием.</text>
-<text x="60" y="5184" class="p">2. FEATURE.md + verify. Шаблон фичи и одна команда проверки:</text>
-<text x="60" y="5208" class="p">линт, тесты, секреты, мёртвый код, drift.</text>
-<text x="60" y="5232" class="p">3. Пилот. Провести одну реальную фичу по всему циклу и</text>
-<text x="60" y="5256" class="p">замерить:</text>
-<text x="60" y="5280" class="p">время, ошибки, откаты, расхождения карты.</text>
-<text x="60" y="5304" class="p">После пилота очередь пересматривается: то, что не дало</text>
-<text x="60" y="5328" class="p">эффекта, уходит</text>
-<text x="60" y="5352" class="p">в «не брать», а не в «когда-нибудь».</text>
-<text x="60" y="5376" class="p">Версия 0.9.8 · 22.10.2026</text>
+<text x="60" y="3972" class="p">Многопроектная изоляция: docs/ISOLATION.md, deploy/*, ADR-0004/0005.</text>
+<text x="60" y="3996" class="p">Доверенный gate, nologin, журнал приёмки.</text>
+<text x="60" y="4020" class="p">examples/minimal-go проверяет Go-путь. PROJECT.md и FEATURE.md теперь</text>
+<text x="60" y="4044" class="p">шаблоны: заполняются под проект и фичу.</text>
+<text x="60" y="4068" class="h3">Матрица impact / effort</text>
+<text x="60" y="4092" class="bullet">• P0 — верхний левый угол: высокий эффект, низкое усилие. Делать</text>
+<text x="60" y="4116" class="p">сейчас.</text>
+<text x="60" y="4140" class="bullet">• P1 — верхний правый: высокий эффект, высокое усилие.</text>
+<text x="60" y="4164" class="p">Планировать.</text>
+<text x="60" y="4188" class="bullet">• P2 — нижняя половина: эффект ниже. После пилота.</text>
+<text x="60" y="4212" class="bullet">• Нижний правый: высокое усилие при низком эффекте — только</text>
+<text x="60" y="4236" class="p">после пилота и с причиной.</text>
+<text x="60" y="4272" class="h2">Метрики успеха</text>
+<text x="60" y="4296" class="bullet">• Время до первой правильной правки у нового агента: меньше 30</text>
+<text x="60" y="4320" class="p">минут.</text>
+<text x="60" y="4344" class="bullet">• Доля фич с планом, тестом и фактом: 100%.</text>
+<text x="60" y="4368" class="bullet">• Пропущенные дефекты на фичу: меньше одного.</text>
+<text x="60" y="4392" class="bullet">• Доля откатов: меньше 10%.</text>
+<text x="60" y="4416" class="bullet">• Drift, пойманный автоматикой: 100% известных расхождений.</text>
+<text x="60" y="4440" class="bullet">• verify зелёный до merge: 100%.</text>
+<text x="60" y="4464" class="bullet">• Файлов больше 400 строк или функций больше 80: 0.</text>
+<text x="60" y="4488" class="bullet">• Моделей на map вместо структур: 0.</text>
+<text x="60" y="4512" class="bullet">• Бэкапов без проверки восстановления: 0.</text>
+<text x="60" y="4536" class="bullet">• Удалённых шагов миграций: 0.</text>
+<text x="60" y="4560" class="bullet">• Число правил: не больше десяти.</text>
+<text x="60" y="4584" class="bullet">• Сторонних зависимостей в продукте: 0.</text>
+<text x="60" y="4608" class="bullet">• Время на пересмотр правил: до 30 минут в месяц.</text>
+<text x="60" y="4632" class="p">Числа «900 тестов / 64 группы / 71% документации» — не KPI. Это</text>
+<text x="60" y="4656" class="p">следствие</text>
+<text x="60" y="4680" class="p">дисциплины. KPI — красный gate, покрытие инвариантов и</text>
+<text x="60" y="4704" class="p">отсутствие долгов.</text>
+<text x="60" y="4740" class="h2">Риски и анти-паттерны</text>
+<text x="60" y="4764" class="table">Риск Признак Ответ</text>
+<text x="60" y="4788" class="table">Бюрократия правила есть, проверок нет бюджет 10 +</text>
+<text x="60" y="4812" class="p">автоматизация</text>
+<text x="60" y="4836" class="table">Мёртвые карты схема не менялась три фичи генерация + drift check</text>
+<text x="60" y="4860" class="table">Стек-лок «иначе не умеем» без причины исключение только с</text>
+<text x="60" y="4884" class="p">записью</text>
+<text x="60" y="4908" class="table">Зависимость протащена в go.mod появился сторонний require удалить</text>
+<text x="60" y="4932" class="p">или остановить шаг</text>
+<text x="60" y="4956" class="table">Затянувшееся обдумывание больше 5 минут без отчёта стоп и</text>
+<text x="60" y="4980" class="p">«сделано / не сделано»</text>
+<text x="60" y="5004" class="table">Идеальный шаблон слои растут, пилота нет сначала одна</text>
+<text x="60" y="5028" class="p">реальная фича</text>
+<text x="60" y="5052" class="table">Правила ради правил одиннадцатое правило вобрать старое или</text>
+<text x="60" y="5076" class="p">отклонить</text>
+<text x="60" y="5100" class="table">Один носитель знаний «спроси у автора» ADR, журнал, онбординг</text>
+<text x="60" y="5136" class="h2">Ближайшие три шага</text>
+<text x="60" y="5160" class="p">1. PROJECT.md. Одна страница: Go stdlib, команды, границы, владельцы,</text>
+<text x="60" y="5184" class="p">окружения. Без неё правило 4 остаётся пожеланием.</text>
+<text x="60" y="5208" class="p">2. FEATURE.md + verify. Шаблон фичи и одна команда проверки:</text>
+<text x="60" y="5232" class="p">линт, тесты, секреты, мёртвый код, drift.</text>
+<text x="60" y="5256" class="p">3. Пилот. Провести одну реальную фичу по всему циклу и</text>
+<text x="60" y="5280" class="p">замерить:</text>
+<text x="60" y="5304" class="p">время, ошибки, откаты, расхождения карты.</text>
+<text x="60" y="5328" class="p">После пилота очередь пересматривается: то, что не дало</text>
+<text x="60" y="5352" class="p">эффекта, уходит</text>
+<text x="60" y="5376" class="p">в «не брать», а не в «когда-нибудь».</text>
+<text x="60" y="5400" class="p">Версия 0.9.9 · 22.10.2026</text>
 </svg>

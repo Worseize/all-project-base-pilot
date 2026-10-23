@@ -1,6 +1,6 @@
 {
   "name": "all-project-base",
-  "version": "0.9.8",
+  "version": "0.9.9",
   "date": "22.10.2026",
   "stack": "go",
   "commands": {
@@ -40,6 +40,7 @@
     "deploy/git/pre-receive",
     "deploy/bootstrap-project.sh",
     "deploy/selftest-isolation.sh",
+    "deploy/logrotate/proj",
     "docs/adr/README.md",
     "docs/adr/0000-template.md",
     "docs/BRANCH_PROTECTION.md",

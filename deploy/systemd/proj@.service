@@ -7,7 +7,7 @@ Type=simple
 User=%i
 Group=%i
 WorkingDirectory=/srv/%i
-ExecStart=/srv/%i/app
+ExecStart=/srv/%i/run
 EnvironmentFile=-/etc/%i/app.env
 Restart=on-failure
 

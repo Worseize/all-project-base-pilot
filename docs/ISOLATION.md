@@ -1,6 +1,6 @@
 # Изоляция проектов и агентов
 
-Версия 0.9.8 · 22.10.2026
+Версия 0.9.9 · 22.10.2026
 
 Один хост — несколько проектов — несколько агентов. Root — единственный,
 у кого полные права. Агент проекта получает только git-push в `review`.
@@ -100,9 +100,69 @@ TasksMax=64
 sudo deploy/bootstrap-project.sh proj-a
 # положить публичный ключ агента:
 sudo AGENT_PUBKEY="ssh-ed25519 AAAA... agent-a" deploy/bootstrap-project.sh proj-a
+# root сначала создаёт main с проверенным шаблоном:
+git push origin main
 # проверить изоляцию:
 sudo deploy/selftest-isolation.sh proj-a proj-b
 ```
+
+Пока `refs/heads/main` нет, `pre-receive` отклоняет любой `review`:
+доверенный `verify.py` берётся именно из main.
+
+## Доверенный gate
+
+`pre-receive` не запускает `verify.py` из пушимого дерева. Он берёт
+`verify.py` из `refs/heads/main` и запускает его на pushed tree. Изменения
+`verify.py`, `project.json`, `tests/`, `cmd/schemes` и `cmd/deadcode`
+отклоняются до запуска. Так агент не может ослабить проверку тем же пушем.
+
+## PATH и Go
+
+sshd не добавляет `/usr/local/go/bin` в `PATH`. Хук явно выставляет:
+
+```bash
+PATH="/usr/local/go/bin:/usr/bin:/bin${PATH:+:$PATH}"
+```
+
+Без этого `go test`, `gofmt`, `deadcode` уходили бы в skip.
+
+## Пользователь без shell
+
+`useradd --shell "$(command -v nologin)"`; существующему пользователю
+`usermod --shell ...`. `git-receive-pack` вызывается sshd напрямую и shell
+не требует. Проверка: `getent passwd proj-a` → `nologin`; `ssh ... id` не
+выполняет `id`.
+
+## Журнал приёмки
+
+`/var/log/git/<proj>.log` — root:<proj>, 0640; hook пишет строку на каждый
+push: дата, ref, old, new, результат, причина. Запись идёт через ACL
+(`setfacl -m u:<proj>:rw-`), иначе bootstrap падает в 0660 и предупреждает.
+Ротация — `/etc/logrotate.d/proj-<proj>`: `size 100k`, `rotate 5`,
+`copytruncate`; ACL сохраняется.
+
+## Один проект
+
+`selftest-isolation.sh` работает и с одним проектом:
+
+```bash
+sudo deploy/selftest-isolation.sh proj-a
+```
+
+Проверяет: свой CANARY читается, sudo нет, портов нет, hooks/unit/log
+на месте. С двумя — плюс «чужой CANARY не читается».
+
+## systemd
+
+`ExecStart=/srv/%i/run` — стек-нейтральный launcher. `systemd-analyze verify`
+на шаблоне без `run` ожидаемо краснеет; проверять юнит нужно на живом
+экземпляре. `run` должен быть исполняемым и запускать приложение проекта.
+
+## Предупреждение про /srv
+
+`bootstrap-project.sh` ставит `/srv` в `0711`. Это влияет на **весь хост**,
+не только на новый проект. Если на `/srv` есть другие данные — проверь
+владельца и режим до онбординга.
 
 ## Проверки
 
@@ -111,12 +171,13 @@ sudo deploy/selftest-isolation.sh proj-a proj-b
 - `sudo deploy/selftest-isolation.sh proj-a proj-b`:
   - `proj-a` не читает `CANARY` проекта B;
   - `proj-a` не имеет sudo;
-  - нет внешних портов;
+  - нет слушающих сокетов;
   - hooksPath и права root:root;
-  - unit существует.
+  - unit и log на месте.
 - Живой push:
   - `git push origin HEAD:main` → rejected;
-  - `git push origin HEAD:review` → accepted после verify;
+  - `git push origin HEAD:review` → accepted после trusted verify;
+  - подмена `verify.py` в review → rejected;
   - удаление/force push → rejected.
 
 ## Границы

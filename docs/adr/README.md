@@ -11,6 +11,7 @@ ADR фиксирует значимое решение: контекст, выб
 | 0002 | [Red gate и журнал решений](0002-red-gate.md) | Accepted |
 | 0003 | [SVG-схемы на Go](0003-svg-go-schemes.md) | Accepted |
 | 0004 | [Многопроектная изоляция](0004-multi-agent-isolation.md) | Accepted |
+| 0005 | [Изоляция: доверенный gate](0005-isolation-hardening.md) | Accepted |
 
 ## Когда писать ADR
 
