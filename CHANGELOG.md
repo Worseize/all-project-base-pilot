@@ -7,6 +7,8 @@
 - `PATH` с Go; `nologin`; журнал приёмки с ACL и logrotate.
 - Проверка портов через pid; selftest для одного проекта; `run` в unit.
 - ADR-0005; обновлены ISOLATION/LOGGING/SCHEME.
+- Имена: `id`/`display`, `projects.example.json`, `check_projects`,
+  `audit-drift.sh`; рабочий `projects.json` в `.gitignore`.
 
 ## 0.9.8 — 2026-10-22
 

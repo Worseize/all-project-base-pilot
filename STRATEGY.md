@@ -147,6 +147,7 @@ Close-task запрещает код без features/ADR/DEBT/JOURNAL.
 Закрытый долг удаляется из DEBT.md.
 Многопроектная изоляция: docs/ISOLATION.md, deploy/*, ADR-0004/0005.
 Доверенный gate, nologin, журнал приёмки.
+Имена и реестр: projects.example.json, projects.json, audit-drift.
 `examples/minimal-go` проверяет Go-путь. `PROJECT.md` и `FEATURE.md` теперь
 шаблоны: заполняются под проект и фичу.
 
