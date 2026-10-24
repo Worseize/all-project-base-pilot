@@ -531,8 +531,10 @@ def check_process(gate: Gate) -> None:
     missing = [word for word in ("verify", "красн", "журнал", "деплой") if word not in text]
     if missing:
         gate.fail("process", "нет разделов: " + ", ".join(missing))
+    elif "закрывает issue только conductor" not in text:
+        gate.fail("process", "не зафиксировано: issue закрывает только conductor")
     else:
-        gate.ok("process", "red gate и журнал описаны")
+        gate.ok("process", "red gate, журнал и правило доски описаны")
 
 
 def check_ci(gate: Gate) -> None:
