@@ -1,6 +1,6 @@
 # Изоляция проектов и агентов
 
-Версия 0.9.13 · 22.10.2026
+Версия 0.9.14 · 22.10.2026
 
 Один хост — несколько проектов — несколько агентов. Root — единственный,
 у кого полные права. Агент проекта получает только git-push в `review`.
@@ -175,11 +175,12 @@ forced command работает, а интерактивного shell нет. �
 
 ## Журнал приёмки
 
-`/var/log/git/<proj>.log` — root:<proj>, 0640; hook пишет строку на каждый
-push: дата, ref, old, new, результат, причина. Запись идёт через ACL
-(`setfacl -m u:<proj>:rw-`), иначе bootstrap падает в 0660 и предупреждает.
+`/var/log/git` — root:root 0755. `/var/log/git/<proj>.log` —
+root:<proj>, 0660; hook пишет строку на каждый push: дата, ref, old, new,
+результат, причина. Групповая запись нужна, потому что hook работает от
+пользователя проекта; setfacl не требуется.
 Ротация — `/etc/logrotate.d/proj-<proj>`: `size 100k`, `rotate 5`,
-`copytruncate`; ACL сохраняется.
+`copytruncate`; режим и группа сохраняются.
 
 ## Один проект
 
@@ -233,6 +234,14 @@ sudo deploy/selftest-isolation.sh proj-a
 отчёт — файл `docs/acceptance/` и сообщение коммита `(findings#N)`,
 отказ — файл с первой строкой `Отказ: <причина>`. Issue закрывает только
 `conductor`.
+
+## CI isolation
+
+`.github/workflows/isolation.yml` запускает `deploy/ci/isolation.sh` на
+`ubuntu-latest`: bootstrap двух проектов, `git-shell`, seed `main`,
+review/force/delete, подмена `verify.py`, canary, sudo, hooksPath, лог и
+logrotate. В конце — `deploy/ci/isolation-cleanup.sh`. Джоба краснеет при
+возврате `nologin`, отсутствии `main` или ослаблении gate.
 
 ## Границы
 

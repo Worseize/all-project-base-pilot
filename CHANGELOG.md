@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.9.14 — 2026-10-25
+
+- CI-джоба `isolation`: bootstrap двух проектов и полная приёмка.
+- Проверки review/force/delete, подмены `verify.py`, canary, sudo,
+  hooksPath, лога и logrotate.
+- `deploy/ci/isolation.sh` + cleanup; workflow `.github/workflows/isolation.yml`.
+
 ## 0.9.13 — 2026-10-24
 
 - Агент не пишет в issues вообще, включая комментарии.

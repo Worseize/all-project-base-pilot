@@ -4,6 +4,10 @@
 # changes to gate files, runs trusted verify.py from main.
 set -euo pipefail
 export PATH="/usr/local/go/bin:/usr/bin:/bin${PATH:+:$PATH}"
+for candidate in /usr/lib/go/bin /opt/hostedtoolcache/go/*/x64/bin; do
+  [ -d "$candidate" ] && PATH="$candidate:$PATH"
+done
+export PATH
 
 ZERO=0000000000000000000000000000000000000000
 PROJECT="$(basename "$(dirname "$0")")"
@@ -42,8 +46,9 @@ while read -r old new ref; do
       reject "force push to review is forbidden"
   fi
 
-  protected="$(git --git-dir="$REPO" diff --name-only refs/heads/main "$new" --
-    verify.py project.json tests cmd/schemes cmd/deadcode 2>/dev/null || true)"
+  changed="$(git --git-dir="$REPO" diff --name-only refs/heads/main "$new" 2>/dev/null || true)"
+  protected="$(printf '%s\n' "$changed" |
+    grep -E '^(verify\.py|project\.json|tests/|cmd/schemes/|cmd/deadcode/)' || true)"
   [ -z "$protected" ] ||
     reject "gate files changed: $(printf '%s' "$protected" | tr '\n' ' ')"
 

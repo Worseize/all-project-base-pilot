@@ -85,10 +85,10 @@ else
 fi
 
 LOG="/var/log/git/$A.log"
-if [ -f "$LOG" ] && [ "$(stat -c '%U:%G %a' "$LOG" 2>/dev/null)" = "root:$A 640" ]; then
-  ok "acceptance log root:$A 640"
+if [ -f "$LOG" ] && [ "$(stat -c '%U:%G %a' "$LOG" 2>/dev/null)" = "root:$A 660" ]; then
+  ok "acceptance log root:$A 660"
 else
-  fail "acceptance log missing or wrong mode (root:$A 640)"
+  fail "acceptance log missing or wrong mode (root:$A 660)"
 fi
 
 if getent passwd "$A" | grep -q 'nologin$\|git-shell$'; then

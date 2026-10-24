@@ -1,6 +1,6 @@
 {
   "name": "all-project-base",
-  "version": "0.9.13",
+  "version": "0.9.14",
   "date": "22.10.2026",
   "stack": "go",
   "commands": {
@@ -23,6 +23,7 @@
     "LICENSE",
     ".env.example",
     ".gitattributes",
+    ".github/workflows/isolation.yml",
     "go.mod",
     "verify.py",
     "project.json",
@@ -44,6 +45,8 @@
     "deploy/selftest-isolation.sh",
     "deploy/logrotate/proj",
     "deploy/audit-drift.sh",
+    "deploy/ci/isolation.sh",
+    "deploy/ci/isolation-cleanup.sh",
     "docs/adr/README.md",
     "docs/adr/0000-template.md",
     "docs/BRANCH_PROTECTION.md",

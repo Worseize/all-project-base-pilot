@@ -65,30 +65,43 @@ chown -R "$PROJECT:$PROJECT" "$REPO"
 git -c safe.directory="$REPO" --git-dir="$REPO" config core.hooksPath "$HOOKS"
 git -c safe.directory="$REPO" --git-dir="$REPO" config receive.denyDeletes true
 git -c safe.directory="$REPO" --git-dir="$REPO" config receive.denyNonFastForwards true
+git -c safe.directory="$REPO" --git-dir="$REPO" symbolic-ref HEAD refs/heads/main
 
 if ! git -c safe.directory="$REPO" --git-dir="$REPO" rev-parse --verify --quiet refs/heads/main >/dev/null; then
-  if ! git -C "$SOURCE_REPO" rev-parse --verify --quiet "$SOURCE_REF" >/dev/null; then
+  if [ "$(git -c safe.directory="$SOURCE_REPO" -C "$SOURCE_REPO" rev-parse --is-shallow-repository 2>/dev/null)" = "true" ]; then
+    echo "SOURCE_REPO is shallow; fetch full history or set SOURCE_REPO" >&2
+    exit 1
+  fi
+  if ! git -c safe.directory="$SOURCE_REPO" -C "$SOURCE_REPO" rev-parse --verify --quiet "$SOURCE_REF" >/dev/null; then
     echo "source repo/ref not found: $SOURCE_REPO $SOURCE_REF" >&2
     exit 1
   fi
-  git -c safe.directory="$REPO" --git-dir="$REPO" fetch "$SOURCE_REPO" "$SOURCE_REF:refs/heads/main"
+  git -c safe.directory="$REPO" -c safe.directory="$SOURCE_REPO" --git-dir="$REPO" fetch "$SOURCE_REPO" "$SOURCE_REF:refs/heads/main"
+  if ! git -c safe.directory="$REPO" --git-dir="$REPO" rev-parse --verify --quiet refs/heads/main >/dev/null; then
+    echo "main was not seeded from $SOURCE_REPO ($SOURCE_REF)" >&2
+    exit 1
+  fi
   chown -R "$PROJECT:$PROJECT" "$REPO"
   echo "seeded main from $SOURCE_REPO ($SOURCE_REF)"
 fi
+git -c safe.directory="$REPO" --git-dir="$REPO" symbolic-ref HEAD refs/heads/main
 
 install -d -m 0755 -o root -g root "$HOOKS"
 install -m 0755 -o root -g root "$SCRIPT_DIR/git/pre-receive" "$HOOKS/pre-receive"
 
-install -d -m 0750 -o root -g "$PROJECT" /var/log/git
+install -d -m 0755 -o root -g root /var/log/git
+chown root:root /var/log/git
+chmod 0755 /var/log/git
 LOG="/var/log/git/$PROJECT.log"
 if [ ! -f "$LOG" ]; then
-  install -m 0640 -o root -g "$PROJECT" /dev/null "$LOG"
-fi
-if command -v setfacl >/dev/null 2>&1; then
-  setfacl -m "u:$PROJECT:rw-" "$LOG"
+  install -m 0660 -o root -g "$PROJECT" /dev/null "$LOG"
 else
+  chown root:"$PROJECT" "$LOG"
   chmod 0660 "$LOG"
-  echo "warning: setfacl missing; $LOG is 0660, not 0640" >&2
+fi
+if command -v runuser >/dev/null 2>&1 && ! runuser -u "$PROJECT" -- test -w "$LOG"; then
+  echo "$PROJECT cannot write $LOG" >&2
+  exit 1
 fi
 
 install -m 0644 -o root -g root "$SCRIPT_DIR/systemd/proj@.service" /etc/systemd/system/proj@.service
@@ -114,9 +127,9 @@ else
   echo "AGENT_PUBKEY not set; add the agent key later" >&2
 fi
 
-if command -v systemctl >/dev/null 2>&1; then
-  systemctl daemon-reload
-  systemctl enable "proj@$PROJECT.service"
+if command -v systemctl >/dev/null 2>&1 && systemctl is-system-running >/dev/null 2>&1; then
+  systemctl daemon-reload || true
+  systemctl enable "proj@$PROJECT.service" || true
 fi
 
 printf 'ready: project=%s user=%s repo=%s hooks=%s\n' \
