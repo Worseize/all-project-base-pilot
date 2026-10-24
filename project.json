@@ -1,6 +1,6 @@
 {
   "name": "all-project-base",
-  "version": "0.9.18",
+  "version": "0.9.19",
   "date": "22.10.2026",
   "commands": {
     "build": "go build ./cmd/...",
@@ -46,6 +46,11 @@
     "deploy/bootstrap-project.sh",
     "deploy/selftest-isolation.sh",
     "deploy/deploy-project.sh",
+    "deploy/auto-merge.sh",
+    "deploy/allow-path.sh",
+    "deploy/install-auto-merge.sh",
+    "deploy/systemd/proj-auto-merge.service",
+    "deploy/systemd/proj-auto-merge.timer",
     "deploy/audit-drift.sh",
     "deploy/ci/isolation.sh",
     "deploy/ci/isolation-cleanup.sh",

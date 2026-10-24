@@ -346,7 +346,7 @@ RESERVED_PROJECTS = {
     "root", "app", "caddy", "watchdog", "admin", "system", "debian",
     "ubuntu", "nobody", "daemon", "bin", "sys", "mail", "www", "git", "ssh",
 }
-PROJECT_FIELDS = {"display", "agent", "domain", "port", "status"}
+PROJECT_FIELDS = {"display", "agent", "domain", "port", "status", "allowed_paths"}
 DOMAIN_RE = re.compile(
     r"^(?=.{1,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$"
 )
@@ -381,6 +381,7 @@ def validate_projects(data, allowed_ids=None) -> list[str]:
         domain = item["domain"]
         port = item["port"]
         status = item["status"]
+        allowed_paths = item["allowed_paths"]
         if not isinstance(display, str) or not 1 <= len(display) <= 64:
             errors.append(f"{project_id}: display 1–64")
         if not isinstance(agent, str) or not 1 <= len(agent) <= 64:
@@ -401,6 +402,18 @@ def validate_projects(data, allowed_ids=None) -> list[str]:
             ports.add(port)
         if status not in {"active", "paused", "planned"}:
             errors.append(f"{project_id}: status active/paused/planned")
+        if not isinstance(allowed_paths, list) or not allowed_paths:
+            errors.append(f"{project_id}: allowed_paths должен быть непустым списком")
+        else:
+            for allowed in allowed_paths:
+                if (
+                    not isinstance(allowed, str)
+                    or not allowed
+                    or allowed.startswith("/")
+                    or ".." in allowed.split("/")
+                    or "\\" in allowed
+                ):
+                    errors.append(f"{project_id}: некорректный allowed_path: {allowed}")
     return errors
 
 

@@ -271,6 +271,7 @@ class VerifyTests(unittest.TestCase):
                     "domain": "proj-a.example.org",
                     "port": 8011,
                     "status": "active",
+                    "allowed_paths": ["app/"],
                 },
                 "proj-b": {
                     "display": "Project B",
@@ -278,6 +279,7 @@ class VerifyTests(unittest.TestCase):
                     "domain": "",
                     "port": 8012,
                     "status": "planned",
+                    "allowed_paths": ["app/"],
                 },
             }
         }
@@ -320,6 +322,14 @@ class VerifyTests(unittest.TestCase):
     def test_projects_bad_status(self):
         data = self._projects()
         data["projects"]["proj-a"]["status"] = "unknown"
+        self._write_projects(data)
+        gate = verify.Gate()
+        verify.check_projects(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_projects_invalid_allowed_path(self):
+        data = self._projects()
+        data["projects"]["proj-a"]["allowed_paths"] = ["/etc/"]
         self._write_projects(data)
         gate = verify.Gate()
         verify.check_projects(gate)
@@ -493,7 +503,7 @@ class VerifyTests(unittest.TestCase):
         self.assertIn("show refs/heads/main:verify.py", hook)
         self.assertIn("python3 .trusted-verify.py", hook)
         self.assertNotIn("python3 verify.py", hook)
-        for path in ("verify\\.py", "project\\.json", "tests/", "cmd/schemes/", "cmd/deadcode/"):
+        for path in ("verify\\.py", "project\\.json", "tests/", "cmd/", "deploy/"):
             self.assertIn(path, hook)
 
     def test_isolation_matrix_complete(self):

@@ -48,9 +48,23 @@ while read -r old new ref; do
 
   changed="$(git --git-dir="$REPO" diff --name-only refs/heads/main "$new" 2>/dev/null || true)"
   protected="$(printf '%s\n' "$changed" |
-    grep -E '^(verify\.py|project\.json|tests/|cmd/schemes/|cmd/deadcode/)' || true)"
+    grep -E '^(verify\.py|project\.json|go\.mod|go\.sum|tests/|cmd/|deploy/|\.github/|\.gitlab-ci\.yml|azure-pipelines\.yml)' || true)"
   [ -z "$protected" ] ||
     reject "gate files changed: $(printf '%s' "$protected" | tr '\n' ' ')"
+
+  allowed_file="/etc/git-hooks/$PROJECT/allowed-paths"
+  [ -f "$allowed_file" ] || reject "allowlist missing: $allowed_file"
+  while IFS= read -r path; do
+    [ -n "$path" ] || continue
+    allowed=0
+    while IFS= read -r prefix; do
+      [ -n "$prefix" ] || continue
+      case "$path" in
+        "$prefix"*) allowed=1; break ;;
+      esac
+    done < "$allowed_file"
+    [ "$allowed" -eq 1 ] || reject "path not allowed: $path"
+  done <<< "$changed"
 
   tmp="$(mktemp -d)"
   trap 'rm -rf "$tmp"' EXIT

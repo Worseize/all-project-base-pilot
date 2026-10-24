@@ -1,6 +1,6 @@
 # Админ-узел
 
-Версия 0.9.18 · 25.10.2026
+Версия 0.9.19 · 25.10.2026
 
 Этот шаблон разворачивает **админ-узел**, а не продукт. Админ держит
 гейт, принимает правки агентов, следит за firewall, журналами и бэкапом.
@@ -25,6 +25,7 @@
 
 ```bash
 sudo deploy/host-baseline.sh
+sudo deploy/install-auto-merge.sh
 sudo deploy/audit-drift.sh projects.json
 ```
 
@@ -36,6 +37,9 @@ sudo deploy/audit-drift.sh projects.json
 - journald: `SystemMaxUse=200M`, `RuntimeMaxUse=50M`, retention 1 month;
 - logrotate: `/var/log/git/*.log`, 100 КБ × 5, copytruncate;
 - timezone (`TIMEZONE`, по умолчанию UTC).
+
+`install-auto-merge.sh` ставит timer: review → main только по зелёной
+метке гейта, затем deploy и restart; при сбое main откатывается.
 
 ## Проверка здоровья
 
