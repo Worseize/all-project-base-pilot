@@ -1,0 +1,56 @@
+# Админ-узел
+
+Версия 0.9.15 · 25.10.2026
+
+Этот шаблон разворачивает **админ-узел**, а не продукт. Админ держит
+гейт, принимает правки агентов, следит за firewall, журналами и бэкапом.
+Продукты живут отдельными проектами.
+
+## Что делает админ
+
+- запускает `python verify.py` и `--close-task`;
+- принимает `review` в `main` и закрывает findings-issue;
+- разворачивает изоляцию через `deploy/bootstrap-project.sh`;
+- держит `ufw`, `fail2ban`, `journald`, `logrotate` и timezone;
+- проверяет узел через `deploy/audit-drift.sh`.
+
+## Чего не делает
+
+- не пишет продуктовый код и не держит `cmd/app`, `app.service`, `bin/app`;
+- не запускает продуктовый сервис и не хранит данные продукта;
+- не даёт агенту shell, sudo, `main` или чужие проекты;
+- не ослабляет `verify.py`, хуки и проверки изоляции.
+
+## Baseline
+
+```bash
+sudo deploy/host-baseline.sh
+sudo deploy/audit-drift.sh projects.json
+```
+
+`host-baseline.sh` идемпотентно настраивает:
+
+- `ufw`: deny incoming, allow outgoing, `limit` на SSH, 80/443;
+- `fail2ban`: jail `sshd`, file backend `/var/log/auth.log`;
+- sysctl: rp_filter, syncookies, redirects, dmesg/kptr;
+- journald: `SystemMaxUse=200M`, `RuntimeMaxUse=50M`, retention 1 month;
+- logrotate: `/var/log/git/*.log`, 100 КБ × 5, copytruncate;
+- timezone (`TIMEZONE`, по умолчанию UTC).
+
+## Проверка здоровья
+
+`audit-drift.sh` краснеет, если:
+
+- ufw не active или нет SSH-limit;
+- fail2ban jail не активен;
+- нет sysctl/journald/logrotate-файлов;
+- timezone не совпадает;
+- реестр и `/srv` расходятся в любую сторону.
+
+## Границы
+
+- Linux + systemd; Windows для live-проверки не подходит.
+- Пакеты `ufw`/`fail2ban` должны быть установлены; baseline их не ставит.
+- Caddy — единственный вход; продуктовые порты наружу не публикуются.
+- Rule #11 не добавляется: политика в `PROJECT.md`, `ISOLATION.md`,
+  `HOST.md` и `PROCESS.md`.

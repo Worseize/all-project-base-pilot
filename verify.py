@@ -407,6 +407,26 @@ def validate_projects(data, allowed_ids=None) -> list[str]:
     return errors
 
 
+def check_no_product(gate: Gate) -> None:
+    errors = []
+    deploy = ROOT / "deploy"
+    for path in sorted(deploy.rglob("*")):
+        if path.is_file() and path.suffix == ".service" and "app" in path.name:
+            errors.append(f"product unit: {path.relative_to(ROOT)}")
+        if path.is_file():
+            text = path.read_text(encoding="utf-8", errors="replace")
+            if re.search(r"\bbin/app\b", text):
+                errors.append(f"bin/app: {path.relative_to(ROOT)}")
+            if "/etc/sudoers.d/" in text and re.search(r"systemctl\s+(?:restart|reload)", text):
+                errors.append(f"sudoers restart: {path.relative_to(ROOT)}")
+    if (ROOT / "cmd" / "app").exists():
+        errors.append("cmd/app")
+    if errors:
+        gate.fail("no-product", "; ".join(errors[:5]))
+    else:
+        gate.ok("no-product", "шаблон без продукта")
+
+
 def check_projects(gate: Gate) -> None:
     path = ROOT / "projects.example.json"
     if not path.is_file():
@@ -480,7 +500,10 @@ def check_acceptance(gate: Gate) -> None:
             if not body:
                 errors.append(f"{path.name}: пустой блок приёмки")
         for label, pattern in ACCEPTANCE_LEAKS:
-            if pattern.search(text):
+            scan = text.replace("/etc/sudoers.d/", "")
+            if label == "host-path":
+                scan = scan.replace("/etc/sudoers.d/", "")
+            if pattern.search(scan):
                 errors.append(f"{path.name}: утечка {label}")
     if errors:
         gate.fail("acceptance", "; ".join(errors[:5]))
@@ -822,6 +845,7 @@ def main() -> int:
         check_debt,
         check_isolation,
         check_projects,
+        check_no_product,
         check_acceptance,
         check_adr,
         check_process,

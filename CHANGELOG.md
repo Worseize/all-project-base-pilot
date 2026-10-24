@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.9.15 — 2026-10-25
+
+- Шаблон закреплён как админ-узел и приёмка, без продукта.
+- `check_no_product`: запрет `cmd/app`, `app.service`, `bin/app`, sudoers.
+- `PROJECT.md`/`README.md`/`ISOLATION.md`/`docs/HOST.md` — роль админа.
+- `host-baseline.sh` и host-проверки в `audit-drift.sh`.
+
 ## 0.9.14 — 2026-10-25
 
 - CI-джоба `isolation`: bootstrap двух проектов и полная приёмка.
