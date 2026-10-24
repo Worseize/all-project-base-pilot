@@ -23,6 +23,7 @@ cleanup() {
 on_exit() {
   mkdir -p "$CI_LOG_DIR"
   cp -a /var/log/git/*.log "$CI_LOG_DIR/" 2>/dev/null || true
+  chmod 0644 "$CI_LOG_DIR"/*.log 2>/dev/null || true
   {
     echo "== diagnostics"
     echo "shallow=$(git -C "$ROOT" rev-parse --is-shallow-repository 2>/dev/null || echo unknown)"

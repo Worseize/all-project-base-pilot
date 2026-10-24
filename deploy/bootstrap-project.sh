@@ -89,9 +89,9 @@ git -c safe.directory="$REPO" --git-dir="$REPO" symbolic-ref HEAD refs/heads/mai
 install -d -m 0755 -o root -g root "$HOOKS"
 install -m 0755 -o root -g root "$SCRIPT_DIR/git/pre-receive" "$HOOKS/pre-receive"
 
-install -d -m 0750 -o root -g "$PROJECT" /var/log/git
-chown root:"$PROJECT" /var/log/git
-chmod 0750 /var/log/git
+install -d -m 0755 -o root -g root /var/log/git
+chown root:root /var/log/git
+chmod 0755 /var/log/git
 LOG="/var/log/git/$PROJECT.log"
 if [ ! -f "$LOG" ]; then
   install -m 0660 -o root -g "$PROJECT" /dev/null "$LOG"
