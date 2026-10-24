@@ -383,6 +383,15 @@ class VerifyTests(unittest.TestCase):
         verify.check_acceptance(gate)
         self.assertEqual(gate.failed, 1)
 
+    def test_pre_receive_uses_trusted_verify(self):
+        root = Path(__file__).resolve().parents[1]
+        hook = (root / "deploy" / "git" / "pre-receive").read_text(encoding="utf-8")
+        self.assertIn("show refs/heads/main:verify.py", hook)
+        self.assertIn("python3 .trusted-verify.py", hook)
+        self.assertNotIn("python3 verify.py", hook)
+        for path in ("verify.py", "project.json", "tests", "cmd/schemes", "cmd/deadcode"):
+            self.assertIn(path, hook)
+
     def test_isolation_matrix_complete(self):
         docs = verify.ROOT / "docs"
         docs.mkdir()
