@@ -22,12 +22,16 @@ sudo deploy/host-baseline.sh
 sudo deploy/install-auto-merge.sh
 ```
 
-4. Создайте рабочий реестр вне git и первого проекта:
+4. Создайте рабочий реестр вне git и первого проекта из скелета:
 
 ```bash
 cp projects.example.json projects.json
-sudo deploy/bootstrap-project.sh proj-a
+sudo deploy/init-project.sh proj-a
 ```
+
+Скелет — `skeleton/project`: `run`, `PROJECT.md`, `test.sh`,
+`.gitignore`, `README.md`. Контракт агента —
+[docs/AGENT-CONTRACT.md](docs/AGENT-CONTRACT.md).
 
 5. Проверьте узел и изоляцию:
 

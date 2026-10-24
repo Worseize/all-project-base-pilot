@@ -92,7 +92,7 @@ git -c safe.directory="$REPO" --git-dir="$REPO" symbolic-ref HEAD refs/heads/mai
 install -d -m 0755 -o root -g root "$HOOKS"
 install -m 0755 -o root -g root "$SCRIPT_DIR/git/pre-receive" "$HOOKS/pre-receive"
 install -m 0755 -o root -g root "$SCRIPT_DIR/git/post-receive" "$HOOKS/post-receive"
-allowed="app/"
+allowed="${ALLOWED_PATHS:-app/}"
 if [ -f "$PROJECTS_FILE" ]; then
   allowed="$(python3 - "$PROJECTS_FILE" "$PROJECT" 2>/dev/null <<'PY' || true
 import json
@@ -103,7 +103,7 @@ for path in item.get("allowed_paths", []):
     print(path)
 PY
 )"
-  [ -n "$allowed" ] || allowed="app/"
+  [ -n "$allowed" ] || allowed="${ALLOWED_PATHS:-app/}"
 fi
 printf '%s\n' "$allowed" > "$ALLOWED_FILE"
 chown root:root "$ALLOWED_FILE"

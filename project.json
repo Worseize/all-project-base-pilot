@@ -1,6 +1,6 @@
 {
   "name": "all-project-base",
-  "version": "0.9.19",
+  "version": "0.9.20",
   "date": "22.10.2026",
   "commands": {
     "build": "go build ./cmd/...",
@@ -49,6 +49,13 @@
     "deploy/auto-merge.sh",
     "deploy/allow-path.sh",
     "deploy/install-auto-merge.sh",
+    "deploy/init-project.sh",
+    "skeleton/project/run",
+    "skeleton/project/test.sh",
+    "skeleton/project/PROJECT.md",
+    "skeleton/project/README.md",
+    "skeleton/project/.gitignore",
+    "docs/AGENT-CONTRACT.md",
     "deploy/systemd/proj-auto-merge.service",
     "deploy/systemd/proj-auto-merge.timer",
     "deploy/audit-drift.sh",

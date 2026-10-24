@@ -1,6 +1,6 @@
 # Изоляция проектов и агентов
 
-Версия 0.9.19 · 22.10.2026
+Версия 0.9.20 · 22.10.2026
 
 Один хост — несколько проектов — несколько агентов. Root — единственный,
 у кого полные права. Агент проекта получает только git-push в `review`.
@@ -152,9 +152,9 @@ TasksMax=64
 ## Онбординг
 
 ```bash
-sudo deploy/bootstrap-project.sh proj-a
-# bootstrap сам создаёт main из SOURCE_REPO (по умолчанию — этот шаблон)
-sudo AGENT_PUBKEY="ssh-ed25519 AAAA... agent-a" deploy/bootstrap-project.sh proj-a
+sudo deploy/init-project.sh proj-a
+# init собирает main из skeleton/project (run, PROJECT, test.sh, .gitignore)
+sudo AGENT_PUBKEY="ssh-ed25519 AAAA... agent-a" deploy/init-project.sh proj-a
 # рабочий реестр — вне git:
 cp projects.example.json projects.json
 # проверить изоляцию:

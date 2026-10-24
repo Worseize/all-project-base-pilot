@@ -46,15 +46,23 @@ for PROJECT in "${IDS[@]}"; do
     rm -rf "$tmp"
     continue
   fi
-  if ! git -c safe.directory="$REPO" --git-dir="$REPO" show refs/heads/main:verify.py > "$tmp/.trusted-verify.py"; then
-    fail "$PROJECT trusted verify missing"
-    rm -rf "$tmp"
-    continue
-  fi
-  if ! (cd "$tmp" && python3 .trusted-verify.py) >/dev/null 2>&1; then
-    fail "$PROJECT gate red at $review"
-    rm -rf "$tmp"
-    continue
+  if [ -f "$tmp/test.sh" ]; then
+    if ! (cd "$tmp" && bash test.sh) >/dev/null 2>&1; then
+      fail "$PROJECT test.sh red at $review"
+      rm -rf "$tmp"
+      continue
+    fi
+  else
+    if ! git -c safe.directory="$REPO" --git-dir="$REPO" show refs/heads/main:verify.py > "$tmp/.trusted-verify.py"; then
+      fail "$PROJECT trusted verify missing"
+      rm -rf "$tmp"
+      continue
+    fi
+    if ! (cd "$tmp" && python3 .trusted-verify.py) >/dev/null 2>&1; then
+      fail "$PROJECT gate red at $review"
+      rm -rf "$tmp"
+      continue
+    fi
   fi
   rm -rf "$tmp"
 
