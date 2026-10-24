@@ -19,6 +19,7 @@ python verify.py
 
 ```bash
 sudo deploy/host-baseline.sh
+sudo deploy/install-auto-merge.sh
 ```
 
 4. Создайте рабочий реестр вне git и первого проекта:
@@ -35,10 +36,11 @@ sudo deploy/audit-drift.sh projects.json
 sudo REGISTRY=projects.json deploy/selftest-isolation.sh proj-a
 ```
 
-После merge в `main` доставьте код в runtime:
+`review` мержит `main` автоматически по метке гейта (`proj-auto-merge.timer`),
+затем доставляет код в runtime. Пути проекта ограничены allowlist:
 
 ```bash
-sudo deploy/deploy-project.sh proj-a
+sudo deploy/allow-path.sh proj-a docs/
 ```
 
 6. Закройте задачу по процессу:

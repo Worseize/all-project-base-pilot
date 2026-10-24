@@ -1,6 +1,6 @@
 # Процесс: красный не проходит
 
-Версия 0.9.18 · 22.10.2026
+Версия 0.9.19 · 22.10.2026
 
 Схема: `docs/scheme-process.svg` ·
 Правила: [RULES.md](RULES.md) · Стратегия: [STRATEGY.md](STRATEGY.md)
@@ -48,13 +48,12 @@
 ## Ветка внешнего агента
 
 1. Агент пушит в `refs/heads/review`; серверный `pre-receive` запускает
-   `verify.py` и отклоняет delete/force.
-2. Root смотрит diff и мержит `review` в `main` через `git update-ref`
-   (хуки не запускаются — это акт одобрения).
-3. Root доставляет main в runtime: `sudo deploy/deploy-project.sh <proj>`
-   (checkout `/srv/<proj>/current` и restart `proj@<proj>.service`).
-   `post-receive` обновляет checkout только при push-based main; после
-   `update-ref` нужен `deploy-project.sh`.
+   `verify.py`, отклоняет delete/force и пути вне allowlist.
+2. `proj-auto-merge.timer` раз в 5 минут проверяет trusted gate по метке
+   и двигает `main` только при зелёном результате; без анализа содержимого.
+3. Тот же проход доставляет `main` в `/srv/<proj>/current` и перезапускает
+   `proj@<proj>.service`; при сбое `main` откатывается, запись — в
+   `/var/log/git/auto-merge.log`.
 4. Агент не имеет shell, sudo, main и доступа к чужим проектам.
    Матрица — [docs/ISOLATION.md](docs/ISOLATION.md).
 

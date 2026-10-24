@@ -76,7 +76,7 @@ runuser -u "$A" -- git -C "$WORK" config user.email "$A@agents.invalid"
 runuser -u "$A" -- git -C "$WORK" config user.name "$A"
 runuser -u "$A" -- bash -c "id; stat -c '%U:%G %a %n' /var/log/git /var/log/git/$A.log" 2>/dev/null || true
 
-if ! runuser -u "$A" -- bash -c "cd '$WORK' && printf 'proof\\n' > ci-proof.txt && git add ci-proof.txt && git commit -m 'ci proof'" >/dev/null 2>&1; then
+if ! runuser -u "$A" -- bash -c "cd '$WORK' && mkdir -p app && printf 'proof\\n' > app/ci-proof.txt && git add app/ci-proof.txt && git commit -m 'ci proof'" >/dev/null 2>&1; then
   fail "normal commit"
   exit 1
 fi
@@ -149,14 +149,24 @@ else
   fail "post-receive missing"
 fi
 
-review_sha="$(git -c safe.directory="$REPO" --git-dir="$REPO" rev-parse refs/heads/review)"
-git -c safe.directory="$REPO" --git-dir="$REPO" update-ref refs/heads/main "$review_sha"
-if bash "$ROOT/deploy/deploy-project.sh" "$A" >/dev/null 2>&1 &&
-  [ -f "/srv/$A/current/ci-proof.txt" ]; then
-  ok "main delivered to runtime"
+tmp_reg="$(mktemp)"
+cat > "$tmp_reg" <<EOF
+{"projects":{"$A":{"display":"A","agent":"a","domain":"","port":0,"status":"active","allowed_paths":["app/"]}}}
+EOF
+if bash "$ROOT/deploy/auto-merge.sh" "$tmp_reg" >/dev/null 2>&1 &&
+  [ -f "/srv/$A/current/app/ci-proof.txt" ]; then
+  ok "auto-merge delivered main"
 else
-  fail "main not delivered to runtime"
+  fail "auto-merge did not deliver main"
 fi
+main_after="$(git -c safe.directory="$REPO" --git-dir="$REPO" rev-parse refs/heads/main)"
+bash "$ROOT/deploy/auto-merge.sh" "$tmp_reg" >/dev/null 2>&1 || true
+if [ "$main_after" = "$(git -c safe.directory="$REPO" --git-dir="$REPO" rev-parse refs/heads/main)" ]; then
+  ok "auto-merge idempotent"
+else
+  fail "auto-merge changed main on repeat"
+fi
+rm -f "$tmp_reg"
 
 if [ "$FAILED" -ne 0 ]; then
   echo "ISOLATION CI: RED" >&2

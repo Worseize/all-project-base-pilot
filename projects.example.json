@@ -5,14 +5,16 @@
       "agent": "agent-a",
       "domain": "proj-a.example.org",
       "port": 8011,
-      "status": "active"
+      "status": "active",
+      "allowed_paths": ["app/"]
     },
     "proj-b": {
       "display": "Project B",
       "agent": "agent-b",
       "domain": "",
       "port": 8012,
-      "status": "planned"
+      "status": "planned",
+      "allowed_paths": ["app/", "docs/"]
     }
   }
 }

@@ -2,9 +2,9 @@
 <rect width="1400" height="100%" fill="#f7f9fc"/>
 <style>text{font-family:'DejaVu Sans',Arial,sans-serif;fill:#172033}.title{font-size:32px;font-weight:700}.sub{font-size:14px;fill:#667085}.h2{font-size:22px;font-weight:700;fill:#1d4ed8}.h3{font-size:18px;font-weight:700;fill:#172033}.p{font-size:15px}.bullet{font-size:15px}.table{font-family:'DejaVu Sans Mono',monospace;font-size:13px}</style>
 <text x="60" y="64" class="title">Процесс</text>
-<text x="60" y="92" class="sub">Source: PROCESS.md · v0.9.18 · 22.10.2026</text>
+<text x="60" y="92" class="sub">Source: PROCESS.md · v0.9.19 · 22.10.2026</text>
 <text x="60" y="144" class="h2">Процесс: красный не проходит</text>
-<text x="60" y="168" class="p">Версия 0.9.18 · 22.10.2026</text>
+<text x="60" y="168" class="p">Версия 0.9.19 · 22.10.2026</text>
 <text x="60" y="192" class="p">Схема: docs/scheme-process.svg ·</text>
 <text x="60" y="216" class="p">Правила: RULES.md · Стратегия: STRATEGY.md</text>
 <text x="60" y="252" class="h2">Цепочка</text>
@@ -46,13 +46,13 @@
 <text x="60" y="1152" class="p">5. Только теперь задача закрыта.</text>
 <text x="60" y="1188" class="h2">Ветка внешнего агента</text>
 <text x="60" y="1212" class="p">1. Агент пушит в refs/heads/review; серверный pre-receive запускает</text>
-<text x="60" y="1236" class="p">verify.py и отклоняет delete/force.</text>
-<text x="60" y="1260" class="p">2. Root смотрит diff и мержит review в main через git update-ref</text>
-<text x="60" y="1284" class="p">(хуки не запускаются — это акт одобрения).</text>
-<text x="60" y="1308" class="p">3. Root доставляет main в runtime: sudo deploy/deploy-project.sh &lt;proj&gt;</text>
-<text x="60" y="1332" class="p">(checkout /srv/&lt;proj&gt;/current и restart proj@&lt;proj&gt;.service).</text>
-<text x="60" y="1356" class="p">post-receive обновляет checkout только при push-based main; после</text>
-<text x="60" y="1380" class="p">update-ref нужен deploy-project.sh.</text>
+<text x="60" y="1236" class="p">verify.py, отклоняет delete/force и пути вне allowlist.</text>
+<text x="60" y="1260" class="p">2. proj-auto-merge.timer раз в 5 минут проверяет trusted gate по метке</text>
+<text x="60" y="1284" class="p">и двигает main только при зелёном результате; без анализа</text>
+<text x="60" y="1308" class="p">содержимого.</text>
+<text x="60" y="1332" class="p">3. Тот же проход доставляет main в /srv/&lt;proj&gt;/current и перезапускает</text>
+<text x="60" y="1356" class="p">proj@&lt;proj&gt;.service; при сбое main откатывается, запись — в</text>
+<text x="60" y="1380" class="p">/var/log/git/auto-merge.log.</text>
 <text x="60" y="1404" class="p">4. Агент не имеет shell, sudo, main и доступа к чужим проектам.</text>
 <text x="60" y="1428" class="p">Матрица — docs/ISOLATION.md.</text>
 <text x="60" y="1464" class="h2">Канал команд</text>

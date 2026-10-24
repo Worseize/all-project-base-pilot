@@ -1,6 +1,6 @@
 # Изоляция проектов и агентов
 
-Версия 0.9.18 · 22.10.2026
+Версия 0.9.19 · 22.10.2026
 
 Один хост — несколько проектов — несколько агентов. Root — единственный,
 у кого полные права. Агент проекта получает только git-push в `review`.
@@ -38,11 +38,27 @@
 - `projects.example.json` — коммитится, только `proj-a` и `proj-b`.
 - `projects.json` — рабочий реестр хоста, в `.gitignore`, не в публичном
   репозитории.
-- Поля проекта: `display`, `agent`, `domain`, `port`, `status`;
-  лишние поля — ошибка.
+- Поля проекта: `display`, `agent`, `domain`, `port`, `status`,
+  `allowed_paths`; лишние поля — ошибка.
 - `domain` пустой или валидный поддомен; уникален.
 - `port` 0 или 1024–65535; уникален среди ненулевых.
 - `status`: `active`, `paused`, `planned`.
+- `allowed_paths` — непустой список относительных префиксов, например
+  `app/`; их можно расширить `sudo deploy/allow-path.sh <id> <path>`.
+
+## Allowlist и auto-merge
+
+`pre-receive` всегда запрещает служебные пути: `verify.py`, `project.json`,
+`go.mod`, `go.sum`, `tests/`, `cmd/`, `deploy/`, `.github/`,
+`.gitlab-ci.yml`, `azure-pipelines.yml`. Остальные изменения должны
+попадать в `allowed_paths`; иначе пуш отклоняется.
+
+`auto-merge.timer` раз в 5 минут проходит реестр: если `review` впереди
+`main`, запускает trusted `verify.py` из `main`, пишет метку гейта в
+`/var/lib/proj-base/gate/<id>.json` и двигает `main` только при зелёном
+гейте. Затем `deploy-project.sh` доставляет код; при сбое `main`
+откатывается на старый коммит. Всё пишется в `/var/log/git/auto-merge.log`.
+Решение — только по метке/гейту, без анализа содержимого.
 
 ## Модель
 
