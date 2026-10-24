@@ -109,6 +109,11 @@ if [ "$(git -c safe.directory="$REPO" --git-dir="$REPO" config receive.denyDelet
 else
   fail "receive.denyDeletes/denyNonFastForwards not true"
 fi
+if git -c safe.directory="$REPO" --git-dir="$REPO" show-ref --verify --quiet refs/heads/main; then
+  ok "main is seeded"
+else
+  fail "main is missing; bootstrap must seed it"
+fi
 
 if [ -f /etc/systemd/system/proj@.service ]; then
   ok "systemd template installed"
