@@ -383,6 +383,18 @@ class VerifyTests(unittest.TestCase):
         verify.check_acceptance(gate)
         self.assertEqual(gate.failed, 1)
 
+    def test_acceptance_refusal_valid(self):
+        self._acceptance(text="Отказ: нет доступа к внешнему сервису\n")
+        gate = verify.Gate()
+        verify.check_acceptance(gate)
+        self.assertEqual(gate.failed, 0)
+
+    def test_acceptance_refusal_empty_reason(self):
+        self._acceptance(text="Отказ:\n")
+        gate = verify.Gate()
+        verify.check_acceptance(gate)
+        self.assertEqual(gate.failed, 1)
+
     def test_process_requires_conductor_board_rule(self):
         text = "verify красный журнал деплой\n"
         (verify.ROOT / "PROCESS.md").write_text(text, encoding="utf-8")
@@ -391,6 +403,13 @@ class VerifyTests(unittest.TestCase):
         self.assertEqual(gate.failed, 1)
         (verify.ROOT / "PROCESS.md").write_text(
             text + "Закрывает issue только conductor\n", encoding="utf-8"
+        )
+        gate = verify.Gate()
+        verify.check_process(gate)
+        self.assertEqual(gate.failed, 1)
+        (verify.ROOT / "PROCESS.md").write_text(
+            text + "Закрывает issue только conductor\nне пишет комментарии\n",
+            encoding="utf-8",
         )
         gate = verify.Gate()
         verify.check_process(gate)

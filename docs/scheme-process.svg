@@ -2,9 +2,9 @@
 <rect width="1400" height="100%" fill="#f7f9fc"/>
 <style>text{font-family:'DejaVu Sans',Arial,sans-serif;fill:#172033}.title{font-size:32px;font-weight:700}.sub{font-size:14px;fill:#667085}.h2{font-size:22px;font-weight:700;fill:#1d4ed8}.h3{font-size:18px;font-weight:700;fill:#172033}.p{font-size:15px}.bullet{font-size:15px}.table{font-family:'DejaVu Sans Mono',monospace;font-size:13px}</style>
 <text x="60" y="64" class="title">Процесс</text>
-<text x="60" y="92" class="sub">Source: PROCESS.md · v0.9.12 · 22.10.2026</text>
+<text x="60" y="92" class="sub">Source: PROCESS.md · v0.9.13 · 22.10.2026</text>
 <text x="60" y="144" class="h2">Процесс: красный не проходит</text>
-<text x="60" y="168" class="p">Версия 0.9.12 · 22.10.2026</text>
+<text x="60" y="168" class="p">Версия 0.9.13 · 22.10.2026</text>
 <text x="60" y="192" class="p">Схема: docs/scheme-process.svg ·</text>
 <text x="60" y="216" class="p">Правила: RULES.md · Стратегия: STRATEGY.md</text>
 <text x="60" y="252" class="h2">Цепочка</text>
@@ -60,20 +60,20 @@
 <text x="60" y="1512" class="p">блок между &lt;!-- public:begin --&gt; и &lt;!-- public:end --&gt;.</text>
 <text x="60" y="1536" class="p">3. Правка + файл docs/acceptance/&lt;YYYY-MM-DD&gt;-&lt;slug&gt;.md с Версия: и</text>
 <text x="60" y="1560" class="p">Ссылка: findings#N.</text>
-<text x="60" y="1584" class="p">4. Агент пишет комментарий-отчёт published: docs/acceptance/&lt;файл&gt;;</text>
-<text x="60" y="1608" class="p">закрывает issue только conductor после проверки.</text>
-<text x="60" y="1632" class="p">5. Отказ — комментарий с причиной; issue остаётся открытой.</text>
-<text x="60" y="1656" class="p">Публичный</text>
-<text x="60" y="1680" class="p">issue в шаблоне не создаётся и не читается.</text>
+<text x="60" y="1584" class="p">4. Агент не пишет комментарии; отчёт — файл docs/acceptance/...</text>
+<text x="60" y="1608" class="p">и сообщение коммита (findings#N).</text>
+<text x="60" y="1632" class="p">5. Отказ — тоже файл: первая строка Отказ: &lt;причина&gt;, без</text>
+<text x="60" y="1656" class="p">изменений</text>
+<text x="60" y="1680" class="p">в коде. Молча пропускать команду нельзя.</text>
 <text x="60" y="1716" class="h2">Доска issue</text>
 <text x="60" y="1740" class="bullet">• Issue — команда; состояние доски ведёт conductor.</text>
-<text x="60" y="1764" class="bullet">• Агент читает issues/комментарии, правит шаблон и пишет отчёт. Он</text>
-<text x="60" y="1788" class="p">не</text>
-<text x="60" y="1812" class="p">открывает/не закрывает issues, не меняет метки, исполнителей,</text>
-<text x="60" y="1836" class="p">заголовок</text>
-<text x="60" y="1860" class="p">и тело.</text>
-<text x="60" y="1884" class="bullet">• Если задача сделана, отчёт: «готово, жду проверки», а не</text>
-<text x="60" y="1908" class="p">«закрыто».</text>
+<text x="60" y="1764" class="bullet">• Агент только читает issues/комментарии, правит шаблон и пишет</text>
+<text x="60" y="1788" class="p">файл</text>
+<text x="60" y="1812" class="p">приёмки или отказа. Он не открывает/не закрывает issues, не</text>
+<text x="60" y="1836" class="p">меняет</text>
+<text x="60" y="1860" class="p">метки, исполнителей, заголовок и тело, не пишет комментарии.</text>
+<text x="60" y="1884" class="bullet">• Отчёт о работе — в git: docs/acceptance/&lt;date&gt;-&lt;slug&gt;.md и сообщение</text>
+<text x="60" y="1908" class="p">коммита (findings#N), а не в трекере.</text>
 <text x="60" y="1932" class="bullet">• Закрывает issue только conductor — после проверки результата. Иначе</text>
 <text x="60" y="1956" class="p">журнал приёмки перестаёт быть независимым доказательством.</text>
 <text x="60" y="1980" class="p">Формат и фильтр утечек — docs/acceptance/README.md.</text>

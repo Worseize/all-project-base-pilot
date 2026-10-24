@@ -1,6 +1,6 @@
 {
   "name": "all-project-base",
-  "version": "0.9.12",
+  "version": "0.9.13",
   "date": "22.10.2026",
   "stack": "go",
   "commands": {

@@ -466,13 +466,19 @@ def check_acceptance(gate: Gate) -> None:
             errors.append(f"{path.name}: неверная дата")
             continue
         text = path.read_text(encoding="utf-8", errors="replace")
-        if not re.search(r"(?m)^Версия:\s*\S+", text):
-            errors.append(f"{path.name}: нет Версия:")
-        if not re.search(r"(?m)^Ссылка:\s*findings#\d+", text):
-            errors.append(f"{path.name}: нет Ссылка: findings#N")
-        body = re.sub(r"(?m)^(?:#.*|Версия:.*|Ссылка:.*)$", "", text).strip()
-        if not body:
-            errors.append(f"{path.name}: пустой блок приёмки")
+        refusal = text.lstrip().startswith("Отказ:")
+        if refusal:
+            first = text.lstrip().splitlines()[0]
+            if not first[len("Отказ:"):].strip():
+                errors.append(f"{path.name}: пустой отказ")
+        else:
+            if not re.search(r"(?m)^Версия:\s*\S+", text):
+                errors.append(f"{path.name}: нет Версия:")
+            if not re.search(r"(?m)^Ссылка:\s*findings#\d+", text):
+                errors.append(f"{path.name}: нет Ссылка: findings#N")
+            body = re.sub(r"(?m)^(?:#.*|Версия:.*|Ссылка:.*)$", "", text).strip()
+            if not body:
+                errors.append(f"{path.name}: пустой блок приёмки")
         for label, pattern in ACCEPTANCE_LEAKS:
             if pattern.search(text):
                 errors.append(f"{path.name}: утечка {label}")
@@ -533,6 +539,8 @@ def check_process(gate: Gate) -> None:
         gate.fail("process", "нет разделов: " + ", ".join(missing))
     elif "закрывает issue только conductor" not in text:
         gate.fail("process", "не зафиксировано: issue закрывает только conductor")
+    elif "не пишет комментарии" not in text:
+        gate.fail("process", "не зафиксировано: агент не пишет комментарии")
     else:
         gate.ok("process", "red gate, журнал и правило доски описаны")
 
