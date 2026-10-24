@@ -134,9 +134,9 @@ else
   fail "acceptance log is empty"
 fi
 if [ -f "/etc/logrotate.d/proj-$A" ]; then
-  ok "logrotate rule installed"
+  fail "per-project logrotate rule duplicates host baseline"
 else
-  fail "logrotate rule missing"
+  ok "no per-project logrotate duplicate"
 fi
 if [ "$(git -c safe.directory="$REPO" --git-dir="$REPO" config core.hooksPath 2>/dev/null)" = "/etc/git-hooks/$A" ]; then
   ok "core.hooksPath outside repo"

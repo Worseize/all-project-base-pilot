@@ -28,6 +28,7 @@ esac
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="/srv/$PROJECT"
 REPO="$PROJECT_ROOT/repo.git"
+WORK="$PROJECT_ROOT/current"
 HOOKS="/etc/git-hooks/$PROJECT"
 SECRETS="/etc/$PROJECT"
 AUTH="$PROJECT_ROOT/.ssh/authorized_keys"
@@ -104,9 +105,20 @@ if command -v runuser >/dev/null 2>&1 && ! runuser -u "$PROJECT" -- test -w "$LO
   exit 1
 fi
 
+if [ ! -d "$WORK/.git" ]; then
+  if [ -e "$WORK" ]; then
+    echo "working directory exists but is not a git checkout: $WORK" >&2
+    exit 1
+  fi
+  git -c safe.directory="$REPO" clone "$REPO" "$WORK"
+fi
+chown -R "$PROJECT:$PROJECT" "$WORK"
+git -c safe.directory="$WORK" -C "$WORK" fetch origin main
+git -c safe.directory="$WORK" -C "$WORK" checkout -B main FETCH_HEAD
+git -c safe.directory="$WORK" -C "$WORK" reset --hard FETCH_HEAD
+chown -R "$PROJECT:$PROJECT" "$WORK"
+
 install -m 0644 -o root -g root "$SCRIPT_DIR/systemd/proj@.service" /etc/systemd/system/proj@.service
-sed "s/%i/$PROJECT/g" "$SCRIPT_DIR/logrotate/proj" > "/etc/logrotate.d/proj-$PROJECT"
-chmod 0644 "/etc/logrotate.d/proj-$PROJECT"
 
 install -d -m 0750 -o root -g "$PROJECT" "$SECRETS"
 if [ ! -f "$SECRETS/app.env" ]; then

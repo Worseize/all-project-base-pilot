@@ -27,6 +27,8 @@ go run ./cmd/schemes -write
 go run ./cmd/deadcode
 sudo deploy/host-baseline.sh
 sudo deploy/audit-drift.sh
+sudo deploy/bootstrap-project.sh proj-a
+sudo deploy/deploy-project.sh proj-a
 ```
 
 ## Границы

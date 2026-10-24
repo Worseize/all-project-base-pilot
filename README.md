@@ -35,6 +35,12 @@ sudo deploy/audit-drift.sh projects.json
 sudo REGISTRY=projects.json deploy/selftest-isolation.sh proj-a
 ```
 
+После merge в `main` доставьте код в runtime:
+
+```bash
+sudo deploy/deploy-project.sh proj-a
+```
+
 6. Закройте задачу по процессу:
 
 ```bash

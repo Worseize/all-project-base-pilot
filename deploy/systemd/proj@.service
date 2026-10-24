@@ -6,8 +6,8 @@ After=network.target
 Type=simple
 User=%i
 Group=%i
-WorkingDirectory=/srv/%i
-ExecStart=/srv/%i/run
+WorkingDirectory=/srv/%i/current
+ExecStart=/srv/%i/current/run
 EnvironmentFile=-/etc/%i/app.env
 Restart=on-failure
 
@@ -19,7 +19,7 @@ NoNewPrivileges=yes
 MemoryMax=512M
 CPUQuota=50%
 TasksMax=64
-ReadWritePaths=/srv/%i
+ReadWritePaths=/srv/%i/current
 
 [Install]
 WantedBy=multi-user.target
