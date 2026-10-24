@@ -383,6 +383,19 @@ class VerifyTests(unittest.TestCase):
         verify.check_acceptance(gate)
         self.assertEqual(gate.failed, 1)
 
+    def test_process_requires_conductor_board_rule(self):
+        text = "verify красный журнал деплой\n"
+        (verify.ROOT / "PROCESS.md").write_text(text, encoding="utf-8")
+        gate = verify.Gate()
+        verify.check_process(gate)
+        self.assertEqual(gate.failed, 1)
+        (verify.ROOT / "PROCESS.md").write_text(
+            text + "Закрывает issue только conductor\n", encoding="utf-8"
+        )
+        gate = verify.Gate()
+        verify.check_process(gate)
+        self.assertEqual(gate.failed, 0)
+
     def test_bootstrap_uses_git_shell_and_seeds_main(self):
         root = Path(__file__).resolve().parents[1]
         script = (root / "deploy" / "bootstrap-project.sh").read_text(encoding="utf-8")
