@@ -443,7 +443,7 @@ class VerifyTests(unittest.TestCase):
         self.assertIn("show refs/heads/main:verify.py", hook)
         self.assertIn("python3 .trusted-verify.py", hook)
         self.assertNotIn("python3 verify.py", hook)
-        for path in ("verify.py", "project.json", "tests", "cmd/schemes", "cmd/deadcode"):
+        for path in ("verify\\.py", "project\\.json", "tests/", "cmd/schemes/", "cmd/deadcode/"):
             self.assertIn(path, hook)
 
     def test_isolation_matrix_complete(self):
