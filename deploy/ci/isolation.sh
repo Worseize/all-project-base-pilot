@@ -58,6 +58,7 @@ if ! runuser -u "$A" -- git clone "$REPO" "$WORK" >/dev/null 2>&1; then
 fi
 runuser -u "$A" -- git -C "$WORK" config user.email "$A@agents.invalid"
 runuser -u "$A" -- git -C "$WORK" config user.name "$A"
+runuser -u "$A" -- bash -c "id; stat -c '%U:%G %a %n' /var/log/git /var/log/git/$A.log" 2>/dev/null || true
 
 if ! runuser -u "$A" -- bash -c "cd '$WORK' && printf 'proof\\n' > ci-proof.txt && git add ci-proof.txt && git commit -m 'ci proof'" >/dev/null 2>&1; then
   fail "normal commit"

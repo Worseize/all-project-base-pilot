@@ -433,6 +433,7 @@ class VerifyTests(unittest.TestCase):
         self.assertIn("git-shell", script)
         self.assertIn("SOURCE_REPO", script)
         self.assertIn("refs/heads/main", script)
+        self.assertIn("symbolic-ref", script)
         self.assertIn("fetch", script)
         self.assertNotIn("nologin", script)
 

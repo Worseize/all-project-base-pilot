@@ -65,6 +65,7 @@ chown -R "$PROJECT:$PROJECT" "$REPO"
 git -c safe.directory="$REPO" --git-dir="$REPO" config core.hooksPath "$HOOKS"
 git -c safe.directory="$REPO" --git-dir="$REPO" config receive.denyDeletes true
 git -c safe.directory="$REPO" --git-dir="$REPO" config receive.denyNonFastForwards true
+git -c safe.directory="$REPO" --git-dir="$REPO" symbolic-ref HEAD refs/heads/main
 
 if ! git -c safe.directory="$REPO" --git-dir="$REPO" rev-parse --verify --quiet refs/heads/main >/dev/null; then
   if ! git -c safe.directory="$SOURCE_REPO" -C "$SOURCE_REPO" rev-parse --verify --quiet "$SOURCE_REF" >/dev/null; then
@@ -79,7 +80,7 @@ fi
 install -d -m 0755 -o root -g root "$HOOKS"
 install -m 0755 -o root -g root "$SCRIPT_DIR/git/pre-receive" "$HOOKS/pre-receive"
 
-install -d -m 0750 -o root -g "$PROJECT" /var/log/git
+install -d -m 0770 -o root -g "$PROJECT" /var/log/git
 LOG="/var/log/git/$PROJECT.log"
 if [ ! -f "$LOG" ]; then
   install -m 0660 -o root -g "$PROJECT" /dev/null "$LOG"
@@ -87,6 +88,8 @@ else
   chown root:"$PROJECT" "$LOG"
   chmod 0660 "$LOG"
 fi
+chown root:"$PROJECT" /var/log/git
+chmod 0770 /var/log/git
 
 install -m 0644 -o root -g root "$SCRIPT_DIR/systemd/proj@.service" /etc/systemd/system/proj@.service
 sed "s/%i/$PROJECT/g" "$SCRIPT_DIR/logrotate/proj" > "/etc/logrotate.d/proj-$PROJECT"
