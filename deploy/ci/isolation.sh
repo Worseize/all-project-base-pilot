@@ -10,6 +10,7 @@ B="proj-b"
 WORK="/srv/$A/work"
 FAILED=0
 TMP_KEY="$(mktemp -d)"
+CI_LOG_DIR="$ROOT/ci-logs"
 
 fail() { printf 'FAIL: %s\n' "$*" >&2; FAILED=1; }
 ok() { printf 'ok: %s\n' "$*"; }
@@ -18,7 +19,20 @@ cleanup() {
   rm -rf "$TMP_KEY"
   bash "$SCRIPT_DIR/isolation-cleanup.sh" "$A" "$B" >/dev/null 2>&1 || true
 }
-trap cleanup EXIT
+
+on_exit() {
+  mkdir -p "$CI_LOG_DIR"
+  cp -a /var/log/git/*.log "$CI_LOG_DIR/" 2>/dev/null || true
+  {
+    echo "== diagnostics"
+    echo "shallow=$(git -C "$ROOT" rev-parse --is-shallow-repository 2>/dev/null || echo unknown)"
+    stat -c '%a %U:%G %n' /var/log/git /var/log/git/*.log 2>/dev/null || true
+    getent passwd "$A" 2>/dev/null || true
+    [ -d /run/systemd/system ] && echo "systemd=yes" || echo "systemd=no"
+  } > "$CI_LOG_DIR/diagnostics.txt" 2>&1
+  cleanup
+}
+trap on_exit EXIT
 
 if [ "$(id -u)" -ne 0 ]; then
   echo "run as root" >&2
@@ -41,6 +55,7 @@ for PROJECT in "$A" "$B"; do
 done
 ok "bootstrap: $A, $B"
 
+echo "== step: checks"
 EXPECTED_SHELL="$(command -v git-shell)"
 for PROJECT in "$A" "$B"; do
   actual="$(getent passwd "$PROJECT" | awk -F: '{print $7}')"
@@ -65,6 +80,7 @@ if ! runuser -u "$A" -- bash -c "cd '$WORK' && printf 'proof\\n' > ci-proof.txt 
   exit 1
 fi
 
+echo "== step: review"
 if ! out="$(runuser -u "$A" -- git -C "$WORK" push origin HEAD:review 2>&1)"; then
   fail "review push: $out"
 else

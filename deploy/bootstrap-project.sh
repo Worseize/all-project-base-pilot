@@ -68,19 +68,30 @@ git -c safe.directory="$REPO" --git-dir="$REPO" config receive.denyNonFastForwar
 git -c safe.directory="$REPO" --git-dir="$REPO" symbolic-ref HEAD refs/heads/main
 
 if ! git -c safe.directory="$REPO" --git-dir="$REPO" rev-parse --verify --quiet refs/heads/main >/dev/null; then
+  if [ "$(git -c safe.directory="$SOURCE_REPO" -C "$SOURCE_REPO" rev-parse --is-shallow-repository 2>/dev/null)" = "true" ]; then
+    echo "SOURCE_REPO is shallow; fetch full history or set SOURCE_REPO" >&2
+    exit 1
+  fi
   if ! git -c safe.directory="$SOURCE_REPO" -C "$SOURCE_REPO" rev-parse --verify --quiet "$SOURCE_REF" >/dev/null; then
     echo "source repo/ref not found: $SOURCE_REPO $SOURCE_REF" >&2
     exit 1
   fi
   git -c safe.directory="$REPO" -c safe.directory="$SOURCE_REPO" --git-dir="$REPO" fetch "$SOURCE_REPO" "$SOURCE_REF:refs/heads/main"
+  if ! git -c safe.directory="$REPO" --git-dir="$REPO" rev-parse --verify --quiet refs/heads/main >/dev/null; then
+    echo "main was not seeded from $SOURCE_REPO ($SOURCE_REF)" >&2
+    exit 1
+  fi
   chown -R "$PROJECT:$PROJECT" "$REPO"
   echo "seeded main from $SOURCE_REPO ($SOURCE_REF)"
 fi
+git -c safe.directory="$REPO" --git-dir="$REPO" symbolic-ref HEAD refs/heads/main
 
 install -d -m 0755 -o root -g root "$HOOKS"
 install -m 0755 -o root -g root "$SCRIPT_DIR/git/pre-receive" "$HOOKS/pre-receive"
 
-install -d -m 0770 -o root -g "$PROJECT" /var/log/git
+install -d -m 0750 -o root -g "$PROJECT" /var/log/git
+chown root:"$PROJECT" /var/log/git
+chmod 0750 /var/log/git
 LOG="/var/log/git/$PROJECT.log"
 if [ ! -f "$LOG" ]; then
   install -m 0660 -o root -g "$PROJECT" /dev/null "$LOG"
@@ -88,8 +99,10 @@ else
   chown root:"$PROJECT" "$LOG"
   chmod 0660 "$LOG"
 fi
-chown root:"$PROJECT" /var/log/git
-chmod 0770 /var/log/git
+if command -v runuser >/dev/null 2>&1 && ! runuser -u "$PROJECT" -- test -w "$LOG"; then
+  echo "$PROJECT cannot write $LOG" >&2
+  exit 1
+fi
 
 install -m 0644 -o root -g root "$SCRIPT_DIR/systemd/proj@.service" /etc/systemd/system/proj@.service
 sed "s/%i/$PROJECT/g" "$SCRIPT_DIR/logrotate/proj" > "/etc/logrotate.d/proj-$PROJECT"
