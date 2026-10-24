@@ -27,6 +27,3 @@ jobs:
         run: python verify.py --close-task
       - name: gate tests
         run: python -m unittest discover -s tests -v
-      - name: example microblock
-        working-directory: examples/minimal-go
-        run: go test ./...

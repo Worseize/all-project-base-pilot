@@ -98,12 +98,9 @@ def check_no_npm(gate: Gate) -> None:
 
 
 def check_go_mod(gate: Gate) -> None:
-    if CONFIG.get("stack") != "go":
-        gate.skip("go.mod", "стек не Go")
-        return
     gomod = ROOT / "go.mod"
     if not gomod.exists():
-        gate.skip("go.mod", "продукта ещё нет")
+        gate.skip("go.mod", "инструментов на Go ещё нет")
         return
     text = gomod.read_text(encoding="utf-8", errors="replace")
     bad = [line.strip() for line in text.splitlines()
@@ -624,9 +621,6 @@ def go_files() -> list[Path]:
 
 
 def check_go_sizes(gate: Gate) -> None:
-    if CONFIG.get("stack") != "go":
-        gate.skip("go sizes", "стек не Go")
-        return
     files = go_files()
     if not files:
         gate.skip("go sizes", "Go-файлов ещё нет")
@@ -657,9 +651,6 @@ def check_go_sizes(gate: Gate) -> None:
 
 
 def check_gofmt(gate: Gate) -> None:
-    if CONFIG.get("stack") != "go":
-        gate.skip("gofmt", "стек не Go")
-        return
     if not go_files():
         gate.skip("gofmt", "Go-файлов ещё нет")
         return
@@ -680,13 +671,6 @@ def check_commands(gate: Gate) -> None:
     if not commands:
         gate.skip("commands", "в project.json нет команд")
         return
-    if CONFIG.get("stack") == "go":
-        if not (ROOT / "go.mod").exists():
-            gate.skip("commands", "go.mod ещё нет")
-            return
-        if not shutil.which("go"):
-            gate.skip("commands", "go не установлен")
-            return
     for name in ("build", "vet", "test", "deadcode", "lint", "fmt"):
         command = commands.get(name)
         if not command:

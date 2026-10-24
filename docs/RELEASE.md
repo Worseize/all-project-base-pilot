@@ -1,6 +1,6 @@
 # Release
 
-Версия 0.9.17 · 22.10.2026
+Версия 0.9.18 · 22.10.2026
 
 Релиз — это не «код готов», а набор доказательств. Чек-лист ниже фиксирует
 их до тега.
@@ -16,8 +16,7 @@
 - [ ] `python -m unittest discover -s tests` — зелёный.
 - [ ] `go test ./...` — зелёный.
 - [ ] `go run ./cmd/deadcode` — без находок.
-- [ ] `examples/minimal-go` — `go test ./...` зелёный.
-- [ ] `python verify.py --update-schemes` выполнен; lock обновлён.
+- [ ] `python verify.py --update-schemes` выполнен; SVG обновлены.
 - [ ] Выбранные CI-контуры зелёные, либо `ci: ["none"]` осознанно.
 - [ ] Branch protection требует `verify` (если платформа используется).
 - [ ] Лицензия выбрана: [LICENSE](../LICENSE) (MIT).

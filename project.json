@@ -1,13 +1,12 @@
 {
   "name": "all-project-base",
-  "version": "0.9.17",
+  "version": "0.9.18",
   "date": "22.10.2026",
-  "stack": "go",
   "commands": {
-    "build": "go build -o bin/ ./...",
-    "test": "go test ./...",
-    "vet": "go vet ./...",
-    "fmt": "gofmt -l .",
+    "build": "go build ./cmd/...",
+    "test": "go test ./cmd/...",
+    "vet": "go vet ./cmd/...",
+    "fmt": "gofmt -l cmd",
     "deadcode": "go run ./cmd/deadcode"
   },
   "required": [
@@ -63,11 +62,7 @@
     "docs/BACKUP.md",
     "docs/MIGRATIONS.md",
     "docs/SECRETS.md",
-    "tests/test_verify.py",
-    "examples/minimal-go/README.md",
-    "examples/minimal-go/go.mod",
-    "examples/minimal-go/microblock.go",
-    "examples/minimal-go/microblock_test.go"
+    "tests/test_verify.py"
   ],
   "rules_count": 10,
   "adr_min": 2,

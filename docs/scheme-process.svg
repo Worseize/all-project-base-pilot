@@ -1,10 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="3906" viewBox="0 0 1400 3906">
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="3954" viewBox="0 0 1400 3954">
 <rect width="1400" height="100%" fill="#f7f9fc"/>
 <style>text{font-family:'DejaVu Sans',Arial,sans-serif;fill:#172033}.title{font-size:32px;font-weight:700}.sub{font-size:14px;fill:#667085}.h2{font-size:22px;font-weight:700;fill:#1d4ed8}.h3{font-size:18px;font-weight:700;fill:#172033}.p{font-size:15px}.bullet{font-size:15px}.table{font-family:'DejaVu Sans Mono',monospace;font-size:13px}</style>
 <text x="60" y="64" class="title">Процесс</text>
-<text x="60" y="92" class="sub">Source: PROCESS.md · v0.9.17 · 22.10.2026</text>
+<text x="60" y="92" class="sub">Source: PROCESS.md · v0.9.18 · 22.10.2026</text>
 <text x="60" y="144" class="h2">Процесс: красный не проходит</text>
-<text x="60" y="168" class="p">Версия 0.9.17 · 22.10.2026</text>
+<text x="60" y="168" class="p">Версия 0.9.18 · 22.10.2026</text>
 <text x="60" y="192" class="p">Схема: docs/scheme-process.svg ·</text>
 <text x="60" y="216" class="p">Правила: RULES.md · Стратегия: STRATEGY.md</text>
 <text x="60" y="252" class="h2">Цепочка</text>
@@ -107,54 +107,56 @@
 <text x="60" y="2664" class="p">исключение</text>
 <text x="60" y="2688" class="table">commands build/test/lint/fmt/deadcode из project.json</text>
 <text x="60" y="2712" class="p">Запуск:</text>
-<text x="60" y="2736" class="p">verify.py — инструмент на стандартной библиотеке Python. Продукт</text>
-<text x="60" y="2760" class="p">остаётся</text>
-<text x="60" y="2784" class="p">на Go stdlib: никаких npm и сторонних пакетов.</text>
-<text x="60" y="2820" class="h2">CI и branch protection</text>
-<text x="60" y="2844" class="p">В репозитории три CI-файла:</text>
-<text x="60" y="2868" class="bullet">• GitHub — .github/workflows/verify.yml;</text>
-<text x="60" y="2892" class="bullet">• GitLab — .gitlab-ci.yml;</text>
-<text x="60" y="2916" class="bullet">• Azure DevOps — azure-pipelines.yml.</text>
-<text x="60" y="2940" class="p">project.json.ci — список: [&#34;none&#34;] по умолчанию, либо</text>
-<text x="60" y="2964" class="p">github/gitlab/azure. verify.py проверяет наличие выбранных файлов;</text>
-<text x="60" y="2988" class="p">none отключает CI.</text>
-<text x="60" y="3012" class="p">Файл workflow не включает branch protection сам по себе. В настройках</text>
-<text x="60" y="3036" class="p">репозитория нужно включить защиту основной ветки и</text>
-<text x="60" y="3060" class="p">потребовать проверку</text>
-<text x="60" y="3084" class="p">verify. Без этого красный workflow можно смержить. Подробная</text>
-<text x="60" y="3108" class="p">настройка —</text>
-<text x="60" y="3132" class="p">docs/BRANCH_PROTECTION.md.</text>
-<text x="60" y="3168" class="h2">Журнал решений</text>
-<text x="60" y="3192" class="bullet">• JOURNAL.md — короткие записи по ходу: что решили, почему, что</text>
-<text x="60" y="3216" class="p">дальше.</text>
-<text x="60" y="3240" class="bullet">• docs/adr/ — значимые архитектурные решения: контекст,</text>
-<text x="60" y="3264" class="p">альтернативы,</text>
-<text x="60" y="3288" class="p">последствия.</text>
-<text x="60" y="3312" class="p">Одно решение — одна запись. Запись без альтернатив и</text>
-<text x="60" y="3336" class="p">последствий —</text>
-<text x="60" y="3360" class="p">это не решение, а заголовок.</text>
-<text x="60" y="3396" class="h2">Почему это работает на неидеальном коде</text>
-<text x="60" y="3420" class="p">Процесс проверяет наблюдаемые факты, а не красоту кода: тест</text>
-<text x="60" y="3444" class="p">красный</text>
-<text x="60" y="3468" class="p">или зелёный, verify вернул 0 или 1, живой результат есть или нет,</text>
-<text x="60" y="3492" class="p">откат</text>
-<text x="60" y="3516" class="p">готов или нет. Поэтому даже неидеальный код не проходит</text>
-<text x="60" y="3540" class="p">дальше красного,</text>
-<text x="60" y="3564" class="p">а хороший код не считается готовым без доказательства.</text>
-<text x="60" y="3588" class="p">Правило 1 (чистый код) снижает вероятность ошибки. Процесс</text>
-<text x="60" y="3612" class="p">ловит то,</text>
-<text x="60" y="3636" class="p">что правило 1 пропустило.</text>
-<text x="60" y="3672" class="h2">Границы</text>
-<text x="60" y="3696" class="bullet">• verify.py и cmd/schemes — build-time инструменты, не продукт.</text>
-<text x="60" y="3720" class="bullet">• SVG-схемы — текст на Go stdlib; Pillow, шрифты и lock не нужны.</text>
-<text x="60" y="3744" class="bullet">• Если ноль зависимостей нужен и для verify.py, его переписывают на</text>
-<text x="60" y="3768" class="p">Go</text>
-<text x="60" y="3792" class="p">отдельной задачей.</text>
-<text x="60" y="3816" class="bullet">• Branch protection — настройка репозитория, а не файл в репозитории.</text>
-<text x="60" y="3852" class="h2">Связанные процедуры</text>
-<text x="60" y="3876" class="bullet">• Release</text>
-<text x="60" y="3900" class="bullet">• Backup и restore</text>
-<text x="60" y="3924" class="bullet">• Миграции</text>
-<text x="60" y="3948" class="bullet">• Секреты</text>
-<text x="60" y="3972" class="bullet">• Branch protection</text>
+<text x="60" y="2736" class="p">verify.py — инструмент на стандартной библиотеке Python.</text>
+<text x="60" y="2760" class="p">Инструменты узла</text>
+<text x="60" y="2784" class="p">остаются на Go stdlib; продукт выбирает свой стек и фиксирует его</text>
+<text x="60" y="2808" class="p">в профиле</text>
+<text x="60" y="2832" class="p">проекта.</text>
+<text x="60" y="2868" class="h2">CI и branch protection</text>
+<text x="60" y="2892" class="p">В репозитории три CI-файла:</text>
+<text x="60" y="2916" class="bullet">• GitHub — .github/workflows/verify.yml;</text>
+<text x="60" y="2940" class="bullet">• GitLab — .gitlab-ci.yml;</text>
+<text x="60" y="2964" class="bullet">• Azure DevOps — azure-pipelines.yml.</text>
+<text x="60" y="2988" class="p">project.json.ci — список: [&#34;none&#34;] по умолчанию, либо</text>
+<text x="60" y="3012" class="p">github/gitlab/azure. verify.py проверяет наличие выбранных файлов;</text>
+<text x="60" y="3036" class="p">none отключает CI.</text>
+<text x="60" y="3060" class="p">Файл workflow не включает branch protection сам по себе. В настройках</text>
+<text x="60" y="3084" class="p">репозитория нужно включить защиту основной ветки и</text>
+<text x="60" y="3108" class="p">потребовать проверку</text>
+<text x="60" y="3132" class="p">verify. Без этого красный workflow можно смержить. Подробная</text>
+<text x="60" y="3156" class="p">настройка —</text>
+<text x="60" y="3180" class="p">docs/BRANCH_PROTECTION.md.</text>
+<text x="60" y="3216" class="h2">Журнал решений</text>
+<text x="60" y="3240" class="bullet">• JOURNAL.md — короткие записи по ходу: что решили, почему, что</text>
+<text x="60" y="3264" class="p">дальше.</text>
+<text x="60" y="3288" class="bullet">• docs/adr/ — значимые архитектурные решения: контекст,</text>
+<text x="60" y="3312" class="p">альтернативы,</text>
+<text x="60" y="3336" class="p">последствия.</text>
+<text x="60" y="3360" class="p">Одно решение — одна запись. Запись без альтернатив и</text>
+<text x="60" y="3384" class="p">последствий —</text>
+<text x="60" y="3408" class="p">это не решение, а заголовок.</text>
+<text x="60" y="3444" class="h2">Почему это работает на неидеальном коде</text>
+<text x="60" y="3468" class="p">Процесс проверяет наблюдаемые факты, а не красоту кода: тест</text>
+<text x="60" y="3492" class="p">красный</text>
+<text x="60" y="3516" class="p">или зелёный, verify вернул 0 или 1, живой результат есть или нет,</text>
+<text x="60" y="3540" class="p">откат</text>
+<text x="60" y="3564" class="p">готов или нет. Поэтому даже неидеальный код не проходит</text>
+<text x="60" y="3588" class="p">дальше красного,</text>
+<text x="60" y="3612" class="p">а хороший код не считается готовым без доказательства.</text>
+<text x="60" y="3636" class="p">Правило 1 (чистый код) снижает вероятность ошибки. Процесс</text>
+<text x="60" y="3660" class="p">ловит то,</text>
+<text x="60" y="3684" class="p">что правило 1 пропустило.</text>
+<text x="60" y="3720" class="h2">Границы</text>
+<text x="60" y="3744" class="bullet">• verify.py и cmd/schemes — build-time инструменты, не продукт.</text>
+<text x="60" y="3768" class="bullet">• SVG-схемы — текст на Go stdlib; Pillow, шрифты и lock не нужны.</text>
+<text x="60" y="3792" class="bullet">• Если ноль зависимостей нужен и для verify.py, его переписывают на</text>
+<text x="60" y="3816" class="p">Go</text>
+<text x="60" y="3840" class="p">отдельной задачей.</text>
+<text x="60" y="3864" class="bullet">• Branch protection — настройка репозитория, а не файл в репозитории.</text>
+<text x="60" y="3900" class="h2">Связанные процедуры</text>
+<text x="60" y="3924" class="bullet">• Release</text>
+<text x="60" y="3948" class="bullet">• Backup и restore</text>
+<text x="60" y="3972" class="bullet">• Миграции</text>
+<text x="60" y="3996" class="bullet">• Секреты</text>
+<text x="60" y="4020" class="bullet">• Branch protection</text>
 </svg>
