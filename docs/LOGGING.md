@@ -38,7 +38,7 @@ JOURNAL.md, JOURNAL.1.md ... JOURNAL.4.md
 
 ## Проектные логи изоляции
 
-`/var/log/git/<proj>.log` — журнал приёмки пушей (root:<proj>, 0640).
+`/var/log/git/<proj>.log` — журнал приёмки пушей (root:<proj>, 0660).
 `bootstrap-project.sh` ставит `/etc/logrotate.d/proj-<proj>`:
 `size 100k`, `rotate 5`, `copytruncate`; ACL записи сохраняется.
 

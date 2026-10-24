@@ -175,9 +175,9 @@ forced command работает, а интерактивного shell нет. �
 
 ## Журнал приёмки
 
-`/var/log/git/<proj>.log` — root:<proj>, 0640; hook пишет строку на каждый
-push: дата, ref, old, new, результат, причина. Запись идёт через ACL
-(`setfacl -m u:<proj>:rw-`), иначе bootstrap падает в 0660 и предупреждает.
+`/var/log/git/<proj>.log` — root:<proj>, 0660; hook пишет строку на каждый
+push: дата, ref, old, new, результат, причина. Групповая запись нужна,
+потому что hook работает от пользователя проекта; setfacl не требуется.
 Ротация — `/etc/logrotate.d/proj-<proj>`: `size 100k`, `rotate 5`,
 `copytruncate`; ACL сохраняется.
 

@@ -4,6 +4,6 @@
     missingok
     notifempty
     copytruncate
-    create 0640 root %i
+    create 0660 root %i
     su root %i
 }

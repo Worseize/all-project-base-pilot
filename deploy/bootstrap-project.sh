@@ -82,13 +82,10 @@ install -m 0755 -o root -g root "$SCRIPT_DIR/git/pre-receive" "$HOOKS/pre-receiv
 install -d -m 0750 -o root -g "$PROJECT" /var/log/git
 LOG="/var/log/git/$PROJECT.log"
 if [ ! -f "$LOG" ]; then
-  install -m 0640 -o root -g "$PROJECT" /dev/null "$LOG"
-fi
-if command -v setfacl >/dev/null 2>&1; then
-  setfacl -m "u:$PROJECT:rw-" "$LOG"
+  install -m 0660 -o root -g "$PROJECT" /dev/null "$LOG"
 else
+  chown root:"$PROJECT" "$LOG"
   chmod 0660 "$LOG"
-  echo "warning: setfacl missing; $LOG is 0660, not 0640" >&2
 fi
 
 install -m 0644 -o root -g root "$SCRIPT_DIR/systemd/proj@.service" /etc/systemd/system/proj@.service
