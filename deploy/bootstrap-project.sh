@@ -31,8 +31,10 @@ REPO="$PROJECT_ROOT/repo.git"
 HOOKS="/etc/git-hooks/$PROJECT"
 SECRETS="/etc/$PROJECT"
 AUTH="$PROJECT_ROOT/.ssh/authorized_keys"
-NOLOGIN="$(command -v nologin || true)"
-[ -n "$NOLOGIN" ] || NOLOGIN="/usr/sbin/nologin"
+SOURCE_REPO="${SOURCE_REPO:-$(cd "$SCRIPT_DIR/.." && pwd)}"
+SOURCE_REF="${SOURCE_REF:-HEAD}"
+GIT_SHELL="$(command -v git-shell || true)"
+[ -n "$GIT_SHELL" ] || GIT_SHELL="/usr/bin/git-shell"
 USER_EXISTED=0
 if id -u "$PROJECT" >/dev/null 2>&1; then
   USER_EXISTED=1
@@ -44,9 +46,9 @@ fi
 
 install -d -m 0711 -o root -g root /srv
 if [ "$USER_EXISTED" -eq 0 ]; then
-  useradd --system --home-dir "$PROJECT_ROOT" --shell "$NOLOGIN" --create-home "$PROJECT"
+  useradd --system --home-dir "$PROJECT_ROOT" --shell "$GIT_SHELL" --create-home "$PROJECT"
 fi
-usermod --shell "$NOLOGIN" "$PROJECT"
+usermod --shell "$GIT_SHELL" "$PROJECT"
 install -d -m 0750 -o "$PROJECT" -g "$PROJECT" "$PROJECT_ROOT"
 install -d -m 0700 -o "$PROJECT" -g "$PROJECT" "$PROJECT_ROOT/.ssh"
 
@@ -63,6 +65,16 @@ chown -R "$PROJECT:$PROJECT" "$REPO"
 git -c safe.directory="$REPO" --git-dir="$REPO" config core.hooksPath "$HOOKS"
 git -c safe.directory="$REPO" --git-dir="$REPO" config receive.denyDeletes true
 git -c safe.directory="$REPO" --git-dir="$REPO" config receive.denyNonFastForwards true
+
+if ! git -c safe.directory="$REPO" --git-dir="$REPO" rev-parse --verify --quiet refs/heads/main >/dev/null; then
+  if ! git -C "$SOURCE_REPO" rev-parse --verify --quiet "$SOURCE_REF" >/dev/null; then
+    echo "source repo/ref not found: $SOURCE_REPO $SOURCE_REF" >&2
+    exit 1
+  fi
+  git -c safe.directory="$REPO" --git-dir="$REPO" fetch "$SOURCE_REPO" "$SOURCE_REF:refs/heads/main"
+  chown -R "$PROJECT:$PROJECT" "$REPO"
+  echo "seeded main from $SOURCE_REPO ($SOURCE_REF)"
+fi
 
 install -d -m 0755 -o root -g root "$HOOKS"
 install -m 0755 -o root -g root "$SCRIPT_DIR/git/pre-receive" "$HOOKS/pre-receive"
@@ -109,4 +121,4 @@ fi
 
 printf 'ready: project=%s user=%s repo=%s hooks=%s\n' \
   "$PROJECT" "$PROJECT" "$REPO" "$HOOKS"
-echo "next: root must push the initial main before agents push review" >&2
+echo "next: review push is allowed; main is seeded from $SOURCE_REPO" >&2

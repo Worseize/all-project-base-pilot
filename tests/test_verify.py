@@ -383,6 +383,15 @@ class VerifyTests(unittest.TestCase):
         verify.check_acceptance(gate)
         self.assertEqual(gate.failed, 1)
 
+    def test_bootstrap_uses_git_shell_and_seeds_main(self):
+        root = Path(__file__).resolve().parents[1]
+        script = (root / "deploy" / "bootstrap-project.sh").read_text(encoding="utf-8")
+        self.assertIn("git-shell", script)
+        self.assertIn("SOURCE_REPO", script)
+        self.assertIn("refs/heads/main", script)
+        self.assertIn("fetch", script)
+        self.assertNotIn("nologin", script)
+
     def test_pre_receive_uses_trusted_verify(self):
         root = Path(__file__).resolve().parents[1]
         hook = (root / "deploy" / "git" / "pre-receive").read_text(encoding="utf-8")

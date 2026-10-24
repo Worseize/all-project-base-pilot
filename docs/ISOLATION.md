@@ -1,6 +1,6 @@
 # Изоляция проектов и агентов
 
-Версия 0.9.10 · 22.10.2026
+Версия 0.9.11 · 22.10.2026
 
 Один хост — несколько проектов — несколько агентов. Root — единственный,
 у кого полные права. Агент проекта получает только git-push в `review`.
@@ -137,18 +137,17 @@ TasksMax=64
 
 ```bash
 sudo deploy/bootstrap-project.sh proj-a
-# положить публичный ключ агента:
+# bootstrap сам создаёт main из SOURCE_REPO (по умолчанию — этот шаблон)
 sudo AGENT_PUBKEY="ssh-ed25519 AAAA... agent-a" deploy/bootstrap-project.sh proj-a
-# root сначала создаёт main с проверенным шаблоном:
-git push origin main
 # рабочий реестр — вне git:
 cp projects.example.json projects.json
 # проверить изоляцию:
 sudo REGISTRY=projects.json deploy/selftest-isolation.sh proj-a proj-b
 ```
 
-Пока `refs/heads/main` нет, `pre-receive` отклоняет любой `review`:
-доверенный `verify.py` берётся именно из main.
+`SOURCE_REPO`/`SOURCE_REF` переопределяют источник initial main, если
+проект сеется не из шаблона. Пока `refs/heads/main` нет, `pre-receive`
+отклоняет `review`: доверенный `verify.py` берётся именно из main.
 
 ## Доверенный gate
 
@@ -169,10 +168,10 @@ PATH="/usr/local/go/bin:/usr/bin:/bin${PATH:+:$PATH}"
 
 ## Пользователь без shell
 
-`useradd --shell "$(command -v nologin)"`; существующему пользователю
-`usermod --shell ...`. `git-receive-pack` вызывается sshd напрямую и shell
-не требует. Проверка: `getent passwd proj-a` → `nologin`; `ssh ... id` не
-выполняет `id`.
+`useradd --shell "$(command -v git-shell)"`; существующему пользователю
+`usermod --shell ...`. `git-shell` пропускает только git-команды, поэтому
+forced command работает, а интерактивного shell нет. Проверка:
+`getent passwd proj-a` → `git-shell`; `ssh ... id` не выполняет `id`.
 
 ## Журнал приёмки
 
