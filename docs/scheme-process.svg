@@ -1,10 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="3210" viewBox="0 0 1400 3210">
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="3546" viewBox="0 0 1400 3546">
 <rect width="1400" height="100%" fill="#f7f9fc"/>
 <style>text{font-family:'DejaVu Sans',Arial,sans-serif;fill:#172033}.title{font-size:32px;font-weight:700}.sub{font-size:14px;fill:#667085}.h2{font-size:22px;font-weight:700;fill:#1d4ed8}.h3{font-size:18px;font-weight:700;fill:#172033}.p{font-size:15px}.bullet{font-size:15px}.table{font-family:'DejaVu Sans Mono',monospace;font-size:13px}</style>
 <text x="60" y="64" class="title">Процесс</text>
-<text x="60" y="92" class="sub">Source: PROCESS.md · v0.9.9 · 22.10.2026</text>
+<text x="60" y="92" class="sub">Source: PROCESS.md · v0.9.10 · 22.10.2026</text>
 <text x="60" y="144" class="h2">Процесс: красный не проходит</text>
-<text x="60" y="168" class="p">Версия 0.9.9 · 22.10.2026</text>
+<text x="60" y="168" class="p">Версия 0.9.10 · 22.10.2026</text>
 <text x="60" y="192" class="p">Схема: docs/scheme-process.svg ·</text>
 <text x="60" y="216" class="p">Правила: RULES.md · Стратегия: STRATEGY.md</text>
 <text x="60" y="252" class="h2">Цепочка</text>
@@ -52,80 +52,94 @@
 <text x="60" y="1308" class="p">3. Root деплоит и перезапускает proj@&lt;proj&gt;.service.</text>
 <text x="60" y="1332" class="p">4. Агент не имеет shell, sudo, main и доступа к чужим проектам.</text>
 <text x="60" y="1356" class="p">Матрица — docs/ISOLATION.md.</text>
-<text x="60" y="1392" class="h2">Что проверяет verify</text>
-<text x="60" y="1416" class="table">Проверка Что ловит</text>
-<text x="60" y="1440" class="table">required files пропали правила, процесс, журнал или схема</text>
-<text x="60" y="1464" class="table">no npm artifacts package.json, lock-файлы, node_modules</text>
-<text x="60" y="1488" class="table">go.mod сторонние require/replace/exclude и go.sum</text>
-<text x="60" y="1512" class="table">secrets ключи, токены, private keys в текстовых файлах</text>
-<text x="60" y="1536" class="table">junk временные и мусорные файлы</text>
-<text x="60" y="1560" class="table">schemes SVG отсутствует или не совпадает с docs</text>
-<text x="60" y="1584" class="table">rules в RULES.md не десять правил, AGENTS-протокол неполный</text>
-<text x="60" y="1608" class="table">close-task cmd//deploy/ изменены без features/ADR/DEBT/JOURNAL</text>
-<text x="60" y="1632" class="table">logs тестовый/прод-лог не разделён, не в .gitignore, &gt;100 КБ или &gt;5</text>
-<text x="60" y="1656" class="p">страниц</text>
-<text x="60" y="1680" class="table">debt закрытый долг остался в docs/DEBT.md</text>
-<text x="60" y="1704" class="table">profile PROJECT.md или FEATURE.md без обязательных разделов</text>
-<text x="60" y="1728" class="table">readme нет быстрого старта</text>
-<text x="60" y="1752" class="table">journal журнал решений пуст или без «почему»</text>
-<text x="60" y="1776" class="table">adr нет шаблона, ADR мало или неполные разделы</text>
-<text x="60" y="1800" class="table">process процесс не описан</text>
-<text x="60" y="1824" class="table">ci выбранный в project.json CI-файл отсутствует</text>
-<text x="60" y="1848" class="table">versions версия в project.json не совпадает с документами</text>
-<text x="60" y="1872" class="table">go sizes (Go) файл &gt; 400 строк или функция &gt; 80</text>
-<text x="60" y="1896" class="table">gofmt (Go) файл не отформатирован</text>
-<text x="60" y="1920" class="table">deadcode (Go) неиспользуемые unexported func/type/var/const/method; // deadcode:keep —</text>
-<text x="60" y="1944" class="p">исключение</text>
-<text x="60" y="1968" class="table">commands build/test/lint/fmt/deadcode из project.json</text>
-<text x="60" y="1992" class="p">Запуск:</text>
-<text x="60" y="2016" class="p">verify.py — инструмент на стандартной библиотеке Python. Продукт</text>
-<text x="60" y="2040" class="p">остаётся</text>
-<text x="60" y="2064" class="p">на Go stdlib: никаких npm и сторонних пакетов.</text>
-<text x="60" y="2100" class="h2">CI и branch protection</text>
-<text x="60" y="2124" class="p">В репозитории три CI-файла:</text>
-<text x="60" y="2148" class="bullet">• GitHub — .github/workflows/verify.yml;</text>
-<text x="60" y="2172" class="bullet">• GitLab — .gitlab-ci.yml;</text>
-<text x="60" y="2196" class="bullet">• Azure DevOps — azure-pipelines.yml.</text>
-<text x="60" y="2220" class="p">project.json.ci — список: [&#34;none&#34;] по умолчанию, либо</text>
-<text x="60" y="2244" class="p">github/gitlab/azure. verify.py проверяет наличие выбранных файлов;</text>
-<text x="60" y="2268" class="p">none отключает CI.</text>
-<text x="60" y="2292" class="p">Файл workflow не включает branch protection сам по себе. В настройках</text>
-<text x="60" y="2316" class="p">репозитория нужно включить защиту основной ветки и</text>
-<text x="60" y="2340" class="p">потребовать проверку</text>
-<text x="60" y="2364" class="p">verify. Без этого красный workflow можно смержить. Подробная</text>
-<text x="60" y="2388" class="p">настройка —</text>
-<text x="60" y="2412" class="p">docs/BRANCH_PROTECTION.md.</text>
-<text x="60" y="2448" class="h2">Журнал решений</text>
-<text x="60" y="2472" class="bullet">• JOURNAL.md — короткие записи по ходу: что решили, почему, что</text>
-<text x="60" y="2496" class="p">дальше.</text>
-<text x="60" y="2520" class="bullet">• docs/adr/ — значимые архитектурные решения: контекст,</text>
-<text x="60" y="2544" class="p">альтернативы,</text>
-<text x="60" y="2568" class="p">последствия.</text>
-<text x="60" y="2592" class="p">Одно решение — одна запись. Запись без альтернатив и</text>
-<text x="60" y="2616" class="p">последствий —</text>
-<text x="60" y="2640" class="p">это не решение, а заголовок.</text>
-<text x="60" y="2676" class="h2">Почему это работает на неидеальном коде</text>
-<text x="60" y="2700" class="p">Процесс проверяет наблюдаемые факты, а не красоту кода: тест</text>
-<text x="60" y="2724" class="p">красный</text>
-<text x="60" y="2748" class="p">или зелёный, verify вернул 0 или 1, живой результат есть или нет,</text>
-<text x="60" y="2772" class="p">откат</text>
-<text x="60" y="2796" class="p">готов или нет. Поэтому даже неидеальный код не проходит</text>
-<text x="60" y="2820" class="p">дальше красного,</text>
-<text x="60" y="2844" class="p">а хороший код не считается готовым без доказательства.</text>
-<text x="60" y="2868" class="p">Правило 1 (чистый код) снижает вероятность ошибки. Процесс</text>
-<text x="60" y="2892" class="p">ловит то,</text>
-<text x="60" y="2916" class="p">что правило 1 пропустило.</text>
-<text x="60" y="2952" class="h2">Границы</text>
-<text x="60" y="2976" class="bullet">• verify.py и cmd/schemes — build-time инструменты, не продукт.</text>
-<text x="60" y="3000" class="bullet">• SVG-схемы — текст на Go stdlib; Pillow, шрифты и lock не нужны.</text>
-<text x="60" y="3024" class="bullet">• Если ноль зависимостей нужен и для verify.py, его переписывают на</text>
-<text x="60" y="3048" class="p">Go</text>
-<text x="60" y="3072" class="p">отдельной задачей.</text>
-<text x="60" y="3096" class="bullet">• Branch protection — настройка репозитория, а не файл в репозитории.</text>
-<text x="60" y="3132" class="h2">Связанные процедуры</text>
-<text x="60" y="3156" class="bullet">• Release</text>
-<text x="60" y="3180" class="bullet">• Backup и restore</text>
-<text x="60" y="3204" class="bullet">• Миграции</text>
-<text x="60" y="3228" class="bullet">• Секреты</text>
-<text x="60" y="3252" class="bullet">• Branch protection</text>
+<text x="60" y="1392" class="h2">Канал команд</text>
+<text x="60" y="1416" class="p">1. Команда приходит из приватного all-project-base-findings: автор</text>
+<text x="60" y="1440" class="p">conductor, метка from:conductor. Публичный issue — не команда.</text>
+<text x="60" y="1464" class="p">2. Агент читает публичную и приватную части; в репозиторий</text>
+<text x="60" y="1488" class="p">попадает только</text>
+<text x="60" y="1512" class="p">блок между &lt;!-- public:begin --&gt; и &lt;!-- public:end --&gt;.</text>
+<text x="60" y="1536" class="p">3. Правка + файл docs/acceptance/&lt;YYYY-MM-DD&gt;-&lt;slug&gt;.md с Версия: и</text>
+<text x="60" y="1560" class="p">Ссылка: findings#N.</text>
+<text x="60" y="1584" class="p">4. Issue закрывается комментарием published: docs/acceptance/&lt;файл&gt;.</text>
+<text x="60" y="1608" class="p">5. Отказ — комментарий с причиной; issue остаётся открытой.</text>
+<text x="60" y="1632" class="p">Публичный</text>
+<text x="60" y="1656" class="p">issue в шаблоне не создаётся и не читается.</text>
+<text x="60" y="1680" class="p">Формат и фильтр утечек — docs/acceptance/README.md.</text>
+<text x="60" y="1716" class="h2">Что проверяет verify</text>
+<text x="60" y="1740" class="table">Проверка Что ловит</text>
+<text x="60" y="1764" class="table">required files пропали правила, процесс, журнал или схема</text>
+<text x="60" y="1788" class="table">no npm artifacts package.json, lock-файлы, node_modules</text>
+<text x="60" y="1812" class="table">go.mod сторонние require/replace/exclude и go.sum</text>
+<text x="60" y="1836" class="table">secrets ключи, токены, private keys в текстовых файлах</text>
+<text x="60" y="1860" class="table">junk временные и мусорные файлы</text>
+<text x="60" y="1884" class="table">schemes SVG отсутствует или не совпадает с docs</text>
+<text x="60" y="1908" class="table">rules в RULES.md не десять правил, AGENTS-протокол неполный</text>
+<text x="60" y="1932" class="table">close-task cmd//deploy/ изменены без features/ADR/DEBT/JOURNAL</text>
+<text x="60" y="1956" class="table">logs тестовый/прод-лог не разделён, не в .gitignore, &gt;100 КБ или &gt;5</text>
+<text x="60" y="1980" class="p">страниц</text>
+<text x="60" y="2004" class="table">debt закрытый долг остался в docs/DEBT.md</text>
+<text x="60" y="2028" class="table">acceptance имя/дата/Версия:/Ссылка:, IPv4, /srv/, e-mail, ssh-</text>
+<text x="60" y="2052" class="table">profile PROJECT.md или FEATURE.md без обязательных разделов</text>
+<text x="60" y="2076" class="table">readme нет быстрого старта</text>
+<text x="60" y="2100" class="table">journal журнал решений пуст или без «почему»</text>
+<text x="60" y="2124" class="table">adr нет шаблона, ADR мало или неполные разделы</text>
+<text x="60" y="2148" class="table">process процесс не описан</text>
+<text x="60" y="2172" class="table">ci выбранный в project.json CI-файл отсутствует</text>
+<text x="60" y="2196" class="table">versions версия в project.json не совпадает с документами</text>
+<text x="60" y="2220" class="table">go sizes (Go) файл &gt; 400 строк или функция &gt; 80</text>
+<text x="60" y="2244" class="table">gofmt (Go) файл не отформатирован</text>
+<text x="60" y="2268" class="table">deadcode (Go) неиспользуемые unexported func/type/var/const/method; // deadcode:keep —</text>
+<text x="60" y="2292" class="p">исключение</text>
+<text x="60" y="2316" class="table">commands build/test/lint/fmt/deadcode из project.json</text>
+<text x="60" y="2340" class="p">Запуск:</text>
+<text x="60" y="2364" class="p">verify.py — инструмент на стандартной библиотеке Python. Продукт</text>
+<text x="60" y="2388" class="p">остаётся</text>
+<text x="60" y="2412" class="p">на Go stdlib: никаких npm и сторонних пакетов.</text>
+<text x="60" y="2448" class="h2">CI и branch protection</text>
+<text x="60" y="2472" class="p">В репозитории три CI-файла:</text>
+<text x="60" y="2496" class="bullet">• GitHub — .github/workflows/verify.yml;</text>
+<text x="60" y="2520" class="bullet">• GitLab — .gitlab-ci.yml;</text>
+<text x="60" y="2544" class="bullet">• Azure DevOps — azure-pipelines.yml.</text>
+<text x="60" y="2568" class="p">project.json.ci — список: [&#34;none&#34;] по умолчанию, либо</text>
+<text x="60" y="2592" class="p">github/gitlab/azure. verify.py проверяет наличие выбранных файлов;</text>
+<text x="60" y="2616" class="p">none отключает CI.</text>
+<text x="60" y="2640" class="p">Файл workflow не включает branch protection сам по себе. В настройках</text>
+<text x="60" y="2664" class="p">репозитория нужно включить защиту основной ветки и</text>
+<text x="60" y="2688" class="p">потребовать проверку</text>
+<text x="60" y="2712" class="p">verify. Без этого красный workflow можно смержить. Подробная</text>
+<text x="60" y="2736" class="p">настройка —</text>
+<text x="60" y="2760" class="p">docs/BRANCH_PROTECTION.md.</text>
+<text x="60" y="2796" class="h2">Журнал решений</text>
+<text x="60" y="2820" class="bullet">• JOURNAL.md — короткие записи по ходу: что решили, почему, что</text>
+<text x="60" y="2844" class="p">дальше.</text>
+<text x="60" y="2868" class="bullet">• docs/adr/ — значимые архитектурные решения: контекст,</text>
+<text x="60" y="2892" class="p">альтернативы,</text>
+<text x="60" y="2916" class="p">последствия.</text>
+<text x="60" y="2940" class="p">Одно решение — одна запись. Запись без альтернатив и</text>
+<text x="60" y="2964" class="p">последствий —</text>
+<text x="60" y="2988" class="p">это не решение, а заголовок.</text>
+<text x="60" y="3024" class="h2">Почему это работает на неидеальном коде</text>
+<text x="60" y="3048" class="p">Процесс проверяет наблюдаемые факты, а не красоту кода: тест</text>
+<text x="60" y="3072" class="p">красный</text>
+<text x="60" y="3096" class="p">или зелёный, verify вернул 0 или 1, живой результат есть или нет,</text>
+<text x="60" y="3120" class="p">откат</text>
+<text x="60" y="3144" class="p">готов или нет. Поэтому даже неидеальный код не проходит</text>
+<text x="60" y="3168" class="p">дальше красного,</text>
+<text x="60" y="3192" class="p">а хороший код не считается готовым без доказательства.</text>
+<text x="60" y="3216" class="p">Правило 1 (чистый код) снижает вероятность ошибки. Процесс</text>
+<text x="60" y="3240" class="p">ловит то,</text>
+<text x="60" y="3264" class="p">что правило 1 пропустило.</text>
+<text x="60" y="3300" class="h2">Границы</text>
+<text x="60" y="3324" class="bullet">• verify.py и cmd/schemes — build-time инструменты, не продукт.</text>
+<text x="60" y="3348" class="bullet">• SVG-схемы — текст на Go stdlib; Pillow, шрифты и lock не нужны.</text>
+<text x="60" y="3372" class="bullet">• Если ноль зависимостей нужен и для verify.py, его переписывают на</text>
+<text x="60" y="3396" class="p">Go</text>
+<text x="60" y="3420" class="p">отдельной задачей.</text>
+<text x="60" y="3444" class="bullet">• Branch protection — настройка репозитория, а не файл в репозитории.</text>
+<text x="60" y="3480" class="h2">Связанные процедуры</text>
+<text x="60" y="3504" class="bullet">• Release</text>
+<text x="60" y="3528" class="bullet">• Backup и restore</text>
+<text x="60" y="3552" class="bullet">• Миграции</text>
+<text x="60" y="3576" class="bullet">• Секреты</text>
+<text x="60" y="3600" class="bullet">• Branch protection</text>
 </svg>

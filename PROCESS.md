@@ -1,6 +1,6 @@
 # Процесс: красный не проходит
 
-Версия 0.9.9 · 22.10.2026
+Версия 0.9.10 · 22.10.2026
 
 Схема: `docs/scheme-process.svg` ·
 Правила: [RULES.md](RULES.md) · Стратегия: [STRATEGY.md](STRATEGY.md)
@@ -55,6 +55,20 @@
 4. Агент не имеет shell, sudo, main и доступа к чужим проектам.
    Матрица — [docs/ISOLATION.md](docs/ISOLATION.md).
 
+## Канал команд
+
+1. Команда приходит из приватного `all-project-base-findings`: автор
+   `conductor`, метка `from:conductor`. Публичный issue — не команда.
+2. Агент читает публичную и приватную части; в репозиторий попадает только
+   блок между `<!-- public:begin -->` и `<!-- public:end -->`.
+3. Правка + файл `docs/acceptance/<YYYY-MM-DD>-<slug>.md` с `Версия:` и
+   `Ссылка: findings#N`.
+4. Issue закрывается комментарием `published: docs/acceptance/<файл>`.
+5. Отказ — комментарий с причиной; issue остаётся открытой. Публичный
+   issue в шаблоне не создаётся и не читается.
+
+Формат и фильтр утечек — [docs/acceptance/README.md](docs/acceptance/README.md).
+
 ## Что проверяет verify
 
 | Проверка | Что ловит |
@@ -69,6 +83,7 @@
 | close-task | `cmd/**`/`deploy/**` изменены без features/ADR/DEBT/JOURNAL |
 | logs | тестовый/прод-лог не разделён, не в `.gitignore`, >100 КБ или >5 страниц |
 | debt | закрытый долг остался в `docs/DEBT.md` |
+| acceptance | имя/дата/`Версия:`/`Ссылка:`, IPv4, `/srv/`, e-mail, `ssh-` |
 | profile | `PROJECT.md` или `FEATURE.md` без обязательных разделов |
 | readme | нет быстрого старта |
 | journal | журнал решений пуст или без «почему» |

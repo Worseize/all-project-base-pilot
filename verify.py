@@ -19,6 +19,7 @@ import re
 import shutil
 import subprocess
 import sys
+from datetime import date as date_type
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -438,6 +439,49 @@ def check_projects(gate: Gate) -> None:
     gate.ok("projects", "пример валиден, projects.json игнорируется")
 
 
+ACCEPTANCE_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})-([a-z0-9]+(?:-[a-z0-9]+)*)\.md$")
+ACCEPTANCE_LEAKS = [
+    ("ipv4", re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b")),
+    ("host-path", re.compile(r"(?:^|\s)/(?:srv|etc|home)/")),
+    ("email", re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")),
+    ("ssh-key", re.compile(r"\bssh-[A-Za-z0-9-]+")),
+]
+
+
+def check_acceptance(gate: Gate) -> None:
+    directory = ROOT / "docs" / "acceptance"
+    if not directory.is_dir():
+        gate.fail("acceptance", "нет docs/acceptance/")
+        return
+    files = sorted(path for path in directory.glob("*.md") if path.name != "README.md")
+    errors = []
+    for path in files:
+        match = ACCEPTANCE_RE.fullmatch(path.name)
+        if not match:
+            errors.append(f"{path.name}: имя YYYY-MM-DD-<slug>.md")
+            continue
+        try:
+            date_type.fromisoformat(match.group(1))
+        except ValueError:
+            errors.append(f"{path.name}: неверная дата")
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
+        if not re.search(r"(?m)^Версия:\s*\S+", text):
+            errors.append(f"{path.name}: нет Версия:")
+        if not re.search(r"(?m)^Ссылка:\s*findings#\d+", text):
+            errors.append(f"{path.name}: нет Ссылка: findings#N")
+        body = re.sub(r"(?m)^(?:#.*|Версия:.*|Ссылка:.*)$", "", text).strip()
+        if not body:
+            errors.append(f"{path.name}: пустой блок приёмки")
+        for label, pattern in ACCEPTANCE_LEAKS:
+            if pattern.search(text):
+                errors.append(f"{path.name}: утечка {label}")
+    if errors:
+        gate.fail("acceptance", "; ".join(errors[:5]))
+    else:
+        gate.ok("acceptance", f"{len(files)} файлов, утечек нет")
+
+
 def check_isolation(gate: Gate) -> None:
     path = ROOT / "docs" / "ISOLATION.md"
     if not path.is_file():
@@ -768,6 +812,7 @@ def main() -> int:
         check_debt,
         check_isolation,
         check_projects,
+        check_acceptance,
         check_adr,
         check_process,
         check_ci,

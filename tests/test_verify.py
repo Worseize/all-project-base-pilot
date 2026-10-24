@@ -332,6 +332,57 @@ class VerifyTests(unittest.TestCase):
         verify.check_projects(gate)
         self.assertEqual(gate.failed, 1)
 
+    def _acceptance(self, name="2026-10-24-example.md", text=None):
+        directory = verify.ROOT / "docs" / "acceptance"
+        directory.mkdir(parents=True)
+        body = text if text is not None else (
+            "# Проверка\n\nСимптом и воспроизведение.\n\n"
+            "Версия: 0.9.10\nСсылка: findings#1\n"
+        )
+        (directory / name).write_text(body, encoding="utf-8")
+
+    def test_acceptance_valid(self):
+        self._acceptance()
+        gate = verify.Gate()
+        verify.check_acceptance(gate)
+        self.assertEqual(gate.failed, 0)
+
+    def test_acceptance_bad_name(self):
+        self._acceptance("bad.md")
+        gate = verify.Gate()
+        verify.check_acceptance(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_acceptance_missing_link(self):
+        self._acceptance(text="# Проверка\n\nТекст.\n\nВерсия: 0.9.10\n")
+        gate = verify.Gate()
+        verify.check_acceptance(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_acceptance_ipv4_leak(self):
+        self._acceptance(text="# Проверка\n\nАдрес 192.168.1.10.\n\nВерсия: 0.9.10\nСсылка: findings#1\n")
+        gate = verify.Gate()
+        verify.check_acceptance(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_acceptance_host_path_leak(self):
+        self._acceptance(text="# Проверка\n\nПуть /srv/example.\n\nВерсия: 0.9.10\nСсылка: findings#1\n")
+        gate = verify.Gate()
+        verify.check_acceptance(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_acceptance_email_leak(self):
+        self._acceptance(text="# Проверка\n\nПочта user@example.org.\n\nВерсия: 0.9.10\nСсылка: findings#1\n")
+        gate = verify.Gate()
+        verify.check_acceptance(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_acceptance_empty_body(self):
+        self._acceptance(text="# Проверка\n\nВерсия: 0.9.10\nСсылка: findings#1\n")
+        gate = verify.Gate()
+        verify.check_acceptance(gate)
+        self.assertEqual(gate.failed, 1)
+
     def test_isolation_matrix_complete(self):
         docs = verify.ROOT / "docs"
         docs.mkdir()

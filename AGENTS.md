@@ -75,5 +75,7 @@ Go, только стандартная библиотека. Никаких npm
 схема — `docs/scheme-process.svg`.
 Изоляция: `docs/ISOLATION.md`, `deploy/*`; агент — только `review`,
 `main` двигает root.
+Канал команд — приватный findings, история — `docs/acceptance/`;
+публичный issue не команда.
 Перед закрытием: `python verify.py` — только зелёный; мёртвый код —
 `go run ./cmd/deadcode`; запись в `JOURNAL.md` или `docs/adr/`.

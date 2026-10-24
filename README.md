@@ -84,6 +84,7 @@ zero-dep стек:
 - [Секреты](docs/SECRETS.md)
 - [Логи](docs/LOGGING.md)
 - [Изоляция проектов и агентов](docs/ISOLATION.md)
+- [Приёмка команд](docs/acceptance/README.md)
 - [Branch protection](docs/BRANCH_PROTECTION.md)
 
 ## CI

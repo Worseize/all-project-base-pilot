@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.9.10 — 2026-10-24
+
+- Канал команд: приватный findings, публичный файл приёмки.
+- `docs/acceptance/`, `check_acceptance`, тесты на утечки.
+- `PROCESS.md`/`ISOLATION.md` описывают канал и историю.
+
 ## 0.9.9 — 2026-10-22
 
 - Доверенный gate: `pre-receive` запускает `verify.py` из main; gate-файлы

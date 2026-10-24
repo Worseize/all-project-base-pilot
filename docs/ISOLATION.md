@@ -1,6 +1,6 @@
 # Изоляция проектов и агентов
 
-Версия 0.9.9 · 22.10.2026
+Версия 0.9.10 · 22.10.2026
 
 Один хост — несколько проектов — несколько агентов. Root — единственный,
 у кого полные права. Агент проекта получает только git-push в `review`.
@@ -223,6 +223,13 @@ sudo deploy/selftest-isolation.sh proj-a
 - `deploy/audit-drift.sh projects.json` — сироты в обе стороны:
   каталог без записи и запись без каталога.
 - `selftest-isolation.sh` принимает только id из `projects.json`.
+
+## Канал команд
+
+Задачи приходят из приватного `all-project-base-findings` (автор
+`conductor`, метка `from:conductor`), а не из публичного трекера шаблона.
+Публичная история закрытых команд — `docs/acceptance/`; формат и фильтр
+утечек — [docs/acceptance/README.md](acceptance/README.md).
 
 ## Границы
 
