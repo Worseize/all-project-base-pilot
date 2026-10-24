@@ -1,6 +1,6 @@
 # Процесс: красный не проходит
 
-Версия 0.9.16 · 22.10.2026
+Версия 0.9.17 · 22.10.2026
 
 Схема: `docs/scheme-process.svg` ·
 Правила: [RULES.md](RULES.md) · Стратегия: [STRATEGY.md](STRATEGY.md)
@@ -53,6 +53,8 @@
    (хуки не запускаются — это акт одобрения).
 3. Root доставляет main в runtime: `sudo deploy/deploy-project.sh <proj>`
    (checkout `/srv/<proj>/current` и restart `proj@<proj>.service`).
+   `post-receive` обновляет checkout только при push-based main; после
+   `update-ref` нужен `deploy-project.sh`.
 4. Агент не имеет shell, sudo, main и доступа к чужим проектам.
    Матрица — [docs/ISOLATION.md](docs/ISOLATION.md).
 

@@ -1,6 +1,6 @@
 {
   "name": "all-project-base",
-  "version": "0.9.16",
+  "version": "0.9.17",
   "date": "22.10.2026",
   "stack": "go",
   "commands": {
@@ -43,6 +43,7 @@
     "deploy/host-baseline.sh",
     "deploy/systemd/proj@.service",
     "deploy/git/pre-receive",
+    "deploy/git/post-receive",
     "deploy/bootstrap-project.sh",
     "deploy/selftest-isolation.sh",
     "deploy/deploy-project.sh",

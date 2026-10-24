@@ -3,6 +3,22 @@
 Одно решение — одна запись. Формат: дата, версия, решение, почему,
 что отвергли, последствия, ссылки.
 
+## 2026-10-25 · 0.9.17 · Ubuntu 24.04 delivery
+
+**Решение:** bootstrap и `deploy-project.sh` клонируют/обновляют checkout
+от имени пользователя проекта через `runuser`; CI isolation и verify
+закреплены на `ubuntu-24.04`; ставится `post-receive`, а после
+`update-ref` доставка идёт через `deploy-project.sh`.
+
+**Почему:** root-клон на git 2.43 падает на dubious ownership;
+`ubuntu-latest` уже не та ОС; без доставки main код остаётся в bare.
+
+**Отвергли:** `git -c safe.directory` для clone; `ubuntu-latest`;
+автоматический deploy после update-ref (хуки не запускаются).
+
+**Последствия:** CI ловит target-версию; isolation проверяет, что main
+появляется в `current`; post-receive покрывает push-based main.
+
 ## 2026-10-25 · 0.9.16 · Один logrotate, проектный drift, доставка main
 
 **Решение:** оставить одно правило `/etc/logrotate.d/proj-logs` (baseline);

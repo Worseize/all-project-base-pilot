@@ -1,6 +1,6 @@
 # Изоляция проектов и агентов
 
-Версия 0.9.16 · 22.10.2026
+Версия 0.9.17 · 22.10.2026
 
 Один хост — несколько проектов — несколько агентов. Root — единственный,
 у кого полные права. Агент проекта получает только git-push в `review`.
@@ -147,13 +147,17 @@ sudo REGISTRY=projects.json deploy/selftest-isolation.sh proj-a proj-b
 
 `SOURCE_REPO`/`SOURCE_REF` переопределяют источник initial main, если
 проект сеется не из шаблона. Bootstrap сразу создаёт рабочий checkout
-`/srv/<id>/current`. Пока `refs/heads/main` нет, `pre-receive` отклоняет
-`review`: доверенный `verify.py` берётся именно из main. После merge
-root доставляет main в runtime:
+`/srv/<id>/current` **от имени пользователя проекта** (`runuser`), поэтому
+git 2.43 не падает на dubious ownership. Пока `refs/heads/main` нет,
+`pre-receive` отклоняет `review`: доверенный `verify.py` берётся именно из
+main. После merge root доставляет main в runtime:
 
 ```bash
 sudo deploy/deploy-project.sh proj-a
 ```
+
+`update-ref` не запускает хуки; `deploy-project.sh` — основной путь.
+`post-receive` обновляет `current` только для push-based main.
 
 ## Доверенный gate
 
