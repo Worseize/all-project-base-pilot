@@ -1,6 +1,6 @@
 # Процесс: красный не проходит
 
-Версия 0.9.15 · 22.10.2026
+Версия 0.9.16 · 22.10.2026
 
 Схема: `docs/scheme-process.svg` ·
 Правила: [RULES.md](RULES.md) · Стратегия: [STRATEGY.md](STRATEGY.md)
@@ -51,7 +51,8 @@
    `verify.py` и отклоняет delete/force.
 2. Root смотрит diff и мержит `review` в `main` через `git update-ref`
    (хуки не запускаются — это акт одобрения).
-3. Root деплоит и перезапускает `proj@<proj>.service`.
+3. Root доставляет main в runtime: `sudo deploy/deploy-project.sh <proj>`
+   (checkout `/srv/<proj>/current` и restart `proj@<proj>.service`).
 4. Агент не имеет shell, sudo, main и доступа к чужим проектам.
    Матрица — [docs/ISOLATION.md](docs/ISOLATION.md).
 

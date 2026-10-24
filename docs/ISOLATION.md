@@ -1,6 +1,6 @@
 # Изоляция проектов и агентов
 
-Версия 0.9.15 · 22.10.2026
+Версия 0.9.16 · 22.10.2026
 
 Один хост — несколько проектов — несколько агентов. Root — единственный,
 у кого полные права. Агент проекта получает только git-push в `review`.
@@ -146,8 +146,14 @@ sudo REGISTRY=projects.json deploy/selftest-isolation.sh proj-a proj-b
 ```
 
 `SOURCE_REPO`/`SOURCE_REF` переопределяют источник initial main, если
-проект сеется не из шаблона. Пока `refs/heads/main` нет, `pre-receive`
-отклоняет `review`: доверенный `verify.py` берётся именно из main.
+проект сеется не из шаблона. Bootstrap сразу создаёт рабочий checkout
+`/srv/<id>/current`. Пока `refs/heads/main` нет, `pre-receive` отклоняет
+`review`: доверенный `verify.py` берётся именно из main. После merge
+root доставляет main в runtime:
+
+```bash
+sudo deploy/deploy-project.sh proj-a
+```
 
 ## Доверенный gate
 
@@ -179,8 +185,10 @@ forced command работает, а интерактивного shell нет. �
 root:<proj>, 0660; hook пишет строку на каждый push: дата, ref, old, new,
 результат, причина. Групповая запись нужна, потому что hook работает от
 пользователя проекта; setfacl не требуется.
-Ротация — `/etc/logrotate.d/proj-<proj>`: `size 100k`, `rotate 5`,
-`copytruncate`; режим и группа сохраняются.
+Ротация — **одно** правило `/etc/logrotate.d/proj-logs` на
+`/var/log/git/*.log` (ставит `host-baseline.sh`): `size 100k`,
+`rotate 5`, `copytruncate`; режим и группа сохраняются. Per-project
+правил нет — иначе logrotate падает на дубле.
 
 ## Один проект
 
@@ -195,9 +203,11 @@ sudo deploy/selftest-isolation.sh proj-a
 
 ## systemd
 
-`ExecStart=/srv/%i/run` — стек-нейтральный launcher. `systemd-analyze verify`
-на шаблоне без `run` ожидаемо краснеет; проверять юнит нужно на живом
-экземпляре. `run` должен быть исполняемым и запускать приложение проекта.
+`ExecStart=/srv/%i/current/run` — launcher из рабочего checkout.
+`bootstrap` создаёт `/srv/<id>/current`, `deploy-project.sh` обновляет его
+после merge. `systemd-analyze verify` на шаблоне без `run` ожидаемо
+краснеет; проверять юнит нужно на живом экземпляре. `run` должен быть
+исполняемым и запускать приложение проекта.
 
 ## Предупреждение про /srv
 

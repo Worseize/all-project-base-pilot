@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.9.16 — 2026-10-25
+
+- Одно logrotate-правило `proj-logs`; per-project правило удалено.
+- `audit-drift` считает проектом только каталог с `repo.git`/`CANARY`.
+- Bootstrap создаёт `/srv/<id>/current`; `deploy-project.sh` доставляет main
+  и перезапускает unit; `ExecStart=/srv/%i/current/run`.
+
 ## 0.9.15 — 2026-10-25
 
 - Шаблон закреплён как админ-узел и приёмка, без продукта.

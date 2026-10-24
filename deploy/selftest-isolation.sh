@@ -114,6 +114,11 @@ if git -c safe.directory="$REPO" --git-dir="$REPO" show-ref --verify --quiet ref
 else
   fail "main is missing; bootstrap must seed it"
 fi
+if [ -d "/srv/$A/current/.git" ]; then
+  ok "runtime checkout exists"
+else
+  fail "runtime checkout missing"
+fi
 
 if [ -f /etc/systemd/system/proj@.service ]; then
   ok "systemd template installed"

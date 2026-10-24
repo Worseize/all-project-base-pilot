@@ -1,6 +1,6 @@
 # Логи
 
-Версия 0.9.15 · 22.10.2026
+Версия 0.9.16 · 22.10.2026
 
 Три разных журнала. Смешивать их нельзя: тестовый шум не должен попадать
 в решения, а прод-ошибки — в тестовый лог.
@@ -39,8 +39,10 @@ JOURNAL.md, JOURNAL.1.md ... JOURNAL.4.md
 ## Проектные логи изоляции
 
 `/var/log/git/<proj>.log` — журнал приёмки пушей (root:<proj>, 0660).
-`bootstrap-project.sh` ставит `/etc/logrotate.d/proj-<proj>`:
-`size 100k`, `rotate 5`, `copytruncate`; ACL записи сохраняется.
+`host-baseline.sh` ставит **одно** правило `/etc/logrotate.d/proj-logs`
+на `/var/log/git/*.log`: `size 100k`, `rotate 5`, `copytruncate`.
+`bootstrap-project.sh` своё правило не ставит — иначе logrotate падает на
+дубле.
 
 ## Go, stdlib
 

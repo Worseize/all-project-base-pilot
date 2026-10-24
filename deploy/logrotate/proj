@@ -1,9 +1,0 @@
-/var/log/git/%i.log {
-    size 100k
-    rotate 5
-    missingok
-    notifempty
-    copytruncate
-    create 0660 root %i
-    su root %i
-}

@@ -45,6 +45,9 @@ PY
   done
   while IFS= read -r dir; do
     id="$(basename "$dir")"
+    if [ ! -d "$dir/repo.git" ] && [ ! -f "$dir/CANARY" ]; then
+      continue
+    fi
     [ -n "${REG[$id]:-}" ] || fail "orphan-dir: /srv/$id not in registry"
   done < <(find /srv -mindepth 1 -maxdepth 1 -type d 2>/dev/null)
 else
