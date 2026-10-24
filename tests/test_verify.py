@@ -395,6 +395,18 @@ class VerifyTests(unittest.TestCase):
         verify.check_acceptance(gate)
         self.assertEqual(gate.failed, 1)
 
+    def test_isolation_ci_wired(self):
+        root = Path(__file__).resolve().parents[1]
+        workflow = (root / ".github" / "workflows" / "isolation.yml").read_text(encoding="utf-8")
+        script = (root / "deploy" / "ci" / "isolation.sh").read_text(encoding="utf-8")
+        cleanup = (root / "deploy" / "ci" / "isolation-cleanup.sh").read_text(encoding="utf-8")
+        self.assertIn("ubuntu-latest", workflow)
+        self.assertIn("deploy/ci/isolation.sh", workflow)
+        self.assertIn("deploy/ci/isolation-cleanup.sh", workflow)
+        for word in ("git-shell", "refs/heads/main", "gate files changed", "CANARY", "sudo -n", "logrotate"):
+            self.assertIn(word, script)
+        self.assertIn("userdel", cleanup)
+
     def test_process_requires_conductor_board_rule(self):
         text = "verify красный журнал деплой\n"
         (verify.ROOT / "PROCESS.md").write_text(text, encoding="utf-8")

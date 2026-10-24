@@ -1,6 +1,6 @@
 # Изоляция проектов и агентов
 
-Версия 0.9.13 · 22.10.2026
+Версия 0.9.14 · 22.10.2026
 
 Один хост — несколько проектов — несколько агентов. Root — единственный,
 у кого полные права. Агент проекта получает только git-push в `review`.
@@ -233,6 +233,14 @@ sudo deploy/selftest-isolation.sh proj-a
 отчёт — файл `docs/acceptance/` и сообщение коммита `(findings#N)`,
 отказ — файл с первой строкой `Отказ: <причина>`. Issue закрывает только
 `conductor`.
+
+## CI isolation
+
+`.github/workflows/isolation.yml` запускает `deploy/ci/isolation.sh` на
+`ubuntu-latest`: bootstrap двух проектов, `git-shell`, seed `main`,
+review/force/delete, подмена `verify.py`, canary, sudo, hooksPath, лог и
+logrotate. В конце — `deploy/ci/isolation-cleanup.sh`. Джоба краснеет при
+возврате `nologin`, отсутствии `main` или ослаблении gate.
 
 ## Границы
 

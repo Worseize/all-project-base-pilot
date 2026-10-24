@@ -67,11 +67,11 @@ git -c safe.directory="$REPO" --git-dir="$REPO" config receive.denyDeletes true
 git -c safe.directory="$REPO" --git-dir="$REPO" config receive.denyNonFastForwards true
 
 if ! git -c safe.directory="$REPO" --git-dir="$REPO" rev-parse --verify --quiet refs/heads/main >/dev/null; then
-  if ! git -C "$SOURCE_REPO" rev-parse --verify --quiet "$SOURCE_REF" >/dev/null; then
+  if ! git -c safe.directory="$SOURCE_REPO" -C "$SOURCE_REPO" rev-parse --verify --quiet "$SOURCE_REF" >/dev/null; then
     echo "source repo/ref not found: $SOURCE_REPO $SOURCE_REF" >&2
     exit 1
   fi
-  git -c safe.directory="$REPO" --git-dir="$REPO" fetch "$SOURCE_REPO" "$SOURCE_REF:refs/heads/main"
+  git -c safe.directory="$REPO" -c safe.directory="$SOURCE_REPO" --git-dir="$REPO" fetch "$SOURCE_REPO" "$SOURCE_REF:refs/heads/main"
   chown -R "$PROJECT:$PROJECT" "$REPO"
   echo "seeded main from $SOURCE_REPO ($SOURCE_REF)"
 fi
@@ -114,9 +114,9 @@ else
   echo "AGENT_PUBKEY not set; add the agent key later" >&2
 fi
 
-if command -v systemctl >/dev/null 2>&1; then
-  systemctl daemon-reload
-  systemctl enable "proj@$PROJECT.service"
+if command -v systemctl >/dev/null 2>&1 && systemctl is-system-running >/dev/null 2>&1; then
+  systemctl daemon-reload || true
+  systemctl enable "proj@$PROJECT.service" || true
 fi
 
 printf 'ready: project=%s user=%s repo=%s hooks=%s\n' \
