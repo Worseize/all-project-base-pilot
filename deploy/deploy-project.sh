@@ -23,13 +23,17 @@ if [ ! -d "$REPO" ]; then
   echo "repo not found: $REPO" >&2
   exit 1
 fi
+if ! command -v runuser >/dev/null 2>&1; then
+  echo "runuser is required" >&2
+  exit 1
+fi
 if [ ! -d "$WORK/.git" ]; then
-  git -c safe.directory="$REPO" clone "$REPO" "$WORK"
+  runuser -u "$PROJECT" -- git clone "$REPO" "$WORK"
 fi
 chown -R "$PROJECT:$PROJECT" "$WORK"
-git -c safe.directory="$WORK" -C "$WORK" fetch origin main
-git -c safe.directory="$WORK" -C "$WORK" checkout -B main FETCH_HEAD
-git -c safe.directory="$WORK" -C "$WORK" reset --hard FETCH_HEAD
+runuser -u "$PROJECT" -- git -C "$WORK" fetch origin main
+runuser -u "$PROJECT" -- git -C "$WORK" checkout -B main FETCH_HEAD
+runuser -u "$PROJECT" -- git -C "$WORK" reset --hard FETCH_HEAD
 chown -R "$PROJECT:$PROJECT" "$WORK"
 
 if [ ! -x "$WORK/run" ]; then

@@ -83,6 +83,11 @@ if [ "$(stat -c '%U:%G %a' "/etc/git-hooks/$A" 2>/dev/null)" = "root:root 755" ]
 else
   fail "hooks directory is not root:root 755"
 fi
+if [ -f "/etc/git-hooks/$A/post-receive" ]; then
+  ok "post-receive installed"
+else
+  fail "post-receive missing"
+fi
 
 LOG="/var/log/git/$A.log"
 if [ -f "$LOG" ] && [ "$(stat -c '%U:%G %a' "$LOG" 2>/dev/null)" = "root:$A 660" ]; then

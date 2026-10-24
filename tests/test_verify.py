@@ -451,7 +451,7 @@ class VerifyTests(unittest.TestCase):
         workflow = (root / ".github" / "workflows" / "isolation.yml").read_text(encoding="utf-8")
         script = (root / "deploy" / "ci" / "isolation.sh").read_text(encoding="utf-8")
         cleanup = (root / "deploy" / "ci" / "isolation-cleanup.sh").read_text(encoding="utf-8")
-        self.assertIn("ubuntu-latest", workflow)
+        self.assertIn("ubuntu-24.04", workflow)
         self.assertIn("deploy/ci/isolation.sh", workflow)
         self.assertIn("deploy/ci/isolation-cleanup.sh", workflow)
         for word in ("git-shell", "refs/heads/main", "gate files changed", "CANARY", "sudo -n", "logrotate"):

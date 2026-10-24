@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.9.17 — 2026-10-25
+
+- Bootstrap/deploy клонируют и обновляют checkout через `runuser`.
+- CI закреплён на `ubuntu-24.04`; isolation проверяет доставку main.
+- Установлен `post-receive`; `update-ref` по-прежнему требует
+  `deploy-project.sh`.
+
 ## 0.9.16 — 2026-10-25
 
 - Одно logrotate-правило `proj-logs`; per-project правило удалено.

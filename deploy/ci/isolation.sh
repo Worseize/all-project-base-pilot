@@ -143,6 +143,20 @@ if [ "$(git -c safe.directory="$REPO" --git-dir="$REPO" config core.hooksPath 2>
 else
   fail "core.hooksPath is wrong"
 fi
+if [ -f "/etc/git-hooks/$A/post-receive" ]; then
+  ok "post-receive installed"
+else
+  fail "post-receive missing"
+fi
+
+review_sha="$(git -c safe.directory="$REPO" --git-dir="$REPO" rev-parse refs/heads/review)"
+git -c safe.directory="$REPO" --git-dir="$REPO" update-ref refs/heads/main "$review_sha"
+if bash "$ROOT/deploy/deploy-project.sh" "$A" >/dev/null 2>&1 &&
+  [ -f "/srv/$A/current/ci-proof.txt" ]; then
+  ok "main delivered to runtime"
+else
+  fail "main not delivered to runtime"
+fi
 
 if [ "$FAILED" -ne 0 ]; then
   echo "ISOLATION CI: RED" >&2
