@@ -1,138 +1,93 @@
 # all-project-base
 
-Шаблон архитектуры крупного проекта: десять правил, процесс с red-gate,
-схемы, ADR и журнал решений. Стек по умолчанию — Go, только стандартная
-библиотека; у продукта нет сторонних зависимостей.
+Шаблон **админ-узла и приёмки**, а не приложения. Он держит гейт,
+принимает правки агентов и изолирует проекты. Продукты живут отдельными
+проектами и не входят в этот репозиторий.
 
 Лицензия — [MIT](LICENSE).
 
-## Быстрый старт
+## Быстрый старт: разверни админ-узел
 
-1. Скопируйте папку/репозиторий под новый проект.
-2. Заполните `project.json`: имя, версия, стек, команды, обязательные файлы.
-3. Заполните `PROJECT.md`: назначение, границы, данные, окружения, исключения.
-4. Скопируйте `FEATURE.md` в карточку конкретной фичи.
-5. Проверьте шаблон:
+1. Скопируйте репозиторий на Linux-хост с systemd.
+2. Проверьте сам шаблон:
 
 ```bash
 python verify.py
 ```
 
-6. Если меняли правила или схемы:
+3. Разверните базовую обвязку узла:
 
 ```bash
-python verify.py --update-schemes
+sudo deploy/host-baseline.sh
 ```
 
-7. Включите branch protection и потребуйте проверку `verify`.
+4. Создайте рабочий реестр вне git и первого проекта:
+
+```bash
+cp projects.example.json projects.json
+sudo deploy/bootstrap-project.sh proj-a
+```
+
+5. Проверьте узел и изоляцию:
+
+```bash
+sudo deploy/audit-drift.sh projects.json
+sudo REGISTRY=projects.json deploy/selftest-isolation.sh proj-a
+```
+
+6. Закройте задачу по процессу:
+
+```bash
+python verify.py --close-task
+```
+
+## Продукт — отдельным проектом
+
+Шаблон не содержит `cmd/app`, `app.service`, `bin/app` и продуктовых
+данных. Продукт создаётся отдельным проектом:
+
+- свой `id`, пользователь и `/srv/<id>`;
+- свой агент, который пушит только в `review`;
+- свой деплой и свой сервис;
+- админ узла принимает правки и закрывает issue.
+
+`verify.py` → `check_no_product` краснеет, если продукт пытаются вернуть
+в шаблон.
 
 ## Что внутри
 
 | Файл | Зачем |
 | --- | --- |
 | `RULES.md` | десять правил и проверки |
-| `PROJECT.md` | профиль конкретного проекта |
-| `FEATURE.md` | шаблон карточки фичи |
-| `PROCESS.md` | правила → тест → verify → деплой → журнал |
-| `STRATEGY.md` | видение, слои, дорожная карта |
-| `verify.py` | red gate: 0 — зелёный, иначе деплой запрещён |
-| `JOURNAL.md` | короткие решения с «почему» |
-| `docs/adr/` | значимые архитектурные решения |
-| `docs/scheme-*.svg` | схемы в git, текст; генерируются Go |
-
-## Зависимости
-
-Продукт — ноль сторонних зависимостей. Go toolchain, Python (только gate),
-Git и CI — отдельные контуры. Схемы — Go stdlib + SVG, без Pillow.
-Подробно: [docs/DEPENDENCIES.md](docs/DEPENDENCIES.md). Git и CI не обязательны.
+| `PROJECT.md` | профиль админ-узла |
+| `PROCESS.md` | команда → правка → приёмка → conductor |
+| `STRATEGY.md` | стратегия и очередь улучшений |
+| `verify.py` | red gate админ-узла |
+| `docs/ISOLATION.md` | роли, права, изоляция |
+| `docs/HOST.md` | здоровье узла |
+| `docs/acceptance/` | публичная история команд |
+| `docs/scheme-*.svg` | схемы в git, генерируются Go |
+| `deploy/` | baseline, bootstrap, hooks, CI |
 
 ## Требования
 
-- **Go** — для продукта; `verify.py` запускает `go vet`, `go test`, `go build`,
-  `gofmt`, если есть `go.mod`.
-- **Python 3.11+** — только для `verify.py`.
-- **Go** — также генератор SVG: `go run ./cmd/schemes -write`.
+- Linux с systemd, `ufw`, `fail2ban`, `git`.
+- Python 3.11+ — только `verify.py`.
+- Go — инструменты `cmd/schemes` и `cmd/deadcode`.
+- Git и CI — отдельные контуры; сторонних зависимостей нет.
 
-SVG лежат в git как текст. `verify.py` запускает `go run ./cmd/schemes -check`
-и сравнивает содержимое; lock-файл схем не нужен.
+## Роли
 
-## Другой стек
+- **Админ узла** — гейт, firewall, журналы, бэкап, merge в `main`.
+- **Агент проекта** — только свой проект и `review`.
+- **Продукт** — отдельный проект; в этом репозитории его нет.
 
-По умолчанию шаблон Go-центричен, но `project.json` поддерживает другой
-zero-dep стек:
-
-```json
-{
-  "stack": "python",
-  "commands": {
-    "test": "python -m unittest",
-    "lint": "python -m compileall ."
-  }
-}
-```
-
-`verify.py` запустит эти команды, а Go-специфичные проверки (`go.mod`,
-размеры Go-файлов, `gofmt`) пропустит. Правило 4 требует, чтобы у языка
-тоже был ноль зависимостей; исключение фиксируется в ADR. Запрет npm
-остаётся, пока `forbid_npm` не выключен явно.
-
-## Операции
-
-- [Release checklist](docs/RELEASE.md)
-- [Backup и restore](docs/BACKUP.md)
-- [Миграции](docs/MIGRATIONS.md)
-- [Секреты](docs/SECRETS.md)
-- [Логи](docs/LOGGING.md)
-- [Изоляция проектов и агентов](docs/ISOLATION.md)
-- [Приёмка команд](docs/acceptance/README.md)
-- [Branch protection](docs/BRANCH_PROTECTION.md)
+Подробно: [docs/ISOLATION.md](docs/ISOLATION.md),
+[docs/HOST.md](docs/HOST.md), [docs/acceptance/README.md](docs/acceptance/README.md).
 
 ## CI
 
-`project.json.ci` — список контуров. По умолчанию `["none"]`; проект
-включает нужные:
+- `verify` — red gate шаблона.
+- `isolation` — bootstrap двух проектов и полная приёмка изоляции.
 
-```json
-"ci": ["github", "gitlab", "azure"]
-```
-
-- `github` — [.github/workflows/verify.yml](.github/workflows/verify.yml);
-- `gitlab` — [.gitlab-ci.yml](.gitlab-ci.yml);
-- `azure` — [azure-pipelines.yml](azure-pipelines.yml);
-- `none` — CI отключён.
-
-Один и тот же `verify.py` запускается во всех контурах, плюс тесты gate
-и `examples/minimal-go`.
-
-## Главные команды
-
-```bash
-python verify.py                 # red gate
-python verify.py --close-task    # код без features/ADR/DEBT/JOURNAL — красный
-python verify.py --update-schemes  # перерисовать схемы и обновить lock
-python -m unittest discover -s tests
-go run ./cmd/deadcode            # unexported func/type/var/const
-go run ./cmd/deadcode -json      # то же в JSON для CI/отчётов
-```
-
-`cmd/deadcode` — консервативный AST-детектор: проверяет unexported-функции,
-типы, переменные, константы и методы; методы — по селекторам и именам
-интерфейсов. Generated-файлы пропускаются, `// deadcode:keep` — исключение.
-Это не полный type-check: при рефлексии/`go:linkname` используйте keep.
-
-## Правила и бюджет
-
-Правил всегда десять. Новое правило должно вобрать старое или доказать,
-что без него рвётся контур. Проектные особенности — в `PROJECT.md`,
-а не в `RULES.md`.
-
-## Релиз шаблона
-
-- `python verify.py` — зелёный.
-- `python -m unittest discover -s tests` — зелёный.
-- `go run ./cmd/deadcode` — зелёный.
-- `examples/minimal-go` проходит `go test`.
-- Схемы SVG обновлены: `go run ./cmd/schemes -write`.
-- Branch protection требует `verify`: [docs/BRANCH_PROTECTION.md](docs/BRANCH_PROTECTION.md).
-
-Версия шаблона — `project.json.version`.
+CI не деплоит продукт: у админ-узла продукта нет.

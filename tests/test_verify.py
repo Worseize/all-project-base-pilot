@@ -395,6 +395,57 @@ class VerifyTests(unittest.TestCase):
         verify.check_acceptance(gate)
         self.assertEqual(gate.failed, 1)
 
+    def _no_product(self):
+        deploy = verify.ROOT / "deploy"
+        deploy.mkdir(parents=True)
+        return deploy
+
+    def test_no_product_app_service(self):
+        deploy = self._no_product()
+        (deploy / "systemd").mkdir()
+        (deploy / "systemd" / "app.service").write_text("[Service]\n", encoding="utf-8")
+        gate = verify.Gate()
+        verify.check_no_product(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_no_product_app_named_service(self):
+        deploy = self._no_product()
+        (deploy / "systemd").mkdir()
+        (deploy / "systemd" / "my-app.service").write_text("[Service]\n", encoding="utf-8")
+        gate = verify.Gate()
+        verify.check_no_product(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_no_product_cmd_app(self):
+        (verify.ROOT / "cmd" / "app").mkdir(parents=True)
+        gate = verify.Gate()
+        verify.check_no_product(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_no_product_bin_app(self):
+        deploy = self._no_product()
+        (deploy / "run.sh").write_text("exec bin/app\n", encoding="utf-8")
+        gate = verify.Gate()
+        verify.check_no_product(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_no_product_sudoers_restart(self):
+        deploy = self._no_product()
+        (deploy / "sudoers").write_text(
+            "/etc/sudoers.d/proj app ALL=(root) NOPASSWD: systemctl restart app\n",
+            encoding="utf-8",
+        )
+        gate = verify.Gate()
+        verify.check_no_product(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_no_product_tools_allowed(self):
+        (verify.ROOT / "cmd" / "schemes").mkdir(parents=True)
+        (verify.ROOT / "cmd" / "deadcode").mkdir()
+        gate = verify.Gate()
+        verify.check_no_product(gate)
+        self.assertEqual(gate.failed, 0)
+
     def test_isolation_ci_wired(self):
         root = Path(__file__).resolve().parents[1]
         workflow = (root / ".github" / "workflows" / "isolation.yml").read_text(encoding="utf-8")

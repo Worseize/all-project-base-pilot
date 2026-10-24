@@ -1,10 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="3786" viewBox="0 0 1400 3786">
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="3906" viewBox="0 0 1400 3906">
 <rect width="1400" height="100%" fill="#f7f9fc"/>
 <style>text{font-family:'DejaVu Sans',Arial,sans-serif;fill:#172033}.title{font-size:32px;font-weight:700}.sub{font-size:14px;fill:#667085}.h2{font-size:22px;font-weight:700;fill:#1d4ed8}.h3{font-size:18px;font-weight:700;fill:#172033}.p{font-size:15px}.bullet{font-size:15px}.table{font-family:'DejaVu Sans Mono',monospace;font-size:13px}</style>
 <text x="60" y="64" class="title">Изоляция</text>
-<text x="60" y="92" class="sub">Source: docs/ISOLATION.md · v0.9.14 · 22.10.2026</text>
+<text x="60" y="92" class="sub">Source: docs/ISOLATION.md · v0.9.15 · 22.10.2026</text>
 <text x="60" y="144" class="h2">Изоляция проектов и агентов</text>
-<text x="60" y="168" class="p">Версия 0.9.14 · 22.10.2026</text>
+<text x="60" y="168" class="p">Версия 0.9.15 · 22.10.2026</text>
 <text x="60" y="192" class="p">Один хост — несколько проектов — несколько агентов. Root —</text>
 <text x="60" y="216" class="p">единственный,</text>
 <text x="60" y="240" class="p">у кого полные права. Агент проекта получает только git-push в review.</text>
@@ -125,31 +125,36 @@
 <text x="60" y="3204" class="bullet">• deploy/audit-drift.sh projects.json — сироты в обе стороны:</text>
 <text x="60" y="3228" class="p">каталог без записи и запись без каталога.</text>
 <text x="60" y="3252" class="bullet">• selftest-isolation.sh принимает только id из projects.json.</text>
-<text x="60" y="3288" class="h2">Канал команд</text>
-<text x="60" y="3312" class="p">Задачи приходят из приватного all-project-base-findings (автор</text>
-<text x="60" y="3336" class="p">conductor, метка from:conductor), а не из публичного трекера шаблона.</text>
-<text x="60" y="3360" class="p">Публичная история закрытых команд — docs/acceptance/; формат и</text>
-<text x="60" y="3384" class="p">фильтр</text>
-<text x="60" y="3408" class="p">утечек — docs/acceptance/README.md.</text>
-<text x="60" y="3432" class="p">Агент только читает issues и комментарии, в доску не пишет</text>
-<text x="60" y="3456" class="p">вообще;</text>
-<text x="60" y="3480" class="p">отчёт — файл docs/acceptance/ и сообщение коммита (findings#N),</text>
-<text x="60" y="3504" class="p">отказ — файл с первой строкой Отказ: &lt;причина&gt;. Issue закрывает</text>
-<text x="60" y="3528" class="p">только</text>
-<text x="60" y="3552" class="p">conductor.</text>
-<text x="60" y="3588" class="h2">CI isolation</text>
-<text x="60" y="3612" class="p">.github/workflows/isolation.yml запускает deploy/ci/isolation.sh на</text>
-<text x="60" y="3636" class="p">ubuntu-latest: bootstrap двух проектов, git-shell, seed main,</text>
-<text x="60" y="3660" class="p">review/force/delete, подмена verify.py, canary, sudo, hooksPath, лог и</text>
-<text x="60" y="3684" class="p">logrotate. В конце — deploy/ci/isolation-cleanup.sh. Джоба краснеет при</text>
-<text x="60" y="3708" class="p">возврате nologin, отсутствии main или ослаблении gate.</text>
-<text x="60" y="3744" class="h2">Границы</text>
-<text x="60" y="3768" class="bullet">• Это Linux/systemd/sshd-модель; на Windows live-проверка невозможна.</text>
-<text x="60" y="3792" class="bullet">• Caddy — единственный вход; порты приложений наружу не</text>
-<text x="60" y="3816" class="p">публикуются.</text>
-<text x="60" y="3840" class="bullet">• Секреты своего проекта доступны агенту только через</text>
-<text x="60" y="3864" class="p">запущенный процесс</text>
-<text x="60" y="3888" class="p">или явно выданный env; в репозитории секретов нет.</text>
-<text x="60" y="3912" class="bullet">• Нового правила нет: политика живёт в PROJECT.md, этом файле и</text>
-<text x="60" y="3936" class="p">PROCESS.md.</text>
+<text x="60" y="3288" class="h2">Роли</text>
+<text x="60" y="3312" class="bullet">• Админ узла — гейт, firewall, журналы, бэкап, merge в main; продукта</text>
+<text x="60" y="3336" class="p">у него нет.</text>
+<text x="60" y="3360" class="bullet">• Агент проекта — только свой проект, только review.</text>
+<text x="60" y="3384" class="bullet">• Продукт — отдельный проект; не cmd/app и не app.service.</text>
+<text x="60" y="3420" class="h2">Канал команд</text>
+<text x="60" y="3444" class="p">Задачи приходят из приватного all-project-base-findings (автор</text>
+<text x="60" y="3468" class="p">conductor, метка from:conductor), а не из публичного трекера шаблона.</text>
+<text x="60" y="3492" class="p">Публичная история закрытых команд — docs/acceptance/; формат и</text>
+<text x="60" y="3516" class="p">фильтр</text>
+<text x="60" y="3540" class="p">утечек — docs/acceptance/README.md.</text>
+<text x="60" y="3564" class="p">Агент только читает issues и комментарии, в доску не пишет</text>
+<text x="60" y="3588" class="p">вообще;</text>
+<text x="60" y="3612" class="p">отчёт — файл docs/acceptance/ и сообщение коммита (findings#N),</text>
+<text x="60" y="3636" class="p">отказ — файл с первой строкой Отказ: &lt;причина&gt;. Issue закрывает</text>
+<text x="60" y="3660" class="p">только</text>
+<text x="60" y="3684" class="p">conductor.</text>
+<text x="60" y="3720" class="h2">CI isolation</text>
+<text x="60" y="3744" class="p">.github/workflows/isolation.yml запускает deploy/ci/isolation.sh на</text>
+<text x="60" y="3768" class="p">ubuntu-latest: bootstrap двух проектов, git-shell, seed main,</text>
+<text x="60" y="3792" class="p">review/force/delete, подмена verify.py, canary, sudo, hooksPath, лог и</text>
+<text x="60" y="3816" class="p">logrotate. В конце — deploy/ci/isolation-cleanup.sh. Джоба краснеет при</text>
+<text x="60" y="3840" class="p">возврате nologin, отсутствии main или ослаблении gate.</text>
+<text x="60" y="3876" class="h2">Границы</text>
+<text x="60" y="3900" class="bullet">• Это Linux/systemd/sshd-модель; на Windows live-проверка невозможна.</text>
+<text x="60" y="3924" class="bullet">• Caddy — единственный вход; порты приложений наружу не</text>
+<text x="60" y="3948" class="p">публикуются.</text>
+<text x="60" y="3972" class="bullet">• Секреты своего проекта доступны агенту только через</text>
+<text x="60" y="3996" class="p">запущенный процесс</text>
+<text x="60" y="4020" class="p">или явно выданный env; в репозитории секретов нет.</text>
+<text x="60" y="4044" class="bullet">• Нового правила нет: политика живёт в PROJECT.md, этом файле и</text>
+<text x="60" y="4068" class="p">PROCESS.md.</text>
 </svg>

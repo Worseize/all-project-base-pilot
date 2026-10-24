@@ -1,6 +1,6 @@
 {
   "name": "all-project-base",
-  "version": "0.9.14",
+  "version": "0.9.15",
   "date": "22.10.2026",
   "stack": "go",
   "commands": {
@@ -38,7 +38,9 @@
     "docs/scheme-process.svg",
     "docs/scheme-isolation.svg",
     "docs/ISOLATION.md",
+    "docs/HOST.md",
     "docs/acceptance/README.md",
+    "deploy/host-baseline.sh",
     "deploy/systemd/proj@.service",
     "deploy/git/pre-receive",
     "deploy/bootstrap-project.sh",
