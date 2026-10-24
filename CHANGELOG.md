@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.9.20 — 2026-10-25
+
+- Минимальный `skeleton/project`: run, PROJECT, test.sh, .gitignore, README.
+- `init-project.sh` сеет проект из скелета, не из всего шаблона.
+- `docs/AGENT-CONTRACT.md` — механический контракт агента проекта.
+- Gate/auto-merge запускают `test.sh`, если он есть; иначе trusted verify.
+
 ## 0.9.19 — 2026-10-25
 
 - Auto-merge timer: review → main только по зелёной метке гейта.

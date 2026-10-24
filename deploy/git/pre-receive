@@ -69,11 +69,16 @@ while read -r old new ref; do
   tmp="$(mktemp -d)"
   trap 'rm -rf "$tmp"' EXIT
   git --git-dir="$REPO" archive "$new" | tar -x -C "$tmp"
-  git --git-dir="$REPO" show refs/heads/main:verify.py > "$tmp/.trusted-verify.py" ||
-    reject "cannot load trusted verify.py from main"
-
-  if ! (cd "$tmp" && python3 .trusted-verify.py); then
-    reject "trusted verify.py failed for $new"
+  if [ -f "$tmp/test.sh" ]; then
+    if ! (cd "$tmp" && bash test.sh); then
+      reject "test.sh failed for $new"
+    fi
+  else
+    git --git-dir="$REPO" show refs/heads/main:verify.py > "$tmp/.trusted-verify.py" ||
+      reject "cannot load trusted verify.py from main"
+    if ! (cd "$tmp" && python3 .trusted-verify.py); then
+      reject "trusted verify.py failed for $new"
+    fi
   fi
 
   log_event accept "verified"

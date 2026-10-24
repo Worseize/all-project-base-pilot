@@ -455,6 +455,13 @@ class VerifyTests(unittest.TestCase):
         verify.check_no_product(gate)
         self.assertEqual(gate.failed, 0)
 
+    def test_skeleton_project_contract(self):
+        root = Path(__file__).resolve().parents[1] / "skeleton" / "project"
+        for name in ("run", "PROJECT.md", "test.sh", ".gitignore", "README.md"):
+            self.assertTrue((root / name).is_file(), name)
+        self.assertFalse(list(root.rglob("*.go")))
+        self.assertIn("## Назначение", (root / "PROJECT.md").read_text(encoding="utf-8"))
+
     def test_isolation_ci_wired(self):
         root = Path(__file__).resolve().parents[1]
         workflow = (root / ".github" / "workflows" / "isolation.yml").read_text(encoding="utf-8")
