@@ -105,7 +105,6 @@ class VerifyTests(unittest.TestCase):
 
     def test_commands_fail(self):
         verify.CONFIG = {
-            "stack": "python",
             "commands": {"test": f'"{sys.executable}" -c "import sys; sys.exit(1)"'},
         }
         gate = verify.Gate()
