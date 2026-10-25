@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 0.9.27 — 2026-10-25
+
+- `project.conf`: run/test/health, deps/build/migrate, site, TZ, ресурсы.
+- `manifest.py`: валидация ключей и значений; неизвестный ключ — отказ.
+- `deploy-project`: deps → build → migrate до рестарта.
+- `site-config.sh`: Caddy-блок из site/domains/redirects.
+- Drop-in с TZ/MemoryMax/CPUQuota.
+- CI: семь manifest-сценариев.
+
 ## 0.9.26 — 2026-10-25
 
 - `health` проекта: 0/1 + одна строка; узел запускает с таймаутом.

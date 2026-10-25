@@ -88,7 +88,10 @@ PY
 now="$(date +%s)"
 for project in "${PROJECTS[@]}"; do
   work="/srv/$project/current"
-  health="$work/health"
+  manifest_py="/usr/local/sbin/proj-manifest"
+  [ -f "$manifest_py" ] || manifest_py="$HERE/manifest.py"
+  health_rel="$(python3 "$manifest_py" get "$work/project.conf" health 2>/dev/null || echo health)"
+  health="$work/${health_rel:-health}"
   prev_status="$(state_get "$project" | sed -n '1p')"
   prev_alert="$(state_get "$project" | sed -n '2p')"
   [ "$prev_alert" = "0" ] || prev_alert="${prev_alert:-0}"
