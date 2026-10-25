@@ -17,7 +17,10 @@ git_r() { git -c safe.directory="$REPO" --git-dir="$REPO" "$@"; }
 commit_manifest() {
   printf '%b\n' "$1" > "$WORK/project.conf"
   chown "$A:$A" "$WORK/project.conf"
-  runuser -u "$A" -- git -C "$WORK" add project.conf
+  printf '#!/usr/bin/env bash\nexit 0\n' > "$WORK/run"
+  chown "$A:$A" "$WORK/run"
+  chmod 0755 "$WORK/run"
+  runuser -u "$A" -- git -C "$WORK" add project.conf run
   runuser -u "$A" -- git -C "$WORK" commit -qm "manifest fixture" || true
   runuser -u "$A" -- git -C "$WORK" push -q origin HEAD:review
   local sha
@@ -46,8 +49,11 @@ runuser -u "$A" -- git -C "$WORK" config user.name "$A"
 runuser -u "$A" -- git -C "$WORK" fetch -q origin review
 runuser -u "$A" -- git -C "$WORK" checkout -q -B main origin/review || true
 
-commit_manifest "run=\ntest=true\nhealth=health\n"
-if deploy; then fail "missing run accepted"; else ok "missing run rejected"; fi
+commit_manifest "test=true\nhealth=health\n"
+if deploy; then ok "default run accepted"; else cat "$OUT" >&2; fail "default run rejected"; fi
+
+commit_manifest "run=missing\ntest=true\nhealth=health\n"
+if deploy; then fail "missing run file accepted"; else ok "missing run file rejected"; fi
 
 commit_manifest "run=run\nunknown=1\n"
 if deploy; then fail "unknown key accepted"; else ok "unknown key rejected"; fi
@@ -58,8 +64,20 @@ if deploy; then fail "build failure accepted"; else ok "build failure rejected";
 commit_manifest "run=run\nmigrate=false\n"
 if deploy; then fail "migrate failure accepted"; else ok "migrate failure rejected"; fi
 
-commit_manifest "run=run\ndeps=python3 -m venv .venv\nbuild=true\n"
-if deploy; then ok "deps/build"; else cat "$OUT" >&2; fail "deps/build"; fi
+commit_manifest "run=run\nbuild=printf built > built.txt\n"
+if deploy && [ -f "$WORK/built.txt" ]; then
+  ok "build ran"
+else
+  cat "$OUT" >&2
+  fail "build did not run"
+fi
+
+if python3 -m venv --help >/dev/null 2>&1; then
+  commit_manifest "run=run\ndeps=python3 -m venv .venv\n"
+  if deploy; then ok "python deps"; else cat "$OUT" >&2; fail "python deps"; fi
+else
+  printf 'skip: python3-venv отсутствует\n'
+fi
 
 commit_manifest "run=run\nsite=static\ndomains=example.test\n"
 if deploy && grep -q "example.test" /etc/caddy/conf.d/"$A".caddy 2>/dev/null; then
