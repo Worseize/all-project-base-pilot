@@ -12,6 +12,7 @@ WORK="/srv/$A/work"
 FAILED=0
 TMP_KEY="$(mktemp -d)"
 CI_LOG_DIR="$ROOT/ci-logs"
+mkdir -p "$CI_LOG_DIR"
 
 fail() { printf 'FAIL: %s\n' "$*" >&2; FAILED=1; }
 ok() { printf 'ok: %s\n' "$*"; }
