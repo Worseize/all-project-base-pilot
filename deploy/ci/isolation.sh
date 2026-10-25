@@ -168,9 +168,10 @@ else
   fail "auto-merge changed main on repeat"
 fi
 runuser -u "$A" -- bash -c "cd '$WORK' && printf 'second\\n' > app/ci-proof2.txt && git add app/ci-proof2.txt && git commit -m second" >/dev/null 2>&1
-if runuser -u "$A" -- git -C "$WORK" push origin HEAD:review >/dev/null 2>&1; then
+if runuser -u "$A" -- git -C "$WORK" push origin HEAD:review >"$CI_LOG_DIR/second-push.log" 2>&1; then
   ok "second push after auto-merge accepted"
 else
+  cat "$CI_LOG_DIR/second-push.log" >&2
   fail "second push after auto-merge rejected (review not aligned)"
 fi
 rm -f "$tmp_reg"
