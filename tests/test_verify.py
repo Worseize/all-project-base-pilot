@@ -474,6 +474,19 @@ class VerifyTests(unittest.TestCase):
             self.assertIn(word, script)
         self.assertIn("userdel", cleanup)
 
+    def test_isolation_health_scenarios(self):
+        root = Path(__file__).resolve().parents[1]
+        script = (root / "deploy" / "ci" / "isolation.sh").read_text(encoding="utf-8")
+        for marker in (
+            "health=0 silent",
+            "health=1 one alert with reason",
+            "repeat suppressed",
+            "missing health is config alert",
+            "timeout is sick and bounded",
+            "recovery message",
+        ):
+            self.assertIn(marker, script)
+
     def test_fixtures_rule_requires_three_docs(self):
         (verify.ROOT / "docs").mkdir()
         (verify.ROOT / "PROCESS.md").write_text(
