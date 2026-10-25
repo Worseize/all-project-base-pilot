@@ -169,6 +169,13 @@ else
   fail "auto-merge changed main on repeat"
 fi
 runuser -u "$A" -- bash -c "cd '$WORK' && printf 'second\\n' > app/ci-proof2.txt && git add app/ci-proof2.txt && git commit -m second" >/dev/null 2>&1
+{
+  echo "local HEAD: $(git -C "$WORK" rev-parse HEAD)"
+  git -C "$WORK" log --oneline -6
+  echo "remote main: $(git -c safe.directory="$REPO" --git-dir="$REPO" rev-parse refs/heads/main)"
+  echo "remote review: $(git -c safe.directory="$REPO" --git-dir="$REPO" rev-parse refs/heads/review)"
+  git -c safe.directory="$REPO" --git-dir="$REPO" log --oneline --all -8
+} >"$CI_LOG_DIR/second-push-state.txt" 2>&1
 if runuser -u "$A" -- git -C "$WORK" push origin HEAD:review >"$CI_LOG_DIR/second-push.log" 2>&1; then
   ok "second push after auto-merge accepted"
 else
