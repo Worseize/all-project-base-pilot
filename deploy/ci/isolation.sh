@@ -311,6 +311,11 @@ if ! bash "$ROOT/deploy/ci/manifest.sh"; then
   fail "manifest scenarios"
 fi
 
+echo "== step: data snapshots and rollback"
+if ! bash "$ROOT/deploy/ci/data.sh"; then
+  fail "data scenarios"
+fi
+
 if [ "$FAILED" -ne 0 ]; then
   echo "ISOLATION CI: RED" >&2
   exit 1

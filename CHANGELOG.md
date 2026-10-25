@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 0.9.29 — 2026-10-25
+
+- Контракт: данные вне git, snapshot tar+sha256, retention, проверка.
+- PROCESS: три уровня отката; код по сохранённому sha.
+- `snapshot.sh`, `data-guard.sh`, `rollback.sh`.
+- `selftest` проверяет snapshot --verify.
+- CI: шесть data/snapshot/rollback сценариев.
+
 ## 0.9.28 — 2026-10-25
 
 - HOST: пакеты git/curl/caddy/python3-venv с условиями.

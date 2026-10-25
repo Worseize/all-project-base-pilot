@@ -1,6 +1,6 @@
 {
   "name": "all-project-base",
-  "version": "0.9.28",
+  "version": "0.9.29",
   "date": "22.10.2026",
   "commands": {
     "build": "go build ./cmd/...",
@@ -54,6 +54,10 @@
     "deploy/site-config.sh",
     "deploy/ci/manifest.sh",
     "deploy/selftest.sh",
+    "deploy/snapshot.sh",
+    "deploy/data-guard.sh",
+    "deploy/rollback.sh",
+    "deploy/ci/data.sh",
     "deploy/install-watchdog.sh",
     "deploy/systemd/watchdog-health.service",
     "deploy/systemd/watchdog-health.timer",

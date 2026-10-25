@@ -47,6 +47,10 @@ while read -r old new ref; do
   fi
 
   changed="$(git --git-dir="$REPO" diff --name-only refs/heads/main "$new" 2>/dev/null || true)"
+  data_hits="$(printf '%s\n' "$changed" |
+    grep -E '^(data/|.*/data/|\.env$|.*\.log$|var/lib/)' || true)"
+  [ -z "$data_hits" ] ||
+    reject "state file in git: $(printf '%s' "$data_hits" | tr '\n' ' ')"
   protected_file="/etc/git-hooks/$PROJECT/protected-paths"
   if [ -f "$protected_file" ]; then
     while IFS= read -r path; do
