@@ -43,7 +43,8 @@ BASE_MAIN="$(git_r rev-parse refs/heads/main)"
 BASE_REVIEW="$(git_r rev-parse refs/heads/review)"
 runuser -u "$A" -- git -C "$WORK" config user.email "$A@agents.invalid"
 runuser -u "$A" -- git -C "$WORK" config user.name "$A"
-runuser -u "$A" -- git -C "$WORK" checkout -q -B main "$BASE_REVIEW" || true
+runuser -u "$A" -- git -C "$WORK" fetch -q origin review
+runuser -u "$A" -- git -C "$WORK" checkout -q -B main origin/review || true
 
 commit_manifest "run=\ntest=true\nhealth=health\n"
 if deploy; then fail "missing run accepted"; else ok "missing run rejected"; fi
