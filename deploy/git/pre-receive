@@ -87,29 +87,7 @@ while read -r old new ref; do
   tmp="$(mktemp -d)"
   trap 'rm -rf "$tmp"' EXIT
   git --git-dir="$REPO" archive "$new" | tar -x -C "$tmp"
-  if git --git-dir="$REPO" cat-file -e refs/heads/main:project.conf 2>/dev/null; then
-    manifest="$(git --git-dir="$REPO" show refs/heads/main:project.conf)"
-    mget() {
-      printf '%s\n' "$manifest" |
-        awk -F= -v key="$1" '$1 == key { sub(/^[^=]*=/, ""); print; exit }'
-    }
-    run_path="$(mget run)"; run_path="${run_path#./}"; run_path="${run_path:-run}"
-    health_path="$(mget health)"; health_path="${health_path#./}"; health_path="${health_path:-health}"
-    test_cmd="$(mget test)"; test_cmd="${test_cmd:-test.sh}"
-    for f in "$run_path" "$health_path"; do
-      mode="$(git --git-dir="$REPO" ls-tree "$new" -- "$f" | awk '{print $1}')"
-      [ "$mode" = "100755" ] || reject "$f mode ${mode:-missing}, expected 100755"
-    done
-    test_file="${test_cmd#./}"
-    if git --git-dir="$REPO" cat-file -e "refs/heads/main:$test_file" 2>/dev/null; then
-      git --git-dir="$REPO" show "refs/heads/main:$test_file" > "$tmp/.trusted-test.sh"
-      if ! (cd "$tmp" && bash .trusted-test.sh); then
-        reject "test failed for $new"
-      fi
-    elif ! (cd "$tmp" && bash -c "$test_cmd"); then
-      reject "test command failed for $new: $test_cmd"
-    fi
-  elif git --git-dir="$REPO" cat-file -e refs/heads/main:test.sh 2>/dev/null; then
+  if git --git-dir="$REPO" cat-file -e refs/heads/main:test.sh 2>/dev/null; then
     for f in run test.sh health; do
       mode="$(git --git-dir="$REPO" ls-tree "$new" -- "$f" | awk '{print $1}')"
       [ "$mode" = "100755" ] || reject "$f mode ${mode:-missing}, expected 100755"

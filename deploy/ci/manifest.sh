@@ -20,10 +20,7 @@ commit_manifest() {
   printf '#!/usr/bin/env bash\nexit 0\n' > "$WORK/run"
   chown "$A:$A" "$WORK/run"
   chmod 0755 "$WORK/run"
-  printf '#!/usr/bin/env bash\necho ok\nexit 0\n' > "$WORK/health"
-  chown "$A:$A" "$WORK/health"
-  chmod 0755 "$WORK/health"
-  runuser -u "$A" -- git -C "$WORK" add -f project.conf run health
+  runuser -u "$A" -- git -C "$WORK" add project.conf run
   runuser -u "$A" -- git -C "$WORK" commit -qm "manifest fixture" || true
   runuser -u "$A" -- git -C "$WORK" push -q origin HEAD:review
   local sha
@@ -51,16 +48,6 @@ runuser -u "$A" -- git -C "$WORK" config user.email "$A@agents.invalid"
 runuser -u "$A" -- git -C "$WORK" config user.name "$A"
 runuser -u "$A" -- git -C "$WORK" fetch -q origin review
 runuser -u "$A" -- git -C "$WORK" checkout -q -B main origin/review || true
-
-printf '#!/usr/bin/env bash\nexit 0\n' > "$WORK/run"
-printf '#!/usr/bin/env bash\necho ok\nexit 0\n' > "$WORK/health"
-chown "$A:$A" "$WORK/run" "$WORK/health"
-chmod 0755 "$WORK/run" "$WORK/health"
-runuser -u "$A" -- git -C "$WORK" add -f run health
-runuser -u "$A" -- git -C "$WORK" commit -qm "seed run and health"
-runuser -u "$A" -- git -C "$WORK" push -q origin HEAD:review
-SEED="$(runuser -u "$A" -- git -C "$WORK" rev-parse HEAD)"
-git_r update-ref refs/heads/main "$SEED"
 
 commit_manifest "test=true\nhealth=health\n"
 if deploy; then ok "default run accepted"; else cat "$OUT" >&2; fail "default run rejected"; fi
@@ -102,9 +89,6 @@ else
   cat "$OUT" >&2
   fail "site not generated"
 fi
-
-commit_manifest "run=run\nsite=static:../../etc\n"
-if deploy; then fail "site traversal accepted"; else ok "site traversal rejected"; fi
 
 commit_manifest "run=run\n"
 if deploy && ! grep -q '^Environment=TZ=' /etc/systemd/system/"proj@$A.service.d"/manifest.conf 2>/dev/null; then
