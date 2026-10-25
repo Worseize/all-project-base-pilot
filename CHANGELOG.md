@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.9.23 — 2026-10-25
+
+- Контракт: `run`/`test.sh` 100755 в git, `PROJECT_DATA_DIR`, сайт, журналы, бюджет.
+- Gate/auto-merge проверяют mode 100755 у проекта.
+- CI skeleton: negative test `100644`.
+- Skeleton PROJECT/README дополнены данными/сайтом/журналами.
+
 ## 0.9.22 — 2026-10-25
 
 - Правило остановки: две попытки, затем blocked-отчёт.
