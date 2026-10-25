@@ -23,7 +23,7 @@ commit_manifest() {
   printf '#!/usr/bin/env bash\necho ok\nexit 0\n' > "$WORK/health"
   chown "$A:$A" "$WORK/health"
   chmod 0755 "$WORK/health"
-  runuser -u "$A" -- git -C "$WORK" add project.conf run health
+  runuser -u "$A" -- git -C "$WORK" add -f project.conf run health
   runuser -u "$A" -- git -C "$WORK" commit -qm "manifest fixture" || true
   runuser -u "$A" -- git -C "$WORK" push -q origin HEAD:review
   local sha
