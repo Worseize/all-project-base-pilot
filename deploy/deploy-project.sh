@@ -91,6 +91,10 @@ fi
 
 if command -v systemctl >/dev/null 2>&1 && [ -d /run/systemd/system ]; then
   systemctl restart "proj@$PROJECT.service"
+  if ! systemctl is-active --quiet "proj@$PROJECT.service"; then
+    echo "service failed to start: proj@$PROJECT.service" >&2
+    exit 1
+  fi
   echo "delivered and restarted: proj@$PROJECT.service"
 else
   echo "delivered: $WORK"
