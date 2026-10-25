@@ -52,8 +52,6 @@ fi
 ssh-keygen -q -t ed25519 -N '' -f "$TMP_KEY/agent"
 PUBKEY="$(cat "$TMP_KEY/agent.pub")"
 
-bash "$ROOT/deploy/ci/state.sh" snapshot "$STATE_BEFORE"
-
 for PROJECT in "$A" "$B"; do
   if ! AGENT_PUBKEY="$PUBKEY" SOURCE_REPO="$ROOT" SOURCE_REF=HEAD \
     bash "$ROOT/deploy/bootstrap-project.sh" "$PROJECT"; then
@@ -62,6 +60,9 @@ for PROJECT in "$A" "$B"; do
   fi
 done
 ok "bootstrap: $A, $B"
+
+export STATE_IGNORE="$A $B $S"
+bash "$ROOT/deploy/ci/state.sh" snapshot "$STATE_BEFORE"
 
 echo "== step: checks"
 EXPECTED_SHELL="$(command -v git-shell)"
