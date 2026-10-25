@@ -27,5 +27,5 @@ git -C "$tmp" add -A
 git -C "$tmp" commit -qm "project skeleton"
 
 SOURCE_REPO="$tmp" SOURCE_REF=HEAD \
-  ALLOWED_PATHS="app/ run PROJECT.md test.sh README.md .gitignore" \
+  ALLOWED_PATHS="*" \
   bash "$SCRIPT_DIR/bootstrap-project.sh" "$PROJECT"

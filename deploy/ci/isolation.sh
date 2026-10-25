@@ -7,6 +7,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 A="proj-a"
 B="proj-b"
+S="proj-s"
 WORK="/srv/$A/work"
 FAILED=0
 TMP_KEY="$(mktemp -d)"
@@ -17,7 +18,7 @@ ok() { printf 'ok: %s\n' "$*"; }
 
 cleanup() {
   rm -rf "$TMP_KEY"
-  bash "$SCRIPT_DIR/isolation-cleanup.sh" "$A" "$B" >/dev/null 2>&1 || true
+  bash "$SCRIPT_DIR/isolation-cleanup.sh" "$A" "$B" "$S" >/dev/null 2>&1 || true
 }
 
 on_exit() {
@@ -167,6 +168,31 @@ else
   fail "auto-merge changed main on repeat"
 fi
 rm -f "$tmp_reg"
+
+echo "== step: skeleton project"
+if ! bash "$ROOT/deploy/init-project.sh" "$S" >/dev/null 2>&1; then
+  fail "skeleton init $S"
+else
+  SREPO="/srv/$S/repo.git"
+  if git -c safe.directory="$SREPO" --git-dir="$SREPO" cat-file -e refs/heads/main:verify.py 2>/dev/null; then
+    fail "skeleton main contains verify.py"
+  else
+    ok "skeleton main has no verify.py"
+  fi
+  SWORK="/srv/$S/work"
+  if runuser -u "$S" -- git clone "$SREPO" "$SWORK" >/dev/null 2>&1; then
+    runuser -u "$S" -- git -C "$SWORK" config user.email "$S@agents.invalid"
+    runuser -u "$S" -- git -C "$SWORK" config user.name "$S"
+    runuser -u "$S" -- bash -c "cd '$SWORK' && printf 'skeleton\\n' > note.txt && git add note.txt && git commit -m skeleton" >/dev/null 2>&1
+    if runuser -u "$S" -- git -C "$SWORK" push origin HEAD:review >/dev/null 2>&1; then
+      ok "skeleton review accepted via test.sh from main"
+    else
+      fail "skeleton review rejected"
+    fi
+  else
+    fail "skeleton clone"
+  fi
+fi
 
 if [ "$FAILED" -ne 0 ]; then
   echo "ISOLATION CI: RED" >&2

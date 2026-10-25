@@ -47,38 +47,54 @@ while read -r old new ref; do
   fi
 
   changed="$(git --git-dir="$REPO" diff --name-only refs/heads/main "$new" 2>/dev/null || true)"
-  protected="$(printf '%s\n' "$changed" |
-    grep -E '^(verify\.py|project\.json|go\.mod|go\.sum|tests/|cmd/|deploy/|\.github/|\.gitlab-ci\.yml|azure-pipelines\.yml)' || true)"
-  [ -z "$protected" ] ||
-    reject "gate files changed: $(printf '%s' "$protected" | tr '\n' ' ')"
+  protected_file="/etc/git-hooks/$PROJECT/protected-paths"
+  if [ -f "$protected_file" ]; then
+    while IFS= read -r path; do
+      [ -n "$path" ] || continue
+      while IFS= read -r pattern; do
+        [ -n "$pattern" ] || continue
+        case "$path" in
+          "$pattern"*) reject "gate files changed: $path" ;;
+        esac
+      done < "$protected_file"
+    done <<< "$changed"
+  fi
 
   allowed_file="/etc/git-hooks/$PROJECT/allowed-paths"
-  [ -f "$allowed_file" ] || reject "allowlist missing: $allowed_file"
-  while IFS= read -r path; do
-    [ -n "$path" ] || continue
-    allowed=0
-    while IFS= read -r prefix; do
-      [ -n "$prefix" ] || continue
-      case "$path" in
-        "$prefix"*) allowed=1; break ;;
-      esac
-    done < "$allowed_file"
-    [ "$allowed" -eq 1 ] || reject "path not allowed: $path"
-  done <<< "$changed"
+  if [ -f "$allowed_file" ]; then
+    while IFS= read -r path; do
+      [ -n "$path" ] || continue
+      allowed=0
+      while IFS= read -r prefix; do
+        [ -n "$prefix" ] || continue
+        if [ "$prefix" = "*" ]; then
+          allowed=1
+          break
+        fi
+        case "$path" in
+          "$prefix"*) allowed=1; break ;;
+        esac
+      done < "$allowed_file"
+      [ "$allowed" -eq 1 ] || reject "path not allowed: $path"
+    done <<< "$changed"
+  fi
 
   tmp="$(mktemp -d)"
   trap 'rm -rf "$tmp"' EXIT
   git --git-dir="$REPO" archive "$new" | tar -x -C "$tmp"
-  if [ -f "$tmp/test.sh" ]; then
-    if ! (cd "$tmp" && bash test.sh); then
+  if git --git-dir="$REPO" cat-file -e refs/heads/main:test.sh 2>/dev/null; then
+    git --git-dir="$REPO" show refs/heads/main:test.sh > "$tmp/.trusted-test.sh"
+    if ! (cd "$tmp" && bash .trusted-test.sh); then
       reject "test.sh failed for $new"
     fi
-  else
+  elif git --git-dir="$REPO" cat-file -e refs/heads/main:verify.py 2>/dev/null; then
     git --git-dir="$REPO" show refs/heads/main:verify.py > "$tmp/.trusted-verify.py" ||
       reject "cannot load trusted verify.py from main"
     if ! (cd "$tmp" && python3 .trusted-verify.py); then
       reject "trusted verify.py failed for $new"
     fi
+  else
+    reject "no gate in main: test.sh or verify.py required"
   fi
 
   log_event accept "verified"

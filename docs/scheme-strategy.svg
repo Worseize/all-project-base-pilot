@@ -2,9 +2,9 @@
 <rect width="1400" height="100%" fill="#f7f9fc"/>
 <style>text{font-family:'DejaVu Sans',Arial,sans-serif;fill:#172033}.title{font-size:32px;font-weight:700}.sub{font-size:14px;fill:#667085}.h2{font-size:22px;font-weight:700;fill:#1d4ed8}.h3{font-size:18px;font-weight:700;fill:#172033}.p{font-size:15px}.bullet{font-size:15px}.table{font-family:'DejaVu Sans Mono',monospace;font-size:13px}</style>
 <text x="60" y="64" class="title">Стратегия</text>
-<text x="60" y="92" class="sub">Source: STRATEGY.md · v0.9.20 · 22.10.2026</text>
+<text x="60" y="92" class="sub">Source: STRATEGY.md · v0.9.21 · 22.10.2026</text>
 <text x="60" y="144" class="h2">Стратегия шаблона и очередь улучшений</text>
-<text x="60" y="168" class="p">Версия 0.9.20 · 22.10.2026</text>
+<text x="60" y="168" class="p">Версия 0.9.21 · 22.10.2026</text>
 <text x="60" y="192" class="p">Шаблон уже отвечает на вопрос «как работать». Этот блок — про</text>
 <text x="60" y="216" class="p">другое:</text>
 <text x="60" y="240" class="p">как он развивается, что улучшать дальше и по какому признаку</text>
@@ -150,7 +150,7 @@
 <text x="60" y="3684" class="table">8 P1 CI + drift check контур не держится на памяти M</text>
 <text x="60" y="3708" class="table">9 P2 метрики без чисел нет улучшений M</text>
 <text x="60" y="3732" class="table">10 P2 версии и онбординг шаблон должен передаваться S</text>
-<text x="60" y="3756" class="p">Статус 0.9.20: verify, ADR/журнал, PROCESS.md, бюджеты 400/80,</text>
+<text x="60" y="3756" class="p">Статус 0.9.21: verify, ADR/журнал, PROCESS.md, бюджеты 400/80,</text>
 <text x="60" y="3780" class="p">PROJECT.md, FEATURE.md, README.md — сделаны.</text>
 <text x="60" y="3804" class="p">Схемы — SVG на Go stdlib, без Pillow, шрифтов и lock.</text>
 <text x="60" y="3828" class="p">Добавлены entropy secret scan, branch protection, CI GitHub/GitLab/Azure</text>
@@ -220,5 +220,5 @@
 <text x="60" y="5400" class="p">После пилота очередь пересматривается: то, что не дало</text>
 <text x="60" y="5424" class="p">эффекта, уходит</text>
 <text x="60" y="5448" class="p">в «не брать», а не в «когда-нибудь».</text>
-<text x="60" y="5472" class="p">Версия 0.9.20 · 22.10.2026</text>
+<text x="60" y="5472" class="p">Версия 0.9.21 · 22.10.2026</text>
 </svg>

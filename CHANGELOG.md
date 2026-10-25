@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.9.21 — 2026-10-25
+
+- `pre-receive`/auto-merge: гейт проекта — `test.sh` из `main`.
+- Protected-пути на проект; у скелета пусты, у узла — node-набор.
+- Allowlist по умолчанию `*`; проект в своём репозитории не блокируется.
+- CI isolation проверяет скелетный push.
+
 ## 0.9.20 — 2026-10-25
 
 - Минимальный `skeleton/project`: run, PROJECT, test.sh, .gitignore, README.
