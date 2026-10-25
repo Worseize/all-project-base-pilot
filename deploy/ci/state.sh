@@ -49,6 +49,8 @@ snapshot() {
       mv "$out.tmp" "$out"
     done
   fi
+  grep -vE '^unitfile proj-backup@\.timer ' "$out" > "$out.tmp" || true
+  mv "$out.tmp" "$out"
 }
 
 case "${1:-}" in
