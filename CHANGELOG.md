@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.9.22 — 2026-10-25
+
+- Правило остановки: две попытки, затем blocked-отчёт.
+- AGENTS/AGENT-CONTRACT: готово = review + зелёный gate + файл.
+- `check_stop_rule` и тест.
+
 ## 0.9.21 — 2026-10-25
 
 - `pre-receive`/auto-merge: гейт проекта — `test.sh` из `main`.

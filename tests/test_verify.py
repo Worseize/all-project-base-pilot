@@ -474,6 +474,22 @@ class VerifyTests(unittest.TestCase):
             self.assertIn(word, script)
         self.assertIn("userdel", cleanup)
 
+    def test_stop_rule_requires_two_attempts_and_blocked(self):
+        (verify.ROOT / "docs").mkdir()
+        (verify.ROOT / "AGENTS.md").write_text(
+            "дважды blocked review администратор\n", encoding="utf-8"
+        )
+        (verify.ROOT / "docs" / "AGENT-CONTRACT.md").write_text(
+            "Две попытки blocked\n", encoding="utf-8"
+        )
+        gate = verify.Gate()
+        verify.check_stop_rule(gate)
+        self.assertEqual(gate.failed, 0)
+        (verify.ROOT / "AGENTS.md").write_text("review\n", encoding="utf-8")
+        gate = verify.Gate()
+        verify.check_stop_rule(gate)
+        self.assertEqual(gate.failed, 1)
+
     def test_process_requires_conductor_board_rule(self):
         text = "verify красный журнал деплой\n"
         (verify.ROOT / "PROCESS.md").write_text(text, encoding="utf-8")
