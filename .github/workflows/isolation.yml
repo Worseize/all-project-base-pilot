@@ -25,6 +25,7 @@ jobs:
         run: |
           sudo bash deploy/ci/isolation-cleanup.sh proj-a proj-b proj-s
           test -f /etc/systemd/system/proj@.service
+          test "$(stat -c %a /srv)" = "711"
       - name: diagnostics
         if: always()
         uses: actions/upload-artifact@v4
