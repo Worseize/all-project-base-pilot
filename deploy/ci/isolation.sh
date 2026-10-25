@@ -168,13 +168,21 @@ if [ "$main_after" = "$(git -c safe.directory="$REPO" --git-dir="$REPO" rev-pars
 else
   fail "auto-merge changed main on repeat"
 fi
+review_sha="$(git -c safe.directory="$REPO" --git-dir="$REPO" rev-parse refs/heads/review)"
+if [ "$review_sha" = "$main_after" ]; then
+  ok "review aligned to main"
+else
+  fail "review not aligned: review=$review_sha main=$main_after"
+fi
+runuser -u "$A" -- git -C "$WORK" fetch -q origin
+runuser -u "$A" -- git -C "$WORK" checkout -q -B work origin/review
 runuser -u "$A" -- bash -c "cd '$WORK' && printf 'second\\n' > app/ci-proof2.txt && git add app/ci-proof2.txt && git commit -m second" >/dev/null 2>&1
 {
   echo "local HEAD: $(git -C "$WORK" rev-parse HEAD)"
-  git -C "$WORK" log --oneline -6
+  echo "local origin/review: $(git -C "$WORK" rev-parse origin/review)"
   echo "remote main: $(git -c safe.directory="$REPO" --git-dir="$REPO" rev-parse refs/heads/main)"
   echo "remote review: $(git -c safe.directory="$REPO" --git-dir="$REPO" rev-parse refs/heads/review)"
-  git -c safe.directory="$REPO" --git-dir="$REPO" log --oneline --all -8
+  git -C "$WORK" log --oneline -6
 } >"$CI_LOG_DIR/second-push-state.txt" 2>&1
 if runuser -u "$A" -- git -C "$WORK" push origin HEAD:review >"$CI_LOG_DIR/second-push.log" 2>&1; then
   ok "second push after auto-merge accepted"
