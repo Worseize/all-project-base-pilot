@@ -201,6 +201,11 @@ else
 fi
 rm -f "$tmp_reg"
 
+echo "== step: env guard"
+if ! bash "$ROOT/deploy/ci/env-guard.sh"; then
+  fail "env guard"
+fi
+
 echo "== step: skeleton project"
 if ! bash "$ROOT/deploy/init-project.sh" "$S" >/dev/null 2>&1; then
   fail "skeleton init $S"
