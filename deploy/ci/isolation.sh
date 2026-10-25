@@ -13,6 +13,9 @@ FAILED=0
 TMP_KEY="$(mktemp -d)"
 CI_LOG_DIR="$ROOT/ci-logs"
 mkdir -p "$CI_LOG_DIR"
+STATE_BEFORE="$CI_LOG_DIR/state-before.txt"
+STATE_AFTER="$CI_LOG_DIR/state-after.txt"
+STATE_BAD="$CI_LOG_DIR/state-bad.txt"
 
 fail() { printf 'FAIL: %s\n' "$*" >&2; FAILED=1; }
 ok() { printf 'ok: %s\n' "$*"; }
@@ -57,6 +60,9 @@ for PROJECT in "$A" "$B"; do
   fi
 done
 ok "bootstrap: $A, $B"
+
+export STATE_IGNORE="$A $B $S"
+bash "$ROOT/deploy/ci/state.sh" snapshot "$STATE_BEFORE"
 
 echo "== step: checks"
 EXPECTED_SHELL="$(command -v git-shell)"
@@ -315,6 +321,24 @@ echo "== step: data snapshots and rollback"
 if ! bash "$ROOT/deploy/ci/data.sh"; then
   fail "data scenarios"
 fi
+
+echo "== step: host state before/after"
+cleanup
+bash "$ROOT/deploy/ci/state.sh" snapshot "$STATE_AFTER"
+if bash "$ROOT/deploy/ci/state.sh" diff "$STATE_BEFORE" "$STATE_AFTER" >/dev/null 2>&1; then
+  ok "acceptance did not change host state"
+else
+  bash "$ROOT/deploy/ci/state.sh" diff "$STATE_BEFORE" "$STATE_AFTER" >&2 || true
+  fail "приёмка изменила состояние узла"
+fi
+chmod 0755 /srv
+bash "$ROOT/deploy/ci/state.sh" snapshot "$STATE_BAD"
+if bash "$ROOT/deploy/ci/state.sh" diff "$STATE_BEFORE" "$STATE_BAD" >/dev/null 2>&1; then
+  fail "state diff missed /srv 0755"
+else
+  ok "state diff catches /srv 0755"
+fi
+chmod 0711 /srv
 
 if [ "$FAILED" -ne 0 ]; then
   echo "ISOLATION CI: RED" >&2
