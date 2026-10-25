@@ -52,6 +52,16 @@ runuser -u "$A" -- git -C "$WORK" config user.name "$A"
 runuser -u "$A" -- git -C "$WORK" fetch -q origin review
 runuser -u "$A" -- git -C "$WORK" checkout -q -B main origin/review || true
 
+printf '#!/usr/bin/env bash\nexit 0\n' > "$WORK/run"
+printf '#!/usr/bin/env bash\necho ok\nexit 0\n' > "$WORK/health"
+chown "$A:$A" "$WORK/run" "$WORK/health"
+chmod 0755 "$WORK/run" "$WORK/health"
+runuser -u "$A" -- git -C "$WORK" add -f run health
+runuser -u "$A" -- git -C "$WORK" commit -qm "seed run and health"
+runuser -u "$A" -- git -C "$WORK" push -q origin HEAD:review
+SEED="$(runuser -u "$A" -- git -C "$WORK" rev-parse HEAD)"
+git_r update-ref refs/heads/main "$SEED"
+
 commit_manifest "test=true\nhealth=health\n"
 if deploy; then ok "default run accepted"; else cat "$OUT" >&2; fail "default run rejected"; fi
 
