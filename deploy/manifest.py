@@ -18,6 +18,7 @@ DEFAULTS = {
     "port": "", "memory": "512M", "cpu": "50%", "timezone": "UTC",
 }
 SITES = {"none", "static", "proxy"}
+SITE_PREFIX = ("static:", "proxy:")
 MEMORY = re.compile(r"^[0-9]+[KMG]?$")
 CPU = re.compile(r"^[0-9]+%$")
 PORT = re.compile(r"^[0-9]+$")
@@ -50,8 +51,8 @@ def check(path: Path) -> list[str]:
         data = parse(path)
     except ValueError as exc:
         return [str(exc)]
-    if data["site"] not in SITES:
-        errors.append(f"site must be one of {', '.join(sorted(SITES))}")
+    if data["site"] not in SITES and not data["site"].startswith(SITE_PREFIX):
+        errors.append(f"site must be none, static[:dir], proxy[:port]")
     if data["memory"] and not MEMORY.match(data["memory"]):
         errors.append("memory must look like 512M")
     if data["cpu"] and not CPU.match(data["cpu"]):
