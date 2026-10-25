@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 0.9.26 — 2026-10-25
+
+- `health` проекта: 0/1 + одна строка; узел запускает с таймаутом.
+- `watchdog-health.timer` раз в минуту, алерты, подавление, восстановление.
+- `WATCHDOG_NOTIFY_CMD` для тестов; state `/var/lib/watchdog`.
+- CI: шесть health-сценариев.
+- Правило «Проверка — фикстурами» в AGENTS/PROCESS/AGENT-CONTRACT + gate.
+
 ## 0.9.25 — 2026-10-25
 
 - auto-merge/deploy выравнивают `review` на `main` после merge.

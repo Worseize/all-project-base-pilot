@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Health contract: 0 = healthy with one reason line; 1 = sick with one reason line.
+echo "ok"
+exit 0

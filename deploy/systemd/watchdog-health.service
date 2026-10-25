@@ -1,0 +1,7 @@
+[Unit]
+Description=Project health check
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/watchdog-health /etc/proj-base/projects.json

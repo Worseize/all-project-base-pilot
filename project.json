@@ -1,6 +1,6 @@
 {
   "name": "all-project-base",
-  "version": "0.9.25",
+  "version": "0.9.26",
   "date": "22.10.2026",
   "commands": {
     "build": "go build ./cmd/...",
@@ -49,9 +49,14 @@
     "deploy/auto-merge.sh",
     "deploy/allow-path.sh",
     "deploy/install-auto-merge.sh",
+    "deploy/health-check.sh",
+    "deploy/install-watchdog.sh",
+    "deploy/systemd/watchdog-health.service",
+    "deploy/systemd/watchdog-health.timer",
     "deploy/init-project.sh",
     "skeleton/project/run",
     "skeleton/project/test.sh",
+    "skeleton/project/health",
     "skeleton/project/PROJECT.md",
     "skeleton/project/README.md",
     "skeleton/project/.gitignore",

@@ -474,6 +474,23 @@ class VerifyTests(unittest.TestCase):
             self.assertIn(word, script)
         self.assertIn("userdel", cleanup)
 
+    def test_fixtures_rule_requires_three_docs(self):
+        (verify.ROOT / "docs").mkdir()
+        (verify.ROOT / "PROCESS.md").write_text(
+            "## Проверка — фикстурами\nфикстура issue живой проект\n", encoding="utf-8"
+        )
+        for name in ("AGENTS.md", "docs/AGENT-CONTRACT.md"):
+            (verify.ROOT / name).write_text(
+                "## Проверка — фикстурами\nфикстура issue живой проект\n", encoding="utf-8"
+            )
+        gate = verify.Gate()
+        verify.check_fixtures(gate)
+        self.assertEqual(gate.failed, 0)
+        (verify.ROOT / "PROCESS.md").write_text("## Другое\n", encoding="utf-8")
+        gate = verify.Gate()
+        verify.check_fixtures(gate)
+        self.assertEqual(gate.failed, 1)
+
     def test_stop_rule_requires_two_attempts_and_blocked(self):
         (verify.ROOT / "docs").mkdir()
         (verify.ROOT / "AGENTS.md").write_text(
