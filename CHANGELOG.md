@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.9.36 — 2026-10-25
+
+- `timezone` по умолчанию пустой: проект наследует пояс хоста.
+- `TZ` не пишется в drop-in без явного `timezone`.
+- Cleanup backup-таймеров и `/var/backups/<id>` (из #26).
+- `audit-drift`: TZ проектов, apt timers, orphan backup timers.
+
 ## 0.9.35 — 2026-10-25
 
 - `project-backup.sh` без SIGPIPE: листинг в переменную.

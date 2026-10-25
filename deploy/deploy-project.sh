@@ -58,7 +58,9 @@ case "$RUN_PATH" in
   /*|*..*) echo "run must be a relative path" >&2; exit 1 ;;
 esac
 run_project() {
-  runuser -u "$PROJECT" -- env PROJECT_DATA_DIR="/var/lib/$PROJECT" TZ="$TIMEZONE" \
+  local env_args=("PROJECT_DATA_DIR=/var/lib/$PROJECT")
+  [ -n "$TIMEZONE" ] && env_args+=("TZ=$TIMEZONE")
+  runuser -u "$PROJECT" -- env "${env_args[@]}" \
     bash -c "cd '$WORK' && $1"
 }
 if [ -n "$DEPS" ]; then
@@ -75,7 +77,7 @@ bash "$SCRIPT_DIR/site-config.sh" "$PROJECT" "$WORK"
 install -d -m 0755 /etc/systemd/system/"proj@$PROJECT.service.d"
 cat > /etc/systemd/system/"proj@$PROJECT.service.d"/manifest.conf <<EOF
 [Service]
-Environment=TZ=$TIMEZONE
+$( [ -n "$TIMEZONE" ] && printf 'Environment=TZ=%s\n' "$TIMEZONE" )
 Environment=PROJECT_PORT=$PORT
 MemoryMax=$MEMORY
 CPUQuota=$CPU

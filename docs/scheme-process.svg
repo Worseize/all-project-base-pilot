@@ -2,9 +2,9 @@
 <rect width="1400" height="100%" fill="#f7f9fc"/>
 <style>text{font-family:'DejaVu Sans',Arial,sans-serif;fill:#172033}.title{font-size:32px;font-weight:700}.sub{font-size:14px;fill:#667085}.h2{font-size:22px;font-weight:700;fill:#1d4ed8}.h3{font-size:18px;font-weight:700;fill:#172033}.p{font-size:15px}.bullet{font-size:15px}.table{font-family:'DejaVu Sans Mono',monospace;font-size:13px}</style>
 <text x="60" y="64" class="title">Процесс</text>
-<text x="60" y="92" class="sub">Source: PROCESS.md · v0.9.35 · 22.10.2026</text>
+<text x="60" y="92" class="sub">Source: PROCESS.md · v0.9.36 · 22.10.2026</text>
 <text x="60" y="144" class="h2">Процесс: красный не проходит</text>
-<text x="60" y="168" class="p">Версия 0.9.35 · 22.10.2026</text>
+<text x="60" y="168" class="p">Версия 0.9.36 · 22.10.2026</text>
 <text x="60" y="192" class="p">Схема: docs/scheme-process.svg ·</text>
 <text x="60" y="216" class="p">Правила: RULES.md · Стратегия: STRATEGY.md</text>
 <text x="60" y="252" class="h2">Цепочка</text>
