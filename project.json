@@ -64,6 +64,7 @@
     "deploy/systemd/proj-backup@.service",
     "deploy/systemd/proj-backup@.timer",
     "deploy/ci/backup.sh",
+    "deploy/ci/env-guard.sh",
     "deploy/check-backups.sh",
     "deploy/install-watchdog.sh",
     "deploy/systemd/watchdog-health.service",
