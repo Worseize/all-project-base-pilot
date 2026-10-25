@@ -18,6 +18,12 @@ if [ "$site" = "none" ]; then
   rm -f "$FILE"
   exit 0
 fi
+site_type="$site"
+site_arg=""
+case "$site" in
+  static:*) site_type="static"; site_arg="${site#static:}" ;;
+  proxy:*) site_type="proxy"; site_arg="${site#proxy:}" ;;
+esac
 domains="$(get domains)"
 redirects="$(get redirects)"
 port="$(get port)"
@@ -27,10 +33,10 @@ port="$(get port)"
     name="$(printf '%s' "$name" | tr -d ' ')"
     [ -n "$name" ] || continue
     printf '%s {\n' "$name"
-    if [ "$site" = "static" ]; then
-      printf '  root * %s\n  file_server\n' "$WORK"
+    if [ "$site_type" = "static" ]; then
+      printf '  root * %s\n  file_server\n' "$WORK/${site_arg:-.}"
     else
-      printf '  reverse_proxy 127.0.0.1:%s\n' "${port:-8080}"
+      printf '  reverse_proxy 127.0.0.1:%s\n' "${site_arg:-${port:-8080}}"
     fi
     if [ -n "$redirects" ]; then
       IFS=',' read -ra rules <<< "$redirects"

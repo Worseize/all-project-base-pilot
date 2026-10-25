@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.9.32 — 2026-10-25
+
+- Packet alignment: `/etc/localtime` и режим `/etc/git-hooks` в state.
+- Snapshot path `/var/backups/<id>` по packet.
+- `site=static:<dir>` / `site=proxy:<port>` поддержаны.
+
 ## 0.9.31 — 2026-10-25
 
 - `deploy/ci/state.sh`: snapshot/diff нормализованного состояния узла.

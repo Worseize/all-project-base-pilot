@@ -2,9 +2,9 @@
 <rect width="1400" height="100%" fill="#f7f9fc"/>
 <style>text{font-family:'DejaVu Sans',Arial,sans-serif;fill:#172033}.title{font-size:32px;font-weight:700}.sub{font-size:14px;fill:#667085}.h2{font-size:22px;font-weight:700;fill:#1d4ed8}.h3{font-size:18px;font-weight:700;fill:#172033}.p{font-size:15px}.bullet{font-size:15px}.table{font-family:'DejaVu Sans Mono',monospace;font-size:13px}</style>
 <text x="60" y="64" class="title">Изоляция</text>
-<text x="60" y="92" class="sub">Source: docs/ISOLATION.md · v0.9.31 · 22.10.2026</text>
+<text x="60" y="92" class="sub">Source: docs/ISOLATION.md · v0.9.32 · 22.10.2026</text>
 <text x="60" y="144" class="h2">Изоляция проектов и агентов</text>
-<text x="60" y="168" class="p">Версия 0.9.31 · 22.10.2026</text>
+<text x="60" y="168" class="p">Версия 0.9.32 · 22.10.2026</text>
 <text x="60" y="192" class="p">Один хост — несколько проектов — несколько агентов. Root —</text>
 <text x="60" y="216" class="p">единственный,</text>
 <text x="60" y="240" class="p">у кого полные права. Агент проекта получает только git-push в review.</text>

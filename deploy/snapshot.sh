@@ -10,7 +10,7 @@ ID="$1"
 VERIFY=0
 [ "${2:-}" = "--verify" ] && VERIFY=1
 DATA_DIR="${SNAPSHOT_DATA_DIR:-/var/lib/$ID}"
-BACKUP_DIR="${SNAPSHOT_DIR:-/var/backups/proj-base/$ID}"
+BACKUP_DIR="${SNAPSHOT_DIR:-/var/backups/$ID}"
 RETENTION="${SNAPSHOT_RETENTION_DAYS:-7}"
 
 if [ ! -d "$DATA_DIR" ]; then

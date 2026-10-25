@@ -24,6 +24,7 @@ snapshot() {
         awk '{print "unitfile " $1 " " $2}' | sort
     fi
     find /etc/logrotate.d -maxdepth 1 -type f -printf 'logrotate %f\n' 2>/dev/null | sort || true
+    stat -c "hooks %n %a %U:%G" /etc/git-hooks 2>/dev/null || echo "hooks /etc/git-hooks missing"
     find /etc/git-hooks -mindepth 1 -maxdepth 1 -type d -printf 'hooks %f\n' 2>/dev/null | sort || true
     if command -v ufw >/dev/null 2>&1; then
       ufw status 2>/dev/null | sed -n '/^To /,$p' | sort
@@ -37,6 +38,7 @@ snapshot() {
       done < /etc/sysctl.d/90-template-hardening.conf
     fi
     [ -f /etc/timezone ] && echo "timezone $(cat /etc/timezone)" || echo "timezone missing"
+    [ -e /etc/localtime ] && echo "localtime $(readlink -f /etc/localtime)" || echo "localtime missing"
     getent passwd 2>/dev/null | awk -F: '$1 ~ /^(zz-|proj-)/ {print "user " $1}' | sort
     getent group 2>/dev/null | awk -F: '$1 ~ /^(zz-|proj-)/ {print "group " $1}' | sort
   } > "$out"
