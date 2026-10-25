@@ -509,9 +509,11 @@ class VerifyTests(unittest.TestCase):
         hook = (root / "deploy" / "git" / "pre-receive").read_text(encoding="utf-8")
         self.assertIn("show refs/heads/main:verify.py", hook)
         self.assertIn("python3 .trusted-verify.py", hook)
+        self.assertIn(".trusted-test.sh", hook)
+        self.assertIn("protected-paths", hook)
+        self.assertIn("allowed-paths", hook)
+        self.assertIn("no gate in main", hook)
         self.assertNotIn("python3 verify.py", hook)
-        for path in ("verify\\.py", "project\\.json", "tests/", "cmd/", "deploy/"):
-            self.assertIn(path, hook)
 
     def test_isolation_matrix_complete(self):
         docs = verify.ROOT / "docs"

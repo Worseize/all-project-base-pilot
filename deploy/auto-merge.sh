@@ -46,13 +46,14 @@ for PROJECT in "${IDS[@]}"; do
     rm -rf "$tmp"
     continue
   fi
-  if [ -f "$tmp/test.sh" ]; then
-    if ! (cd "$tmp" && bash test.sh) >/dev/null 2>&1; then
+  if git -c safe.directory="$REPO" --git-dir="$REPO" cat-file -e refs/heads/main:test.sh 2>/dev/null; then
+    git -c safe.directory="$REPO" --git-dir="$REPO" show refs/heads/main:test.sh > "$tmp/.trusted-test.sh"
+    if ! (cd "$tmp" && bash .trusted-test.sh) >/dev/null 2>&1; then
       fail "$PROJECT test.sh red at $review"
       rm -rf "$tmp"
       continue
     fi
-  else
+  elif git -c safe.directory="$REPO" --git-dir="$REPO" cat-file -e refs/heads/main:verify.py 2>/dev/null; then
     if ! git -c safe.directory="$REPO" --git-dir="$REPO" show refs/heads/main:verify.py > "$tmp/.trusted-verify.py"; then
       fail "$PROJECT trusted verify missing"
       rm -rf "$tmp"
@@ -63,6 +64,10 @@ for PROJECT in "${IDS[@]}"; do
       rm -rf "$tmp"
       continue
     fi
+  else
+    fail "$PROJECT no gate in main"
+    rm -rf "$tmp"
+    continue
   fi
   rm -rf "$tmp"
 

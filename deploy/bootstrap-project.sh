@@ -34,6 +34,7 @@ SECRETS="/etc/$PROJECT"
 AUTH="$PROJECT_ROOT/.ssh/authorized_keys"
 PROJECTS_FILE="${PROJECTS_FILE:-$SOURCE_REPO/projects.json}"
 ALLOWED_FILE="$HOOKS/allowed-paths"
+PROTECTED_FILE="$HOOKS/protected-paths"
 SOURCE_REPO="${SOURCE_REPO:-$(cd "$SCRIPT_DIR/.." && pwd)}"
 SOURCE_REF="${SOURCE_REF:-HEAD}"
 GIT_SHELL="$(command -v git-shell || true)"
@@ -92,7 +93,7 @@ git -c safe.directory="$REPO" --git-dir="$REPO" symbolic-ref HEAD refs/heads/mai
 install -d -m 0755 -o root -g root "$HOOKS"
 install -m 0755 -o root -g root "$SCRIPT_DIR/git/pre-receive" "$HOOKS/pre-receive"
 install -m 0755 -o root -g root "$SCRIPT_DIR/git/post-receive" "$HOOKS/post-receive"
-allowed="${ALLOWED_PATHS:-app/}"
+allowed="${ALLOWED_PATHS:-*}"
 if [ -f "$PROJECTS_FILE" ]; then
   allowed="$(python3 - "$PROJECTS_FILE" "$PROJECT" 2>/dev/null <<'PY' || true
 import json
@@ -103,11 +104,30 @@ for path in item.get("allowed_paths", []):
     print(path)
 PY
 )"
-  [ -n "$allowed" ] || allowed="${ALLOWED_PATHS:-app/}"
+  [ -n "$allowed" ] || allowed="${ALLOWED_PATHS:-*}"
 fi
 printf '%s\n' "$allowed" > "$ALLOWED_FILE"
 chown root:root "$ALLOWED_FILE"
 chmod 0644 "$ALLOWED_FILE"
+
+if git -c safe.directory="$REPO" --git-dir="$REPO" cat-file -e refs/heads/main:test.sh 2>/dev/null; then
+  : > "$PROTECTED_FILE"
+else
+  cat > "$PROTECTED_FILE" <<'EOF'
+verify.py
+project.json
+go.mod
+go.sum
+tests/
+cmd/
+deploy/
+.github/
+.gitlab-ci.yml
+azure-pipelines.yml
+EOF
+fi
+chown root:root "$PROTECTED_FILE"
+chmod 0644 "$PROTECTED_FILE"
 
 install -d -m 0755 -o root -g root /var/log/git
 chown root:root /var/log/git
