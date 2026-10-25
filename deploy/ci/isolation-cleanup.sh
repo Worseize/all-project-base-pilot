@@ -24,5 +24,4 @@ for PROJECT in "${PROJECTS[@]}"; do
   rm -rf "/etc/systemd/system/proj@$PROJECT.service.d"
 done
 
-[ -d /srv ] && chmod 0755 /srv || true
 echo "isolation cleanup: done"
