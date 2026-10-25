@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 DATA="$(mktemp -d)"
 DIR="$(mktemp -d)"
+chmod 0755 "$DIR"
 printf 'one\n' > "$DATA/a.txt"
 printf 'two\n' > "$DATA/b.txt"
 dd if=/dev/zero of="$DATA/big.bin" bs=1024 count=70 status=none
@@ -20,6 +21,13 @@ BACKUP_DATA_DIR="$DATA" BACKUP_DIR="$DIR" \
   bash "$ROOT/deploy/project-backup.sh" fixture --verify >/dev/null
 count="$(tar -tzf "$archive" | wc -l)"
 [ "$count" -ge 3 ] || { echo "restore count $count" >&2; exit 1; }
+printf 'extra\n' > "$DATA/c.txt"
+if BACKUP_DATA_DIR="$DATA" BACKUP_DIR="$DIR" \
+  bash "$ROOT/deploy/project-backup.sh" fixture --verify >/dev/null 2>&1; then
+  echo "count mismatch not detected" >&2
+  exit 1
+fi
+rm -f "$DATA/c.txt"
 OLD="$(mktemp -d)"
 mkdir -p "$OLD/fixture"
 cp "$archive" "$archive.sha256" "$OLD/fixture/"
