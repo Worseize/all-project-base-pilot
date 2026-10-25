@@ -21,12 +21,19 @@ if [ "$MODE" = "--verify" ]; then
   tmp="$(mktemp -d)"
   trap 'rm -rf "$tmp"' EXIT
   tar -xzf "$latest" -C "$tmp"
-  count="$(tar -tzf "$latest" | wc -l)"
-  echo "verified: $latest entries=$count"
+  source_count="$(find "$DATA" -mindepth 1 | wc -l)"
+  archive_count="$(tar -tzf "$latest" | grep -v '^\./$' | wc -l)"
+  if [ "$source_count" -ne "$archive_count" ]; then
+    echo "restore count mismatch: $source_count != $archive_count" >&2
+    exit 1
+  fi
+  echo "verified: $latest entries=$archive_count"
   exit 0
 fi
 
 install -d -m 0700 -o root -g root "$DIR"
+chown root:root "$DIR"
+chmod 0700 "$DIR"
 stamp="$(date -u +%Y%m%dT%H%M%SZ)"
 archive="$DIR/$stamp.tar.gz"
 tar -czf "$archive" -C "$DATA" . || { echo "backup failed" >&2; exit 1; }

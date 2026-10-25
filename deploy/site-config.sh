@@ -24,6 +24,16 @@ case "$site" in
   static:*) site_type="static"; site_arg="${site#static:}" ;;
   proxy:*) site_type="proxy"; site_arg="${site#proxy:}" ;;
 esac
+if [ -n "$site_arg" ]; then
+  case "$site_arg" in
+    /*|*..*|*[[:space:]]*) echo "invalid site path: $site_arg" >&2; exit 1 ;;
+  esac
+fi
+if [ "$site_type" = "proxy" ] && [ -n "$site_arg" ] &&
+  ! printf '%s' "$site_arg" | grep -Eq '^[0-9]+$'; then
+  echo "invalid proxy port: $site_arg" >&2
+  exit 1
+fi
 domains="$(get domains)"
 redirects="$(get redirects)"
 port="$(get port)"

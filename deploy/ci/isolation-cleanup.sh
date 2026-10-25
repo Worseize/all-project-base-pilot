@@ -19,7 +19,9 @@ for PROJECT in "${PROJECTS[@]}"; do
   if command -v systemctl >/dev/null 2>&1 && [ -d /run/systemd/system ]; then
     systemctl disable "proj@$PROJECT.service" >/dev/null 2>&1 || true
   fi
-  rm -rf "/srv/$PROJECT" "/etc/git-hooks/$PROJECT" "/etc/$PROJECT" "/var/lib/$PROJECT"
+  rm -rf "/srv/$PROJECT" "/etc/git-hooks/$PROJECT" "/etc/$PROJECT" \
+    "/var/lib/$PROJECT" "/var/backups/$PROJECT"
+  rm -f "/var/lib/proj-base/deploy/$PROJECT.sha"
   rm -f "/etc/caddy/conf.d/$PROJECT.caddy" "/var/log/git/$PROJECT.log" "/etc/logrotate.d/proj-$PROJECT"
   rm -rf "/etc/systemd/system/proj@$PROJECT.service.d"
 done

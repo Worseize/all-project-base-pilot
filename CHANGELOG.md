@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 0.9.34 — 2026-10-25
+
+- `/var/log` не меняется при установке watchdog.
+- Бэкап принудительно 0700 root; verify сравнивает count.
+- Cleanup удаляет `/var/backups/<id>` и deploy sha; state их видит.
+- Онбординг валидирует project.conf до бэкапа.
+- Gate/auto-merge читают run/test/health из project.conf.
+- `site=static:` запрещает выход из проекта.
+- `.env.*` отклоняется гейтом.
+
 ## 0.9.33 — 2026-10-25
 
 - `project-backup.sh`: tar+sha256, 0700/0600, KEEP, verify.

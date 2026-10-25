@@ -474,6 +474,12 @@ class VerifyTests(unittest.TestCase):
             self.assertIn(word, script)
         self.assertIn("userdel", cleanup)
 
+    def test_install_watchdog_does_not_chmod_var_log(self):
+        root = Path(__file__).resolve().parents[1]
+        text = (root / "deploy" / "install-watchdog.sh").read_text(encoding="utf-8")
+        self.assertIn("install -d -m 0750 -o root -g root /var/lib/watchdog", text)
+        self.assertNotIn("0750 -o root -g root /var/lib/watchdog /var/log", text)
+
     def test_isolation_health_scenarios(self):
         root = Path(__file__).resolve().parents[1]
         script = (root / "deploy" / "ci" / "isolation.sh").read_text(encoding="utf-8")
@@ -550,6 +556,11 @@ class VerifyTests(unittest.TestCase):
         self.assertIn("fetch", script)
         self.assertNotIn("nologin", script)
 
+    def test_bootstrap_validates_manifest(self):
+        root = Path(__file__).resolve().parents[1]
+        text = (root / "deploy" / "bootstrap-project.sh").read_text(encoding="utf-8")
+        self.assertIn("manifest.py\" check", text)
+
     def test_pre_receive_uses_trusted_verify(self):
         root = Path(__file__).resolve().parents[1]
         hook = (root / "deploy" / "git" / "pre-receive").read_text(encoding="utf-8")
@@ -559,6 +570,8 @@ class VerifyTests(unittest.TestCase):
         self.assertIn("protected-paths", hook)
         self.assertIn("allowed-paths", hook)
         self.assertIn("no gate in main", hook)
+        self.assertIn("project.conf", hook)
+        self.assertIn(r"\.env($|\.)", hook)
         self.assertNotIn("python3 verify.py", hook)
 
     def test_isolation_matrix_complete(self):
