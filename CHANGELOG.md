@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.9.24 — 2026-10-25
+
+- Unit: StateDirectory, PROJECT_DATA_DIR=/var/lib/%i, ReadWritePaths.
+- Bootstrap/deploy создают /var/lib/<id>.
+- Cleanup больше не удаляет общий proj@.service; CI проверяет его наличие.
+
 ## 0.9.23 — 2026-10-25
 
 - Контракт: `run`/`test.sh` 100755 в git, `PROJECT_DATA_DIR`, сайт, журналы, бюджет.

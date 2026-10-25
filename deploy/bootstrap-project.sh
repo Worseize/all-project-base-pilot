@@ -53,6 +53,7 @@ if [ "$USER_EXISTED" -eq 0 ]; then
   useradd --system --home-dir "$PROJECT_ROOT" --shell "$GIT_SHELL" --create-home "$PROJECT"
 fi
 usermod --shell "$GIT_SHELL" "$PROJECT"
+install -d -m 0750 -o "$PROJECT" -g "$PROJECT" "/var/lib/$PROJECT"
 install -d -m 0750 -o "$PROJECT" -g "$PROJECT" "$PROJECT_ROOT"
 install -d -m 0700 -o "$PROJECT" -g "$PROJECT" "$PROJECT_ROOT/.ssh"
 

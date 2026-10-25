@@ -1,6 +1,6 @@
 # Изоляция проектов и агентов
 
-Версия 0.9.23 · 22.10.2026
+Версия 0.9.24 · 22.10.2026
 
 Один хост — несколько проектов — несколько агентов. Root — единственный,
 у кого полные права. Агент проекта получает только git-push в `review`.
@@ -139,6 +139,7 @@ port forwarding или запуск произвольной команды.
 
 ```ini
 User=%i
+Environment=PROJECT_DATA_DIR=/var/lib/%i
 ProtectSystem=strict
 ProtectHome=yes
 ProtectProc=invisible
@@ -147,9 +148,12 @@ NoNewPrivileges=yes
 MemoryMax=512M
 CPUQuota=50%
 TasksMax=64
+StateDirectory=%i
+ReadWritePaths=/var/lib/%i
 ```
 
-`ReadWritePaths=/srv/%i`; секреты — `EnvironmentFile=-/etc/%i/app.env`.
+`StateDirectory=%i` создаёт writable `/var/lib/<id>`; `ReadWritePaths` его
+разрешает; секреты — `EnvironmentFile=-/etc/%i/app.env`.
 
 ## Онбординг
 

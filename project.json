@@ -1,6 +1,6 @@
 {
   "name": "all-project-base",
-  "version": "0.9.23",
+  "version": "0.9.24",
   "date": "22.10.2026",
   "commands": {
     "build": "go build ./cmd/...",
