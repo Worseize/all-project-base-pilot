@@ -19,6 +19,7 @@ commit_manifest() {
   chown "$A:$A" "$WORK/project.conf"
   runuser -u "$A" -- git -C "$WORK" add project.conf
   runuser -u "$A" -- git -C "$WORK" commit -qm "manifest fixture" || true
+  runuser -u "$A" -- git -C "$WORK" push -q origin HEAD:review
   local sha
   sha="$(runuser -u "$A" -- git -C "$WORK" rev-parse HEAD)"
   git_r update-ref refs/heads/main "$sha"
