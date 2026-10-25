@@ -565,6 +565,22 @@ def check_adr(gate: Gate) -> None:
         gate.ok("adr", f"{len(files)} ADR")
 
 
+def check_stop_rule(gate: Gate) -> None:
+    agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8", errors="replace")
+    contract = (ROOT / "docs" / "AGENT-CONTRACT.md").read_text(encoding="utf-8", errors="replace")
+    problems = []
+    if "дважды" not in agents or "blocked" not in agents:
+        problems.append("AGENTS: нет правила двух попыток/blocked")
+    if "review" not in agents or "администратор" not in agents:
+        problems.append("AGENTS: нет review/администратора")
+    if "Две попытки" not in contract or "blocked" not in contract:
+        problems.append("AGENT-CONTRACT: нет остановки")
+    if problems:
+        gate.fail("stop-rule", "; ".join(problems))
+    else:
+        gate.ok("stop-rule", "две попытки и blocked-отчёт")
+
+
 def check_process(gate: Gate) -> None:
     text = (ROOT / "PROCESS.md").read_text(encoding="utf-8", errors="replace").lower()
     missing = [word for word in ("verify", "красн", "журнал", "деплой") if word not in text]
@@ -846,6 +862,7 @@ def main() -> int:
         check_acceptance,
         check_adr,
         check_process,
+        check_stop_rule,
         check_ci,
         check_versions,
         check_go_sizes,
