@@ -20,7 +20,8 @@ for PROJECT in "${PROJECTS[@]}"; do
     systemctl disable "proj@$PROJECT.service" >/dev/null 2>&1 || true
   fi
   rm -rf "/srv/$PROJECT" "/etc/git-hooks/$PROJECT" "/etc/$PROJECT" "/var/lib/$PROJECT"
-  rm -f "/var/log/git/$PROJECT.log" "/etc/logrotate.d/proj-$PROJECT"
+  rm -f "/etc/caddy/conf.d/$PROJECT.caddy" "/var/log/git/$PROJECT.log" "/etc/logrotate.d/proj-$PROJECT"
+  rm -rf "/etc/systemd/system/proj@$PROJECT.service.d"
 done
 
 [ -d /srv ] && chmod 0755 /srv || true

@@ -1,6 +1,6 @@
 # Изоляция проектов и агентов
 
-Версия 0.9.26 · 22.10.2026
+Версия 0.9.27 · 22.10.2026
 
 Один хост — несколько проектов — несколько агентов. Root — единственный,
 у кого полные права. Агент проекта получает только git-push в `review`.
@@ -155,6 +155,14 @@ ReadWritePaths=/var/lib/%i
 
 `StateDirectory=%i` создаёт writable `/var/lib/<id>`; `ReadWritePaths` его
 разрешает; секреты — `EnvironmentFile=-/etc/%i/app.env`.
+
+## Манифест проекта
+
+`project.conf` в корне проекта — `ключ=значение`; неизвестный ключ —
+ошибка. `deploy-project.sh` выполняет `deps`, `build`, `migrate` от
+пользователя проекта до рестарта; `site-config.sh` генерирует Caddy-блок
+из `site`/`domains`/`redirects`; `timezone`/`memory`/`cpu` уходят в
+drop-in `proj@<id>.service.d/manifest.conf`.
 
 ## Health
 
