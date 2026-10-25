@@ -2,7 +2,7 @@
 <rect width="1400" height="100%" fill="#f7f9fc"/>
 <style>text{font-family:'DejaVu Sans',Arial,sans-serif;fill:#172033}.title{font-size:32px;font-weight:700}.sub{font-size:14px;fill:#667085}.h2{font-size:22px;font-weight:700;fill:#1d4ed8}.h3{font-size:18px;font-weight:700;fill:#172033}.p{font-size:15px}.bullet{font-size:15px}.table{font-family:'DejaVu Sans Mono',monospace;font-size:13px}</style>
 <text x="60" y="64" class="title">Правила</text>
-<text x="60" y="92" class="sub">Source: RULES.md · v0.9.30 · 22.10.2026</text>
+<text x="60" y="92" class="sub">Source: RULES.md · v0.9.31 · 22.10.2026</text>
 <text x="60" y="144" class="h2">Базовые правила крупного проекта</text>
 <text x="60" y="168" class="p">Верхний уровень шаблона архитектуры. Узел и его инструменты</text>
 <text x="60" y="192" class="p">— Go stdlib;</text>
@@ -222,5 +222,5 @@
 <text x="60" y="5424" class="p">Бюджет шаблона — десять правил: новое правило должно вобрать</text>
 <text x="60" y="5448" class="p">старое</text>
 <text x="60" y="5472" class="p">или доказать, что без него рвётся контур.</text>
-<text x="60" y="5496" class="p">Версия 0.9.30 · 22.10.2026</text>
+<text x="60" y="5496" class="p">Версия 0.9.31 · 22.10.2026</text>
 </svg>
