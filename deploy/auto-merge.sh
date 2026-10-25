@@ -87,9 +87,11 @@ for PROJECT in "${IDS[@]}"; do
     continue
   fi
   if bash "$SCRIPT_DIR/deploy-project.sh" "$PROJECT" >/dev/null 2>&1; then
-    log "merged $PROJECT $main -> $review"
+    git -c safe.directory="$REPO" --git-dir="$REPO" update-ref refs/heads/review "$review" || true
+    log "merged $PROJECT $main -> $review; review aligned"
   else
     git -c safe.directory="$REPO" --git-dir="$REPO" update-ref refs/heads/main "$main" "$review" || true
-    fail "$PROJECT deploy failed; rolled back to $main"
+    git -c safe.directory="$REPO" --git-dir="$REPO" update-ref refs/heads/review "$main" || true
+    fail "$PROJECT deploy failed; rolled back to $main; review aligned"
   fi
 done

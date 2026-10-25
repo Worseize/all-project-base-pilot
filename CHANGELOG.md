@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.9.25 — 2026-10-25
+
+- auto-merge/deploy выравнивают `review` на `main` после merge.
+- При сбое deploy откат `main` и `review` на прежний коммит.
+- CI: второй push после auto-merge принимается.
+- Контракт: ключ односторонний, fetch невозможен.
+
 ## 0.9.24 — 2026-10-25
 
 - Unit: StateDirectory, PROJECT_DATA_DIR=/var/lib/%i, ReadWritePaths.

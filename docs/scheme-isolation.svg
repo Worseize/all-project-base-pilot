@@ -1,10 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="4482" viewBox="0 0 1400 4482">
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="4554" viewBox="0 0 1400 4554">
 <rect width="1400" height="100%" fill="#f7f9fc"/>
 <style>text{font-family:'DejaVu Sans',Arial,sans-serif;fill:#172033}.title{font-size:32px;font-weight:700}.sub{font-size:14px;fill:#667085}.h2{font-size:22px;font-weight:700;fill:#1d4ed8}.h3{font-size:18px;font-weight:700;fill:#172033}.p{font-size:15px}.bullet{font-size:15px}.table{font-family:'DejaVu Sans Mono',monospace;font-size:13px}</style>
 <text x="60" y="64" class="title">Изоляция</text>
-<text x="60" y="92" class="sub">Source: docs/ISOLATION.md · v0.9.24 · 22.10.2026</text>
+<text x="60" y="92" class="sub">Source: docs/ISOLATION.md · v0.9.25 · 22.10.2026</text>
 <text x="60" y="144" class="h2">Изоляция проектов и агентов</text>
-<text x="60" y="168" class="p">Версия 0.9.24 · 22.10.2026</text>
+<text x="60" y="168" class="p">Версия 0.9.25 · 22.10.2026</text>
 <text x="60" y="192" class="p">Один хост — несколько проектов — несколько агентов. Root —</text>
 <text x="60" y="216" class="p">единственный,</text>
 <text x="60" y="240" class="p">у кого полные права. Агент проекта получает только git-push в review.</text>
@@ -48,137 +48,140 @@
 <text x="60" y="1188" class="p">auto-merge.timer раз в 5 минут проходит реестр: если review впереди</text>
 <text x="60" y="1212" class="p">main, запускает гейт из main (test.sh, иначе verify.py), пишет</text>
 <text x="60" y="1236" class="p">метку гейта в /var/lib/proj-base/gate/&lt;id&gt;.json и двигает main только</text>
-<text x="60" y="1260" class="p">при зелёном гейте. Нет гейта в main — отказ, а не «здоров». Затем</text>
-<text x="60" y="1284" class="p">deploy-project.sh доставляет код; при сбое main откатывается на старый</text>
-<text x="60" y="1308" class="p">коммит. Всё пишется в /var/log/git/auto-merge.log. Решение — только по</text>
-<text x="60" y="1332" class="p">метке/гейту, без анализа содержимого.</text>
-<text x="60" y="1368" class="h2">Модель</text>
-<text x="60" y="1392" class="bullet">• Каждый проект — отдельный пользователь proj-*, каталог /srv/proj-*,</text>
-<text x="60" y="1416" class="p">bare-репозиторий /srv/proj-*/repo.git.</text>
-<text x="60" y="1440" class="bullet">• Агент ходит по SSH с ключом, у которого forced command:</text>
-<text x="60" y="1464" class="p">git-receive-pack &#39;/srv/proj-*/repo.git&#39;, без pty, forwarding и X11.</text>
-<text x="60" y="1488" class="bullet">• Хуки лежат в /etc/git-hooks/&lt;proj&gt; (root:root, 0755), не в репозитории.</text>
-<text x="60" y="1512" class="bullet">• Агент пушит только в refs/heads/review. В main двигает только root</text>
-<text x="60" y="1536" class="p">через git update-ref — это акт одобрения.</text>
-<text x="60" y="1560" class="bullet">• После зелёного review root делает merge в main и перезапускает</text>
-<text x="60" y="1584" class="p">proj@&lt;proj&gt;.service. У агента нет sudo и нет shell.</text>
-<text x="60" y="1620" class="h2">Матрица прав</text>
-<text x="60" y="1644" class="table">Действие Агент проекта Root</text>
-<text x="60" y="1668" class="table">Читать свой код да да</text>
-<text x="60" y="1692" class="table">Читать чужой проект нет да</text>
-<text x="60" y="1716" class="table">Писать в свой каталог да да</text>
-<text x="60" y="1740" class="table">Писать в /etc, юниты, хуки нет да</text>
-<text x="60" y="1764" class="table">Пушить в review да да</text>
-<text x="60" y="1788" class="table">Пушить в main нет да</text>
-<text x="60" y="1812" class="table">Деплоить и перезапускать нет да</text>
-<text x="60" y="1836" class="table">Секреты своего проекта да да</text>
-<text x="60" y="1860" class="table">Секреты чужого проекта нет да</text>
-<text x="60" y="1884" class="table">Порты наружу нет да</text>
-<text x="60" y="1920" class="h2">Схема</text>
-<text x="60" y="1956" class="h2">Раскладка</text>
-<text x="60" y="1992" class="h2">Ключ агента</text>
-<text x="60" y="2016" class="p">authorized_keys — 0600 proj-a:proj-a. Ключ не даёт shell, scp, rsync,</text>
-<text x="60" y="2040" class="p">port forwarding или запуск произвольной команды.</text>
-<text x="60" y="2076" class="h2">Юнит</text>
-<text x="60" y="2100" class="p">deploy/systemd/proj@.service — шаблон. Экземпляр proj@proj-a:</text>
-<text x="60" y="2124" class="p">StateDirectory=%i создаёт writable /var/lib/&lt;id&gt;; ReadWritePaths его</text>
-<text x="60" y="2148" class="p">разрешает; секреты — EnvironmentFile=-/etc/%i/app.env.</text>
-<text x="60" y="2184" class="h2">Онбординг</text>
-<text x="60" y="2208" class="p">SOURCE_REPO/SOURCE_REF переопределяют источник initial main, если</text>
-<text x="60" y="2232" class="p">проект сеется не из шаблона. Bootstrap сразу создаёт рабочий checkout</text>
-<text x="60" y="2256" class="p">/srv/&lt;id&gt;/current от имени пользователя проекта (runuser), поэтому</text>
-<text x="60" y="2280" class="p">git 2.43 не падает на dubious ownership. Пока refs/heads/main нет,</text>
-<text x="60" y="2304" class="p">pre-receive отклоняет review: доверенный verify.py берётся именно из</text>
-<text x="60" y="2328" class="p">main. После merge root доставляет main в runtime:</text>
-<text x="60" y="2352" class="p">update-ref не запускает хуки; deploy-project.sh — основной путь.</text>
-<text x="60" y="2376" class="p">post-receive обновляет current только для push-based main.</text>
-<text x="60" y="2412" class="h2">Доверенный gate</text>
-<text x="60" y="2436" class="p">pre-receive не запускает verify.py из пушимого дерева. Он берёт</text>
-<text x="60" y="2460" class="p">verify.py из refs/heads/main и запускает его на pushed tree. Изменения</text>
-<text x="60" y="2484" class="p">verify.py, project.json, tests/, cmd/schemes и cmd/deadcode</text>
-<text x="60" y="2508" class="p">отклоняются до запуска. Так агент не может ослабить проверку</text>
-<text x="60" y="2532" class="p">тем же пушем.</text>
-<text x="60" y="2568" class="h2">PATH и Go</text>
-<text x="60" y="2592" class="p">sshd не добавляет /usr/local/go/bin в PATH. Хук явно выставляет:</text>
-<text x="60" y="2616" class="p">Без этого go test, gofmt, deadcode уходили бы в skip.</text>
-<text x="60" y="2652" class="h2">Пользователь без shell</text>
-<text x="60" y="2676" class="p">useradd --shell &#34;$(command -v git-shell)&#34;; существующему пользователю</text>
-<text x="60" y="2700" class="p">usermod --shell .... git-shell пропускает только git-команды, поэтому</text>
-<text x="60" y="2724" class="p">forced command работает, а интерактивного shell нет. Проверка:</text>
-<text x="60" y="2748" class="p">getent passwd proj-a → git-shell; ssh ... id не выполняет id.</text>
-<text x="60" y="2784" class="h2">Журнал приёмки</text>
-<text x="60" y="2808" class="p">/var/log/git — root:root 0755. /var/log/git/&lt;proj&gt;.log —</text>
-<text x="60" y="2832" class="p">root:&lt;proj&gt;, 0660; hook пишет строку на каждый push: дата, ref, old, new,</text>
-<text x="60" y="2856" class="p">результат, причина. Групповая запись нужна, потому что hook</text>
-<text x="60" y="2880" class="p">работает от</text>
-<text x="60" y="2904" class="p">пользователя проекта; setfacl не требуется.</text>
-<text x="60" y="2928" class="p">Ротация — одно правило /etc/logrotate.d/proj-logs на</text>
-<text x="60" y="2952" class="p">/var/log/git/*.log (ставит host-baseline.sh): size 100k,</text>
-<text x="60" y="2976" class="p">rotate 5, copytruncate; режим и группа сохраняются. Per-project</text>
-<text x="60" y="3000" class="p">правил нет — иначе logrotate падает на дубле.</text>
-<text x="60" y="3036" class="h2">Один проект</text>
-<text x="60" y="3060" class="p">selftest-isolation.sh работает и с одним проектом:</text>
-<text x="60" y="3084" class="p">Проверяет: свой CANARY читается, sudo нет, портов нет, hooks/unit/log</text>
-<text x="60" y="3108" class="p">на месте. С двумя — плюс «чужой CANARY не читается».</text>
-<text x="60" y="3144" class="h2">systemd</text>
-<text x="60" y="3168" class="p">ExecStart=/srv/%i/current/run — launcher из рабочего checkout.</text>
-<text x="60" y="3192" class="p">bootstrap создаёт /srv/&lt;id&gt;/current, deploy-project.sh обновляет его</text>
-<text x="60" y="3216" class="p">после merge. systemd-analyze verify на шаблоне без run ожидаемо</text>
-<text x="60" y="3240" class="p">краснеет; проверять юнит нужно на живом экземпляре. run должен</text>
-<text x="60" y="3264" class="p">быть</text>
-<text x="60" y="3288" class="p">исполняемым и запускать приложение проекта.</text>
-<text x="60" y="3324" class="h2">Предупреждение про /srv</text>
-<text x="60" y="3348" class="p">bootstrap-project.sh ставит /srv в 0711. Это влияет на весь хост,</text>
-<text x="60" y="3372" class="p">не только на новый проект. Если на /srv есть другие данные —</text>
-<text x="60" y="3396" class="p">проверь</text>
-<text x="60" y="3420" class="p">владельца и режим до онбординга.</text>
-<text x="60" y="3456" class="h2">Проверки</text>
-<text x="60" y="3480" class="bullet">• python verify.py — green.</text>
-<text x="60" y="3504" class="bullet">• python verify.py --close-task — green.</text>
-<text x="60" y="3528" class="bullet">• sudo deploy/selftest-isolation.sh proj-a proj-b:</text>
-<text x="60" y="3552" class="bullet">• proj-a не читает CANARY проекта B;</text>
-<text x="60" y="3576" class="bullet">• proj-a не имеет sudo;</text>
-<text x="60" y="3600" class="bullet">• нет слушающих сокетов;</text>
-<text x="60" y="3624" class="bullet">• hooksPath и права root:root;</text>
-<text x="60" y="3648" class="bullet">• unit и log на месте.</text>
-<text x="60" y="3672" class="bullet">• Живой push:</text>
-<text x="60" y="3696" class="bullet">• git push origin HEAD:main → rejected;</text>
-<text x="60" y="3720" class="bullet">• git push origin HEAD:review → accepted после trusted verify;</text>
-<text x="60" y="3744" class="bullet">• подмена verify.py в review → rejected;</text>
-<text x="60" y="3768" class="bullet">• удаление/force push → rejected.</text>
-<text x="60" y="3792" class="bullet">• deploy/audit-drift.sh projects.json — сироты в обе стороны:</text>
-<text x="60" y="3816" class="p">каталог без записи и запись без каталога.</text>
-<text x="60" y="3840" class="bullet">• selftest-isolation.sh принимает только id из projects.json.</text>
-<text x="60" y="3876" class="h2">Роли</text>
-<text x="60" y="3900" class="bullet">• Админ узла — гейт, firewall, журналы, бэкап, merge в main; продукта</text>
-<text x="60" y="3924" class="p">у него нет.</text>
-<text x="60" y="3948" class="bullet">• Агент проекта — только свой проект, только review.</text>
-<text x="60" y="3972" class="bullet">• Продукт — отдельный проект; не cmd/app и не app.service.</text>
-<text x="60" y="4008" class="h2">Канал команд</text>
-<text x="60" y="4032" class="p">Задачи приходят из приватного all-project-base-findings (автор</text>
-<text x="60" y="4056" class="p">conductor, метка from:conductor), а не из публичного трекера шаблона.</text>
-<text x="60" y="4080" class="p">Публичная история закрытых команд — docs/acceptance/; формат и</text>
-<text x="60" y="4104" class="p">фильтр</text>
-<text x="60" y="4128" class="p">утечек — docs/acceptance/README.md.</text>
-<text x="60" y="4152" class="p">Агент только читает issues и комментарии, в доску не пишет</text>
-<text x="60" y="4176" class="p">вообще;</text>
-<text x="60" y="4200" class="p">отчёт — файл docs/acceptance/ и сообщение коммита (findings#N),</text>
-<text x="60" y="4224" class="p">отказ — файл с первой строкой Отказ: &lt;причина&gt;. Issue закрывает</text>
-<text x="60" y="4248" class="p">только</text>
-<text x="60" y="4272" class="p">conductor.</text>
-<text x="60" y="4308" class="h2">CI isolation</text>
-<text x="60" y="4332" class="p">.github/workflows/isolation.yml запускает deploy/ci/isolation.sh на</text>
-<text x="60" y="4356" class="p">ubuntu-latest: bootstrap двух проектов, git-shell, seed main,</text>
-<text x="60" y="4380" class="p">review/force/delete, подмена verify.py, canary, sudo, hooksPath, лог и</text>
-<text x="60" y="4404" class="p">logrotate. В конце — deploy/ci/isolation-cleanup.sh. Джоба краснеет при</text>
-<text x="60" y="4428" class="p">возврате nologin, отсутствии main или ослаблении gate.</text>
-<text x="60" y="4464" class="h2">Границы</text>
-<text x="60" y="4488" class="bullet">• Это Linux/systemd/sshd-модель; на Windows live-проверка невозможна.</text>
-<text x="60" y="4512" class="bullet">• Caddy — единственный вход; порты приложений наружу не</text>
-<text x="60" y="4536" class="p">публикуются.</text>
-<text x="60" y="4560" class="bullet">• Секреты своего проекта доступны агенту только через</text>
-<text x="60" y="4584" class="p">запущенный процесс</text>
-<text x="60" y="4608" class="p">или явно выданный env; в репозитории секретов нет.</text>
-<text x="60" y="4632" class="bullet">• Нового правила нет: политика живёт в PROJECT.md, этом файле и</text>
-<text x="60" y="4656" class="p">PROCESS.md.</text>
+<text x="60" y="1260" class="p">при зелёном гейте. Нет гейта в main — отказ, а не «здоров». После</text>
+<text x="60" y="1284" class="p">успешной доставки review выравнивается на main; при сбое main</text>
+<text x="60" y="1308" class="p">откатывается, review тоже выравнивается. Ключ агента</text>
+<text x="60" y="1332" class="p">односторонний:</text>
+<text x="60" y="1356" class="p">fetch невозможен, поэтому выравнивание делает узел. Всё пишется</text>
+<text x="60" y="1380" class="p">в</text>
+<text x="60" y="1404" class="p">/var/log/git/auto-merge.log; решение — только по метке/гейту.</text>
+<text x="60" y="1440" class="h2">Модель</text>
+<text x="60" y="1464" class="bullet">• Каждый проект — отдельный пользователь proj-*, каталог /srv/proj-*,</text>
+<text x="60" y="1488" class="p">bare-репозиторий /srv/proj-*/repo.git.</text>
+<text x="60" y="1512" class="bullet">• Агент ходит по SSH с ключом, у которого forced command:</text>
+<text x="60" y="1536" class="p">git-receive-pack &#39;/srv/proj-*/repo.git&#39;, без pty, forwarding и X11.</text>
+<text x="60" y="1560" class="bullet">• Хуки лежат в /etc/git-hooks/&lt;proj&gt; (root:root, 0755), не в репозитории.</text>
+<text x="60" y="1584" class="bullet">• Агент пушит только в refs/heads/review. В main двигает только root</text>
+<text x="60" y="1608" class="p">через git update-ref — это акт одобрения.</text>
+<text x="60" y="1632" class="bullet">• После зелёного review root делает merge в main и перезапускает</text>
+<text x="60" y="1656" class="p">proj@&lt;proj&gt;.service. У агента нет sudo и нет shell.</text>
+<text x="60" y="1692" class="h2">Матрица прав</text>
+<text x="60" y="1716" class="table">Действие Агент проекта Root</text>
+<text x="60" y="1740" class="table">Читать свой код да да</text>
+<text x="60" y="1764" class="table">Читать чужой проект нет да</text>
+<text x="60" y="1788" class="table">Писать в свой каталог да да</text>
+<text x="60" y="1812" class="table">Писать в /etc, юниты, хуки нет да</text>
+<text x="60" y="1836" class="table">Пушить в review да да</text>
+<text x="60" y="1860" class="table">Пушить в main нет да</text>
+<text x="60" y="1884" class="table">Деплоить и перезапускать нет да</text>
+<text x="60" y="1908" class="table">Секреты своего проекта да да</text>
+<text x="60" y="1932" class="table">Секреты чужого проекта нет да</text>
+<text x="60" y="1956" class="table">Порты наружу нет да</text>
+<text x="60" y="1992" class="h2">Схема</text>
+<text x="60" y="2028" class="h2">Раскладка</text>
+<text x="60" y="2064" class="h2">Ключ агента</text>
+<text x="60" y="2088" class="p">authorized_keys — 0600 proj-a:proj-a. Ключ не даёт shell, scp, rsync,</text>
+<text x="60" y="2112" class="p">port forwarding или запуск произвольной команды.</text>
+<text x="60" y="2148" class="h2">Юнит</text>
+<text x="60" y="2172" class="p">deploy/systemd/proj@.service — шаблон. Экземпляр proj@proj-a:</text>
+<text x="60" y="2196" class="p">StateDirectory=%i создаёт writable /var/lib/&lt;id&gt;; ReadWritePaths его</text>
+<text x="60" y="2220" class="p">разрешает; секреты — EnvironmentFile=-/etc/%i/app.env.</text>
+<text x="60" y="2256" class="h2">Онбординг</text>
+<text x="60" y="2280" class="p">SOURCE_REPO/SOURCE_REF переопределяют источник initial main, если</text>
+<text x="60" y="2304" class="p">проект сеется не из шаблона. Bootstrap сразу создаёт рабочий checkout</text>
+<text x="60" y="2328" class="p">/srv/&lt;id&gt;/current от имени пользователя проекта (runuser), поэтому</text>
+<text x="60" y="2352" class="p">git 2.43 не падает на dubious ownership. Пока refs/heads/main нет,</text>
+<text x="60" y="2376" class="p">pre-receive отклоняет review: доверенный verify.py берётся именно из</text>
+<text x="60" y="2400" class="p">main. После merge root доставляет main в runtime:</text>
+<text x="60" y="2424" class="p">update-ref не запускает хуки; deploy-project.sh — основной путь.</text>
+<text x="60" y="2448" class="p">post-receive обновляет current только для push-based main.</text>
+<text x="60" y="2484" class="h2">Доверенный gate</text>
+<text x="60" y="2508" class="p">pre-receive не запускает verify.py из пушимого дерева. Он берёт</text>
+<text x="60" y="2532" class="p">verify.py из refs/heads/main и запускает его на pushed tree. Изменения</text>
+<text x="60" y="2556" class="p">verify.py, project.json, tests/, cmd/schemes и cmd/deadcode</text>
+<text x="60" y="2580" class="p">отклоняются до запуска. Так агент не может ослабить проверку</text>
+<text x="60" y="2604" class="p">тем же пушем.</text>
+<text x="60" y="2640" class="h2">PATH и Go</text>
+<text x="60" y="2664" class="p">sshd не добавляет /usr/local/go/bin в PATH. Хук явно выставляет:</text>
+<text x="60" y="2688" class="p">Без этого go test, gofmt, deadcode уходили бы в skip.</text>
+<text x="60" y="2724" class="h2">Пользователь без shell</text>
+<text x="60" y="2748" class="p">useradd --shell &#34;$(command -v git-shell)&#34;; существующему пользователю</text>
+<text x="60" y="2772" class="p">usermod --shell .... git-shell пропускает только git-команды, поэтому</text>
+<text x="60" y="2796" class="p">forced command работает, а интерактивного shell нет. Проверка:</text>
+<text x="60" y="2820" class="p">getent passwd proj-a → git-shell; ssh ... id не выполняет id.</text>
+<text x="60" y="2856" class="h2">Журнал приёмки</text>
+<text x="60" y="2880" class="p">/var/log/git — root:root 0755. /var/log/git/&lt;proj&gt;.log —</text>
+<text x="60" y="2904" class="p">root:&lt;proj&gt;, 0660; hook пишет строку на каждый push: дата, ref, old, new,</text>
+<text x="60" y="2928" class="p">результат, причина. Групповая запись нужна, потому что hook</text>
+<text x="60" y="2952" class="p">работает от</text>
+<text x="60" y="2976" class="p">пользователя проекта; setfacl не требуется.</text>
+<text x="60" y="3000" class="p">Ротация — одно правило /etc/logrotate.d/proj-logs на</text>
+<text x="60" y="3024" class="p">/var/log/git/*.log (ставит host-baseline.sh): size 100k,</text>
+<text x="60" y="3048" class="p">rotate 5, copytruncate; режим и группа сохраняются. Per-project</text>
+<text x="60" y="3072" class="p">правил нет — иначе logrotate падает на дубле.</text>
+<text x="60" y="3108" class="h2">Один проект</text>
+<text x="60" y="3132" class="p">selftest-isolation.sh работает и с одним проектом:</text>
+<text x="60" y="3156" class="p">Проверяет: свой CANARY читается, sudo нет, портов нет, hooks/unit/log</text>
+<text x="60" y="3180" class="p">на месте. С двумя — плюс «чужой CANARY не читается».</text>
+<text x="60" y="3216" class="h2">systemd</text>
+<text x="60" y="3240" class="p">ExecStart=/srv/%i/current/run — launcher из рабочего checkout.</text>
+<text x="60" y="3264" class="p">bootstrap создаёт /srv/&lt;id&gt;/current, deploy-project.sh обновляет его</text>
+<text x="60" y="3288" class="p">после merge. systemd-analyze verify на шаблоне без run ожидаемо</text>
+<text x="60" y="3312" class="p">краснеет; проверять юнит нужно на живом экземпляре. run должен</text>
+<text x="60" y="3336" class="p">быть</text>
+<text x="60" y="3360" class="p">исполняемым и запускать приложение проекта.</text>
+<text x="60" y="3396" class="h2">Предупреждение про /srv</text>
+<text x="60" y="3420" class="p">bootstrap-project.sh ставит /srv в 0711. Это влияет на весь хост,</text>
+<text x="60" y="3444" class="p">не только на новый проект. Если на /srv есть другие данные —</text>
+<text x="60" y="3468" class="p">проверь</text>
+<text x="60" y="3492" class="p">владельца и режим до онбординга.</text>
+<text x="60" y="3528" class="h2">Проверки</text>
+<text x="60" y="3552" class="bullet">• python verify.py — green.</text>
+<text x="60" y="3576" class="bullet">• python verify.py --close-task — green.</text>
+<text x="60" y="3600" class="bullet">• sudo deploy/selftest-isolation.sh proj-a proj-b:</text>
+<text x="60" y="3624" class="bullet">• proj-a не читает CANARY проекта B;</text>
+<text x="60" y="3648" class="bullet">• proj-a не имеет sudo;</text>
+<text x="60" y="3672" class="bullet">• нет слушающих сокетов;</text>
+<text x="60" y="3696" class="bullet">• hooksPath и права root:root;</text>
+<text x="60" y="3720" class="bullet">• unit и log на месте.</text>
+<text x="60" y="3744" class="bullet">• Живой push:</text>
+<text x="60" y="3768" class="bullet">• git push origin HEAD:main → rejected;</text>
+<text x="60" y="3792" class="bullet">• git push origin HEAD:review → accepted после trusted verify;</text>
+<text x="60" y="3816" class="bullet">• подмена verify.py в review → rejected;</text>
+<text x="60" y="3840" class="bullet">• удаление/force push → rejected.</text>
+<text x="60" y="3864" class="bullet">• deploy/audit-drift.sh projects.json — сироты в обе стороны:</text>
+<text x="60" y="3888" class="p">каталог без записи и запись без каталога.</text>
+<text x="60" y="3912" class="bullet">• selftest-isolation.sh принимает только id из projects.json.</text>
+<text x="60" y="3948" class="h2">Роли</text>
+<text x="60" y="3972" class="bullet">• Админ узла — гейт, firewall, журналы, бэкап, merge в main; продукта</text>
+<text x="60" y="3996" class="p">у него нет.</text>
+<text x="60" y="4020" class="bullet">• Агент проекта — только свой проект, только review.</text>
+<text x="60" y="4044" class="bullet">• Продукт — отдельный проект; не cmd/app и не app.service.</text>
+<text x="60" y="4080" class="h2">Канал команд</text>
+<text x="60" y="4104" class="p">Задачи приходят из приватного all-project-base-findings (автор</text>
+<text x="60" y="4128" class="p">conductor, метка from:conductor), а не из публичного трекера шаблона.</text>
+<text x="60" y="4152" class="p">Публичная история закрытых команд — docs/acceptance/; формат и</text>
+<text x="60" y="4176" class="p">фильтр</text>
+<text x="60" y="4200" class="p">утечек — docs/acceptance/README.md.</text>
+<text x="60" y="4224" class="p">Агент только читает issues и комментарии, в доску не пишет</text>
+<text x="60" y="4248" class="p">вообще;</text>
+<text x="60" y="4272" class="p">отчёт — файл docs/acceptance/ и сообщение коммита (findings#N),</text>
+<text x="60" y="4296" class="p">отказ — файл с первой строкой Отказ: &lt;причина&gt;. Issue закрывает</text>
+<text x="60" y="4320" class="p">только</text>
+<text x="60" y="4344" class="p">conductor.</text>
+<text x="60" y="4380" class="h2">CI isolation</text>
+<text x="60" y="4404" class="p">.github/workflows/isolation.yml запускает deploy/ci/isolation.sh на</text>
+<text x="60" y="4428" class="p">ubuntu-latest: bootstrap двух проектов, git-shell, seed main,</text>
+<text x="60" y="4452" class="p">review/force/delete, подмена verify.py, canary, sudo, hooksPath, лог и</text>
+<text x="60" y="4476" class="p">logrotate. В конце — deploy/ci/isolation-cleanup.sh. Джоба краснеет при</text>
+<text x="60" y="4500" class="p">возврате nologin, отсутствии main или ослаблении gate.</text>
+<text x="60" y="4536" class="h2">Границы</text>
+<text x="60" y="4560" class="bullet">• Это Linux/systemd/sshd-модель; на Windows live-проверка невозможна.</text>
+<text x="60" y="4584" class="bullet">• Caddy — единственный вход; порты приложений наружу не</text>
+<text x="60" y="4608" class="p">публикуются.</text>
+<text x="60" y="4632" class="bullet">• Секреты своего проекта доступны агенту только через</text>
+<text x="60" y="4656" class="p">запущенный процесс</text>
+<text x="60" y="4680" class="p">или явно выданный env; в репозитории секретов нет.</text>
+<text x="60" y="4704" class="bullet">• Нового правила нет: политика живёт в PROJECT.md, этом файле и</text>
+<text x="60" y="4728" class="p">PROCESS.md.</text>
 </svg>
