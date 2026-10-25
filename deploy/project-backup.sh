@@ -22,7 +22,7 @@ if [ "$MODE" = "--verify" ]; then
   trap 'rm -rf "$tmp"' EXIT
   tar -xzf "$latest" -C "$tmp"
   source_count="$(find "$DATA" -mindepth 1 | wc -l)"
-  archive_count="$(tar -tzf "$latest" | grep -v '^\./$' | wc -l)"
+  archive_count="$(tar -tzf "$latest" | awk '!/^\.\/$/' | wc -l)"
   if [ "$source_count" -ne "$archive_count" ]; then
     echo "restore count mismatch: $source_count != $archive_count" >&2
     exit 1
