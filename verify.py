@@ -596,6 +596,28 @@ def check_fixtures(gate: Gate) -> None:
         gate.ok("fixtures", "правило фикстур в трёх документах")
 
 
+def check_handoffs(gate: Gate) -> None:
+    files = [ROOT / "skeleton" / "AGENT-CONNECTOR.md", ROOT / "skeleton" / "project" / "AGENT-CONNECTOR.md"]
+    files += sorted(ROOT.glob("TO-AGENT-*.md"))
+    problems = []
+    markers = ("владелец должен", "владельцу нужно", "попроси владельца")
+    for path in files:
+        if not path.is_file():
+            problems.append(f"{path.name}: missing")
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
+        first = next((line.strip() for line in text.splitlines() if line.strip()), "")
+        if not first.startswith("Аудитория: агент "):
+            problems.append(f"{path.name}: no audience line")
+        low = text.lower()
+        if any(marker in low for marker in markers):
+            problems.append(f"{path.name}: owner task markers")
+    if problems:
+        gate.fail("handoffs", "; ".join(problems))
+    else:
+        gate.ok("handoffs", "аудитория и коннектор проекта")
+
+
 def check_process(gate: Gate) -> None:
     text = (ROOT / "PROCESS.md").read_text(encoding="utf-8", errors="replace").lower()
     missing = [word for word in ("verify", "красн", "журнал", "деплой") if word not in text]
@@ -878,6 +900,7 @@ def main() -> int:
         check_adr,
         check_process,
         check_fixtures,
+        check_handoffs,
         check_stop_rule,
         check_ci,
         check_versions,

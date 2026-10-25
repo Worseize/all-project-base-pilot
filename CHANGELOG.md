@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.9.37 — 2026-10-25
+
+- `check_handoffs`: аудитория и запрет задач владельца в файлах агента.
+- `skeleton/AGENT-CONNECTOR.md` + `skeleton/project/AGENT-CONNECTOR.md`.
+- `bootstrap-project.sh` кладёт коннектор в корень проекта.
+- `docs/ROLES.md`: три роли.
+
 ## 0.9.36 — 2026-10-25
 
 - `timezone` по умолчанию пустой: проект наследует пояс хоста.

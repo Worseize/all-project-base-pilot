@@ -474,6 +474,23 @@ class VerifyTests(unittest.TestCase):
             self.assertIn(word, script)
         self.assertIn("userdel", cleanup)
 
+    def test_handoffs_requires_audience_and_no_owner_tasks(self):
+        root = verify.ROOT
+        (root / "skeleton").mkdir()
+        (root / "skeleton" / "project").mkdir()
+        good = "Аудитория: агент проекта\n\nконнектор\n"
+        for name in ("skeleton/AGENT-CONNECTOR.md", "skeleton/project/AGENT-CONNECTOR.md"):
+            (root / name).write_text(good, encoding="utf-8")
+        gate = verify.Gate()
+        verify.check_handoffs(gate)
+        self.assertEqual(gate.failed, 0)
+        (root / "skeleton/AGENT-CONNECTOR.md").write_text(
+            "Аудитория: агент проекта\n\nвладелец должен сделать\n", encoding="utf-8"
+        )
+        gate = verify.Gate()
+        verify.check_handoffs(gate)
+        self.assertGreaterEqual(gate.failed, 1)
+
     def test_isolation_health_scenarios(self):
         root = Path(__file__).resolve().parents[1]
         script = (root / "deploy" / "ci" / "isolation.sh").read_text(encoding="utf-8")

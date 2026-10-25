@@ -1,6 +1,6 @@
 {
   "name": "all-project-base",
-  "version": "0.9.36",
+  "version": "0.9.37",
   "date": "22.10.2026",
   "commands": {
     "build": "go build ./cmd/...",
@@ -70,6 +70,9 @@
     "deploy/systemd/watchdog-health.service",
     "deploy/systemd/watchdog-health.timer",
     "deploy/init-project.sh",
+    "skeleton/AGENT-CONNECTOR.md",
+    "skeleton/project/AGENT-CONNECTOR.md",
+    "docs/ROLES.md",
     "skeleton/project/run",
     "skeleton/project/test.sh",
     "skeleton/project/health",

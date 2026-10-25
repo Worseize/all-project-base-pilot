@@ -62,6 +62,7 @@ if command -v systemctl >/dev/null 2>&1 && [ -d /run/systemd/system ]; then
   systemctl enable --now "proj-backup@$PROJECT.timer"
 fi
 install -d -m 0750 -o "$PROJECT" -g "$PROJECT" "$PROJECT_ROOT"
+install -m 0644 -o "$PROJECT" -g "$PROJECT" "$SCRIPT_DIR/../skeleton/AGENT-CONNECTOR.md" "$PROJECT_ROOT/AGENT-CONNECTOR.md"
 install -d -m 0700 -o "$PROJECT" -g "$PROJECT" "$PROJECT_ROOT/.ssh"
 
 if [ ! -f "$PROJECT_ROOT/CANARY" ]; then
