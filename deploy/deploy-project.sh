@@ -84,6 +84,13 @@ if command -v systemctl >/dev/null 2>&1 && [ -d /run/systemd/system ]; then
   systemctl daemon-reload
 fi
 
+if [ -f "$WORK/project.conf" ]; then
+  if [ ! -f "$WORK/$RUN_PATH" ] || [ ! -x "$WORK/$RUN_PATH" ]; then
+    echo "run file missing or not executable: $RUN_PATH" >&2
+    exit 1
+  fi
+fi
+
 if [ ! -x "$WORK/$RUN_PATH" ]; then
   echo "delivered; warning: $WORK/$RUN_PATH is missing or not executable" >&2
   exit 0

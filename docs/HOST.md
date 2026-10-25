@@ -37,6 +37,7 @@ sudo deploy/audit-drift.sh projects.json
 - journald: `SystemMaxUse=200M`, `RuntimeMaxUse=50M`, retention 1 month;
 - logrotate: `/var/log/git/*.log`, 100 КБ × 5, copytruncate;
 - timezone (`TIMEZONE`, по умолчанию UTC).
+- `python3-venv` — если проекты используют `python3 -m venv` в `deps`.
 
 `install-auto-merge.sh` ставит timer: review → main только по зелёной
 метке гейта, затем deploy и restart; при сбое main откатывается.

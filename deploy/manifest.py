@@ -50,8 +50,6 @@ def check(path: Path) -> list[str]:
         data = parse(path)
     except ValueError as exc:
         return [str(exc)]
-    if path.is_file() and not data.get("run"):
-        errors.append("run is required")
     if data["site"] not in SITES:
         errors.append(f"site must be one of {', '.join(sorted(SITES))}")
     if data["memory"] and not MEMORY.match(data["memory"]):
