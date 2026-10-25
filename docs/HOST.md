@@ -1,6 +1,6 @@
 # Админ-узел
 
-Версия 0.9.28 · 25.10.2026
+Версия 0.9.29 · 25.10.2026
 
 Этот шаблон разворачивает **админ-узел**, а не продукт. Админ держит
 гейт, принимает правки агентов, следит за firewall, журналами и бэкапом.
@@ -38,7 +38,9 @@ sudo deploy/audit-drift.sh projects.json
 - logrotate: `/var/log/git/*.log`, 100 КБ × 5, copytruncate;
 - timezone (`TIMEZONE`, по умолчанию UTC);
 - `git`, `curl` — базовые; `caddy` — если у проектов есть сайт;
-- `python3-venv` — если проекты используют `python3 -m venv` в `deps`.
+- `python3-venv` — если проекты используют `python3 -m venv` в `deps`;
+- снимки данных — `/var/backups/proj-base/<id>`, tar+sha256, 7 дней;
+  секреты в снимок не входят.
 
 `install-auto-merge.sh` ставит timer: review → main только по зелёной
 метке гейта, затем deploy и restart; при сбое main откатывается.

@@ -82,6 +82,9 @@ for PROJECT in "${IDS[@]}"; do
   printf '{"commit":"%s","gate":"green","at":"%s"}\n' "$review" "$(date -Is)" > "$MARKERS/$PROJECT.json"
   log "gate green $PROJECT $review"
 
+  install -d -m 0750 /var/lib/proj-base/deploy
+  printf '%s\n' "$main" > "/var/lib/proj-base/deploy/$PROJECT.sha"
+
   if ! git -c safe.directory="$REPO" --git-dir="$REPO" update-ref refs/heads/main "$review" "$main"; then
     fail "$PROJECT update-ref failed"
     continue
