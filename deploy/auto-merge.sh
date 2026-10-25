@@ -46,7 +46,37 @@ for PROJECT in "${IDS[@]}"; do
     rm -rf "$tmp"
     continue
   fi
-  if git -c safe.directory="$REPO" --git-dir="$REPO" cat-file -e refs/heads/main:test.sh 2>/dev/null; then
+  if git -c safe.directory="$REPO" --git-dir="$REPO" cat-file -e refs/heads/main:project.conf 2>/dev/null; then
+    manifest="$(git -c safe.directory="$REPO" --git-dir="$REPO" show refs/heads/main:project.conf)"
+    mget() {
+      printf '%s\n' "$manifest" |
+        awk -F= -v key="$1" '$1 == key { sub(/^[^=]*=/, ""); print; exit }'
+    }
+    run_path="$(mget run)"; run_path="${run_path#./}"; run_path="${run_path:-run}"
+    health_path="$(mget health)"; health_path="${health_path#./}"; health_path="${health_path:-health}"
+    test_cmd="$(mget test)"; test_cmd="${test_cmd:-test.sh}"
+    for f in "$run_path" "$health_path"; do
+      mode="$(git -c safe.directory="$REPO" --git-dir="$REPO" ls-tree "$review" -- "$f" | awk '{print $1}')"
+      if [ "$mode" != "100755" ]; then
+        fail "$PROJECT $f mode ${mode:-missing}, expected 100755"
+        rm -rf "$tmp"
+        continue 2
+      fi
+    done
+    test_file="${test_cmd#./}"
+    if git -c safe.directory="$REPO" --git-dir="$REPO" cat-file -e "refs/heads/main:$test_file" 2>/dev/null; then
+      git -c safe.directory="$REPO" --git-dir="$REPO" show "refs/heads/main:$test_file" > "$tmp/.trusted-test.sh"
+      if ! (cd "$tmp" && bash .trusted-test.sh) >/dev/null 2>&1; then
+        fail "$PROJECT test red at $review"
+        rm -rf "$tmp"
+        continue
+      fi
+    elif ! (cd "$tmp" && bash -c "$test_cmd") >/dev/null 2>&1; then
+      fail "$PROJECT test command red at $review"
+      rm -rf "$tmp"
+      continue
+    fi
+  elif git -c safe.directory="$REPO" --git-dir="$REPO" cat-file -e refs/heads/main:test.sh 2>/dev/null; then
     for f in run test.sh health; do
       mode="$(git -c safe.directory="$REPO" --git-dir="$REPO" ls-tree "$review" -- "$f" | awk '{print $1}')"
       if [ "$mode" != "100755" ]; then

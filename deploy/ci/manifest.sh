@@ -90,6 +90,9 @@ else
   fail "site not generated"
 fi
 
+commit_manifest "run=run\nsite=static:../../etc\n"
+if deploy; then fail "site traversal accepted"; else ok "site traversal rejected"; fi
+
 commit_manifest "run=run\n"
 if deploy && ! grep -q '^Environment=TZ=' /etc/systemd/system/"proj@$A.service.d"/manifest.conf 2>/dev/null; then
   ok "timezone default inherits host"

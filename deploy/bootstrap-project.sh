@@ -54,6 +54,11 @@ if [ "$USER_EXISTED" -eq 0 ]; then
 fi
 usermod --shell "$GIT_SHELL" "$PROJECT"
 install -d -m 0750 -o "$PROJECT" -g "$PROJECT" "/var/lib/$PROJECT"
+if [ -f "$SOURCE_REPO/project.conf" ] &&
+  ! python3 "$SCRIPT_DIR/manifest.py" check "$SOURCE_REPO/project.conf"; then
+  echo "invalid project.conf; onboarding stopped" >&2
+  exit 1
+fi
 bash "$SCRIPT_DIR/project-backup.sh" "$PROJECT" >/dev/null
 bash "$SCRIPT_DIR/project-backup.sh" "$PROJECT" --verify >/dev/null
 bash "$SCRIPT_DIR/check-backups.sh" 26

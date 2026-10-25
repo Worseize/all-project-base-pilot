@@ -474,6 +474,12 @@ class VerifyTests(unittest.TestCase):
             self.assertIn(word, script)
         self.assertIn("userdel", cleanup)
 
+    def test_install_watchdog_does_not_chmod_var_log(self):
+        root = Path(__file__).resolve().parents[1]
+        text = (root / "deploy" / "install-watchdog.sh").read_text(encoding="utf-8")
+        self.assertIn("install -d -m 0750 -o root -g root /var/lib/watchdog", text)
+        self.assertNotIn("0750 -o root -g root /var/lib/watchdog /var/log", text)
+
     def test_handoffs_requires_audience_and_no_owner_tasks(self):
         root = verify.ROOT
         (root / "skeleton").mkdir()
