@@ -67,6 +67,10 @@ while read -r old new ref; do
       allowed=0
       while IFS= read -r prefix; do
         [ -n "$prefix" ] || continue
+        if [ "$prefix" = "*" ]; then
+          allowed=1
+          break
+        fi
         case "$path" in
           "$prefix"*) allowed=1; break ;;
         esac
