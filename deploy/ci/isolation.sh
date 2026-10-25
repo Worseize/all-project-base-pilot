@@ -65,6 +65,9 @@ export STATE_IGNORE="$A $B $S"
 bash "$ROOT/deploy/ci/state.sh" snapshot "$STATE_BEFORE"
 
 echo "== step: checks"
+for script in $(find "$ROOT/deploy" -type f -name '*.sh'); do
+  [ -x "$script" ] || fail "deploy script not executable: ${script#"$ROOT/"}"
+done
 EXPECTED_SHELL="$(command -v git-shell)"
 for PROJECT in "$A" "$B"; do
   actual="$(getent passwd "$PROJECT" | awk -F: '{print $7}')"

@@ -23,3 +23,4 @@ if ! SNAPSHOT_DATA_DIR="$tmp/data" SNAPSHOT_DIR="$tmp/snap" \
   exit 1
 fi
 echo "selftest: snapshot verify ok"
+bash "$(dirname "${BASH_SOURCE[0]}")/check-backups.sh" 26

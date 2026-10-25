@@ -56,6 +56,7 @@ usermod --shell "$GIT_SHELL" "$PROJECT"
 install -d -m 0750 -o "$PROJECT" -g "$PROJECT" "/var/lib/$PROJECT"
 bash "$SCRIPT_DIR/project-backup.sh" "$PROJECT" >/dev/null
 bash "$SCRIPT_DIR/project-backup.sh" "$PROJECT" --verify >/dev/null
+bash "$SCRIPT_DIR/check-backups.sh" 26
 if command -v systemctl >/dev/null 2>&1 && [ -d /run/systemd/system ]; then
   bash "$SCRIPT_DIR/install-backup.sh" >/dev/null
   systemctl enable --now "proj-backup@$PROJECT.timer"

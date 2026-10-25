@@ -17,11 +17,18 @@ for PROJECT in "${PROJECTS[@]}"; do
     userdel -r "$PROJECT" >/dev/null 2>&1 || userdel "$PROJECT" >/dev/null 2>&1 || true
   fi
   if command -v systemctl >/dev/null 2>&1 && [ -d /run/systemd/system ]; then
-    systemctl disable "proj@$PROJECT.service" >/dev/null 2>&1 || true
+    systemctl disable --now "proj@$PROJECT.service" >/dev/null 2>&1 || true
+    systemctl disable --now "proj-backup@$PROJECT.timer" >/dev/null 2>&1 || true
   fi
-  rm -rf "/srv/$PROJECT" "/etc/git-hooks/$PROJECT" "/etc/$PROJECT" "/var/lib/$PROJECT"
+  rm -f "/etc/systemd/system/timers.target.wants/proj-backup@$PROJECT.timer"
+  rm -rf "/srv/$PROJECT" "/etc/git-hooks/$PROJECT" "/etc/$PROJECT" \
+    "/var/lib/$PROJECT" "/var/backups/$PROJECT"
+  rm -f "/var/lib/proj-base/deploy/$PROJECT.sha"
   rm -f "/etc/caddy/conf.d/$PROJECT.caddy" "/var/log/git/$PROJECT.log" "/etc/logrotate.d/proj-$PROJECT"
   rm -rf "/etc/systemd/system/proj@$PROJECT.service.d"
 done
+if command -v systemctl >/dev/null 2>&1 && [ -d /run/systemd/system ]; then
+  systemctl daemon-reload >/dev/null 2>&1 || true
+fi
 
 echo "isolation cleanup: done"

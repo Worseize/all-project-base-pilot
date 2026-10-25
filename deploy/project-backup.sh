@@ -33,8 +33,11 @@ tar -czf "$archive" -C "$DATA" . || { echo "backup failed" >&2; exit 1; }
 chmod 0600 "$archive"
 (cd "$DIR" && sha256sum "$(basename "$archive")" > "$(basename "$archive").sha256")
 chmod 0600 "$archive.sha256"
-tar -tzf "$archive" >/dev/null || { echo "backup unreadable" >&2; exit 1; }
-tar -tzf "$archive" | grep -q '^\./' || { echo "backup has no project dir" >&2; exit 1; }
+listing="$(tar -tzf "$archive")" || { echo "backup unreadable" >&2; exit 1; }
+case "$listing" in
+  *"./"*) ;;
+  *) echo "backup has no project dir" >&2; exit 1 ;;
+esac
 ls -1t "$DIR"/*.tar.gz 2>/dev/null | tail -n +$((KEEP + 1)) | while IFS= read -r old; do
   rm -f "$old" "$old.sha256"
 done
