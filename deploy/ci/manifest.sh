@@ -39,6 +39,8 @@ expect_fail() {
 }
 
 BASE="$(git_r rev-parse refs/heads/main)"
+runuser -u "$A" -- git -C "$WORK" config user.email "$A@agents.invalid"
+runuser -u "$A" -- git -C "$WORK" config user.name "$A"
 runuser -u "$A" -- git -C "$WORK" checkout -q -B main "$BASE" || true
 
 commit_manifest "run=\ntest=true\nhealth=health\n"
