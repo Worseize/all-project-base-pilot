@@ -83,7 +83,7 @@ while read -r old new ref; do
   trap 'rm -rf "$tmp"' EXIT
   git --git-dir="$REPO" archive "$new" | tar -x -C "$tmp"
   if git --git-dir="$REPO" cat-file -e refs/heads/main:test.sh 2>/dev/null; then
-    for f in run test.sh; do
+    for f in run test.sh health; do
       mode="$(git --git-dir="$REPO" ls-tree "$new" -- "$f" | awk '{print $1}')"
       [ "$mode" = "100755" ] || reject "$f mode ${mode:-missing}, expected 100755"
     done

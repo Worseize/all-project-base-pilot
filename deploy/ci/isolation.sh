@@ -220,6 +220,92 @@ else
   fi
 fi
 
+echo "== step: health watchdog"
+HREG="$(mktemp)"
+cat > "$HREG" <<EOF
+{"projects":{"$A":{"display":"A","agent":"a","domain":"","port":0,"status":"active","allowed_paths":["*"]}}}
+EOF
+HSTATE="$CI_LOG_DIR/health-state.json"
+HNOTIFY="$CI_LOG_DIR/health-notify.sh"
+HNOTIFY_LOG="$CI_LOG_DIR/health-notify.log"
+HLOG="$CI_LOG_DIR/health-check.log"
+cat > "$HNOTIFY" <<'EOF'
+#!/usr/bin/env bash
+printf '%s\n' "$1" >> "$WATCHDOG_NOTIFY_LOG"
+EOF
+chmod +x "$HNOTIFY"
+rm -f "$HSTATE" "$HNOTIFY_LOG" "$HLOG"
+
+set_health() {
+  printf '#!/usr/bin/env bash\necho "%s"\nexit %s\n' "$2" "$1" > "/srv/$A/current/health"
+  chown "$A:$A" "/srv/$A/current/health"
+  chmod 0755 "/srv/$A/current/health"
+}
+
+health_run() {
+  WATCHDOG_STATE_FILE="$HSTATE" WATCHDOG_LOG="$HLOG" \
+    WATCHDOG_NOTIFY_CMD="$HNOTIFY" WATCHDOG_NOTIFY_LOG="$HNOTIFY_LOG" \
+    WATCHDOG_TIMEOUT="${1:-30}" WATCHDOG_REPEAT_SECONDS=3600 \
+    bash "$ROOT/deploy/health-check.sh" "$HREG" >/dev/null 2>&1
+}
+
+set_health 0 ok
+health_run
+if [ ! -s "$HNOTIFY_LOG" ]; then
+  ok "health=0 silent"
+else
+  fail "health=0 produced messages"
+fi
+
+set_health 1 "model down"
+rm -f "$HSTATE" "$HNOTIFY_LOG"
+health_run
+if [ "$(grep -c . "$HNOTIFY_LOG" 2>/dev/null || true)" -eq 1 ] && grep -q "model down" "$HNOTIFY_LOG"; then
+  ok "health=1 one alert with reason"
+else
+  fail "health=1 alert wrong"
+fi
+health_run
+if [ "$(grep -c . "$HNOTIFY_LOG" 2>/dev/null || true)" -eq 1 ]; then
+  ok "repeat suppressed"
+else
+  fail "repeat was not suppressed"
+fi
+
+rm -f "/srv/$A/current/health" "$HSTATE" "$HNOTIFY_LOG"
+health_run
+if [ "$(grep -c . "$HNOTIFY_LOG" 2>/dev/null || true)" -eq 1 ] && grep -q "health missing" "$HNOTIFY_LOG"; then
+  ok "missing health is config alert"
+else
+  fail "missing health not reported"
+fi
+
+set_health 0 "slow"
+printf '#!/usr/bin/env bash\nsleep 5\n' > "/srv/$A/current/health"
+chown "$A:$A" "/srv/$A/current/health"
+chmod 0755 "/srv/$A/current/health"
+rm -f "$HSTATE" "$HNOTIFY_LOG"
+start="$(date +%s)"
+health_run 1
+elapsed=$(( $(date +%s) - start ))
+if [ "$elapsed" -lt 10 ] && grep -q "timeout 1s" "$HNOTIFY_LOG"; then
+  ok "timeout is sick and bounded"
+else
+  fail "timeout not handled (${elapsed}s)"
+fi
+
+set_health 1 "down"
+rm -f "$HSTATE" "$HNOTIFY_LOG"
+health_run
+set_health 0 "ok"
+health_run
+if grep -q "восстановлен" "$HNOTIFY_LOG"; then
+  ok "recovery message"
+else
+  fail "recovery message missing"
+fi
+rm -f "$HREG" "/srv/$A/current/health"
+
 if [ "$FAILED" -ne 0 ]; then
   echo "ISOLATION CI: RED" >&2
   exit 1

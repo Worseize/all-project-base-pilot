@@ -19,7 +19,7 @@ SKELETON="${SKELETON:-$SCRIPT_DIR/../skeleton/project}"
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 cp -a "$SKELETON/." "$tmp/"
-chmod +x "$tmp/run" "$tmp/test.sh"
+chmod +x "$tmp/run" "$tmp/test.sh" "$tmp/health"
 git -C "$tmp" init -q
 git -C "$tmp" config user.email "skeleton@agents.invalid"
 git -C "$tmp" config user.name "skeleton"

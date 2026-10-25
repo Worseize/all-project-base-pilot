@@ -1,6 +1,6 @@
 # Изоляция проектов и агентов
 
-Версия 0.9.25 · 22.10.2026
+Версия 0.9.26 · 22.10.2026
 
 Один хост — несколько проектов — несколько агентов. Root — единственный,
 у кого полные права. Агент проекта получает только git-push в `review`.
@@ -155,6 +155,16 @@ ReadWritePaths=/var/lib/%i
 
 `StateDirectory=%i` создаёт writable `/var/lib/<id>`; `ReadWritePaths` его
 разрешает; секреты — `EnvironmentFile=-/etc/%i/app.env`.
+
+## Health
+
+Проект поставляет `health` (0 — здоров, 1 — болен, одна строка причины).
+`watchdog-health.timer` раз в минуту запускает `health-check.sh` по
+`projects.json`: `runuser` от проекта, `timeout` 30 с. Нет `health` —
+ошибка конфигурации, а не «здоров». Повторы подавляются по
+`/var/lib/watchdog/health-state.json` (`WATCHDOG_REPEAT_SECONDS`, по
+умолчанию 3600); восстановление — одно сообщение. Канал — `WATCHDOG_NOTIFY_CMD`
+(тесты) или Telegram (`WATCHDOG_TELEGRAM_TOKEN`/`CHAT`).
 
 ## Онбординг
 

@@ -20,6 +20,7 @@ python verify.py
 ```bash
 sudo deploy/host-baseline.sh
 sudo deploy/install-auto-merge.sh
+sudo deploy/install-watchdog.sh
 ```
 
 4. Создайте рабочий реестр вне git и первого проекта из скелета:

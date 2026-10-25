@@ -581,6 +581,21 @@ def check_stop_rule(gate: Gate) -> None:
         gate.ok("stop-rule", "две попытки и blocked-отчёт")
 
 
+def check_fixtures(gate: Gate) -> None:
+    required = ["AGENTS.md", "PROCESS.md", "docs/AGENT-CONTRACT.md"]
+    problems = []
+    for name in required:
+        text = (ROOT / name).read_text(encoding="utf-8", errors="replace")
+        if "## Проверка — фикстурами" not in text:
+            problems.append(f"{name}: нет раздела фикстур")
+        elif not all(word in text.lower() for word in ("фикстура", "issue", "живой проект")):
+            problems.append(f"{name}: раздел фикстур неполный")
+    if problems:
+        gate.fail("fixtures", "; ".join(problems))
+    else:
+        gate.ok("fixtures", "правило фикстур в трёх документах")
+
+
 def check_process(gate: Gate) -> None:
     text = (ROOT / "PROCESS.md").read_text(encoding="utf-8", errors="replace").lower()
     missing = [word for word in ("verify", "красн", "журнал", "деплой") if word not in text]
@@ -862,6 +877,7 @@ def main() -> int:
         check_acceptance,
         check_adr,
         check_process,
+        check_fixtures,
         check_stop_rule,
         check_ci,
         check_versions,
