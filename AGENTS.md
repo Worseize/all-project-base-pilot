@@ -7,6 +7,17 @@ stdlib; стек продукта выбирает отдельный проек
 на каждом шаге, цикл шага — семь ворот, закрытие задачи — по определению
 готовности.
 
+## Сначала почта
+
+Первое действие в любом ходе — проверить почту:
+
+```powershell
+powershell -File "C:\Users\User\Documents\deepseek-harness\default-workspace\firstVibeCodingProject\deploy\check.ps1" -Agent template-agent
+```
+
+Если ответ `PENDING` — прочитать `mailbox\inbox` и ответить в `outbox`
+до основной работы. Если `EMPTY` — продолжать задачу.
+
 ## Обязательный старт сессии
 
 Это условие начала работы, а не рекомендация. Нарушение = задача не начата.
