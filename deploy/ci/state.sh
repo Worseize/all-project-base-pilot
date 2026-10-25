@@ -41,8 +41,10 @@ snapshot() {
     getent group 2>/dev/null | awk -F: '$1 ~ /^(zz-|proj-)/ {print "group " $1}' | sort
   } > "$out"
   if [ -n "${STATE_IGNORE:-}" ]; then
-    grep -vE "(^| )(${STATE_IGNORE})( |$)" "$out" > "$out.tmp" || true
-    mv "$out.tmp" "$out"
+    for id in $STATE_IGNORE; do
+      grep -vE "(^| )${id}( |$)" "$out" > "$out.tmp" || true
+      mv "$out.tmp" "$out"
+    done
   fi
 }
 
