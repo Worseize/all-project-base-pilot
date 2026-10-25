@@ -8,7 +8,7 @@ fail() { echo "FAIL: $*" >&2; exit 1; }
 
 runuser -u "$A" -- git -C "$WORK" config user.email "$A@agents.invalid"
 runuser -u "$A" -- git -C "$WORK" config user.name "$A"
-runuser -u "$A" -- bash -c "cd '$WORK' && printf 'secret\n' > .env.local && git add .env.local && git commit -m env-local" >/dev/null
+runuser -u "$A" -- bash -c "cd '$WORK' && printf 'secret\n' > .env.local && git add -f .env.local && git commit -m env-local" >/dev/null
 if runuser -u "$A" -- git -C "$WORK" push origin HEAD:review >/dev/null 2>&1; then
   fail ".env.local accepted"
 fi
