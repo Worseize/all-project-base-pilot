@@ -6,7 +6,7 @@ set -euo pipefail
 snapshot() {
   local out="$1"
   {
-    for path in /srv /srv/app /var/lib /var/lib/watchdog; do
+    for path in /srv /srv/app /var/lib /var/lib/watchdog /var/backups; do
       if [ -e "$path" ]; then
         stat -c "path %n %a %U:%G" "$path"
       else
@@ -20,10 +20,11 @@ snapshot() {
       echo "unit proj@.service missing"
     fi
     if command -v systemctl >/dev/null 2>&1; then
-      systemctl list-unit-files 'proj@*' 'watchdog*' --no-legend 2>/dev/null |
+      systemctl list-unit-files 'proj@*' 'proj-backup@*' 'watchdog*' --no-legend 2>/dev/null |
         awk '{print "unitfile " $1 " " $2}' | sort
     fi
     find /etc/logrotate.d -maxdepth 1 -type f -printf 'logrotate %f\n' 2>/dev/null | sort || true
+    find /var/backups -mindepth 1 -maxdepth 1 -type d -printf 'backup %f\n' 2>/dev/null | sort || true
     stat -c "hooks %n %a %U:%G" /etc/git-hooks 2>/dev/null || echo "hooks /etc/git-hooks missing"
     find /etc/git-hooks -mindepth 1 -maxdepth 1 -type d -printf 'hooks %f\n' 2>/dev/null | sort || true
     if command -v ufw >/dev/null 2>&1; then

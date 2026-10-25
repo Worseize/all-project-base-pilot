@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 0.9.35 — 2026-10-25
+
+- `project-backup.sh` без SIGPIPE: листинг в переменную.
+- Все `deploy/*.sh` обязаны быть `100755`; CI проверяет.
+- `check-backups.sh`: свежесть 26 ч, sha256, читаемость; selftest/bootstrap.
+- Cleanup отключает `proj-backup@<id>.timer` и удаляет `/var/backups/<id>`.
+- State-guard видит backup-таймеры и каталоги.
+
 ## 0.9.33 — 2026-10-25
 
 - `project-backup.sh`: tar+sha256, 0700/0600, KEEP, verify.
