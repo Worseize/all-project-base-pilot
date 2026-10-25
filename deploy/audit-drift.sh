@@ -9,7 +9,8 @@ if [ "$(id -u)" -ne 0 ]; then
 fi
 REGISTRY="${1:-projects.json}"
 SSH_PORT="${SSH_PORT:-22}"
-TIMEZONE="${TIMEZONE:-UTC}"
+HOST_TZ="${TIMEZONE:-$(timedatectl show -p Timezone --value 2>/dev/null || echo UTC)}"
+TIMEZONE="$HOST_TZ"
 FAILED=0
 fail() { echo "drift: $*" >&2; FAILED=1; }
 
@@ -27,6 +28,27 @@ fi
 [ -f /etc/logrotate.d/proj-logs ] || fail "logrotate rule missing"
 [ "$(timedatectl show -p Timezone --value 2>/dev/null || true)" = "$TIMEZONE" ] ||
   fail "timezone is not $TIMEZONE"
+
+for unit in apt-daily.timer apt-daily-upgrade.timer unattended-upgrades; do
+  if ! systemctl is-enabled --quiet "$unit" 2>/dev/null; then
+    fail "updates disabled: $unit"
+  fi
+done
+
+while IFS= read -r unit; do
+  [ -n "$unit" ] || continue
+  env_line="$(systemctl show "$unit" -p Environment --value 2>/dev/null || true)"
+  tz="$(printf '%s\n' "$env_line" | tr ' ' '\n' | sed -n 's/^TZ=//p' | head -n 1)"
+  if [ -n "$tz" ] && [ "$tz" != "$TIMEZONE" ]; then
+    fail "$unit TZ=$tz, host=$TIMEZONE"
+  fi
+done < <(systemctl list-units 'proj@*.service' --state=running --no-legend 2>/dev/null | awk '{print $1}')
+
+while IFS= read -r unit; do
+  case "$unit" in proj-backup@*.timer) ;; *) continue ;; esac
+  id="${unit#proj-backup@}"; id="${id%.timer}"
+  [ -d "/srv/$id/repo.git" ] || fail "orphan backup timer: $unit"
+done < <(systemctl list-unit-files 'proj-backup@*.timer' --no-legend 2>/dev/null | awk '{print $1}')
 
 if [ -f "$REGISTRY" ]; then
   mapfile -t IDS < <(python3 - "$REGISTRY" <<'PY'

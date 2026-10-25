@@ -15,7 +15,7 @@ DEFAULTS = {
     "run": "run", "test": "test.sh", "health": "health",
     "build": "", "deps": "", "migrate": "",
     "site": "none", "domains": "", "redirects": "",
-    "port": "", "memory": "512M", "cpu": "50%", "timezone": "UTC",
+    "port": "", "memory": "512M", "cpu": "50%", "timezone": "",
 }
 SITES = {"none", "static", "proxy"}
 SITE_PREFIX = ("static:", "proxy:")
