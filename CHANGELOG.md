@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.9.33 — 2026-10-25
+
+- `project-backup.sh`: tar+sha256, 0700/0600, KEEP, verify.
+- `proj-backup@.service/timer`: ежедневно, Persistent, random delay.
+- Онбординг ставит таймер и проверяет первый restore.
+- CI: backup создан, читается, restore count.
+
 ## 0.9.32 — 2026-10-25
 
 - Packet alignment: `/etc/localtime` и режим `/etc/git-hooks` в state.
