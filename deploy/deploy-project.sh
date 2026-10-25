@@ -35,6 +35,7 @@ runuser -u "$PROJECT" -- git -C "$WORK" fetch origin main
 runuser -u "$PROJECT" -- git -C "$WORK" checkout -B main FETCH_HEAD
 runuser -u "$PROJECT" -- git -C "$WORK" reset --hard FETCH_HEAD
 chown -R "$PROJECT:$PROJECT" "$WORK"
+install -d -m 0750 -o "$PROJECT" -g "$PROJECT" "/var/lib/$PROJECT"
 
 if [ ! -x "$WORK/run" ]; then
   echo "delivered; warning: $WORK/run is missing or not executable" >&2

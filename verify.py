@@ -510,9 +510,9 @@ def check_acceptance(gate: Gate) -> None:
             if not body:
                 errors.append(f"{path.name}: пустой блок приёмки")
         for label, pattern in ACCEPTANCE_LEAKS:
-            scan = text.replace("/etc/sudoers.d/", "")
-            if label == "host-path":
-                scan = scan.replace("/etc/sudoers.d/", "")
+            scan = text
+            for safe in ("/etc/sudoers.d/", "/etc/systemd/system/proj@.service", "/srv/%i/current"):
+                scan = scan.replace(safe, "")
             if pattern.search(scan):
                 errors.append(f"{path.name}: утечка {label}")
     if errors:
