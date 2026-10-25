@@ -36,6 +36,7 @@ runuser -u "$PROJECT" -- git -C "$WORK" checkout -B main FETCH_HEAD
 runuser -u "$PROJECT" -- git -C "$WORK" reset --hard FETCH_HEAD
 chown -R "$PROJECT:$PROJECT" "$WORK"
 install -d -m 0750 -o "$PROJECT" -g "$PROJECT" "/var/lib/$PROJECT"
+git -c safe.directory="$REPO" --git-dir="$REPO" update-ref refs/heads/review refs/heads/main
 
 if [ ! -x "$WORK/run" ]; then
   echo "delivered; warning: $WORK/run is missing or not executable" >&2

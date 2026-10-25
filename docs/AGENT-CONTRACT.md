@@ -75,6 +75,8 @@ git ls-tree HEAD run test.sh
 ## Push
 
 - Только ветка `review`; `main` двигает правило auto-merge после gate.
+- Ключ проекта **односторонний**: только `git push`, без `fetch`/`clone`.
+  Состояние забирать не нужно: после merge узел выравнивает `review` на `main`.
 - Пути — только из allowlist проекта; служебные файлы узла запрещены.
 - Force push и удаление `review` запрещены.
 
