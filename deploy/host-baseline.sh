@@ -21,6 +21,11 @@ for cmd in ufw fail2ban-client timedatectl sysctl systemctl; do
   }
 done
 
+if ! python3 -m ensurepip --version >/dev/null 2>&1; then
+  apt-get update -qq
+  DEBIAN_FRONTEND=noninteractive apt-get install -y python3-venv
+fi
+
 ufw default deny incoming
 ufw default allow outgoing
 ufw limit "$SSH_PORT/tcp"

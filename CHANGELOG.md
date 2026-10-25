@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.9.28 — 2026-10-25
+
+- HOST: пакеты git/curl/caddy/python3-venv с условиями.
+- `deploy/selftest.sh`: venv-проверка с текстом «поставь python3-venv».
+- CI: отсутствие venv — понятный отказ, не skip.
+- `host-baseline` идемпотентно ставит python3-venv.
+
 ## 0.9.27 — 2026-10-25
 
 - `project.conf`: run/test/health, deps/build/migrate, site, TZ, ресурсы.

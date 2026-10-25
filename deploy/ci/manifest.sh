@@ -72,11 +72,14 @@ else
   fail "build did not run"
 fi
 
-if python3 -m venv --help >/dev/null 2>&1; then
+venv_tmp="$(mktemp -d)"
+if python3 -m venv "$venv_tmp/venv" >/dev/null 2>&1; then
+  rm -rf "$venv_tmp"
   commit_manifest "run=run\ndeps=python3 -m venv .venv\n"
   if deploy; then ok "python deps"; else cat "$OUT" >&2; fail "python deps"; fi
 else
-  printf 'skip: python3-venv отсутствует\n'
+  rm -rf "$venv_tmp"
+  fail "нет python3-venv: поставь python3-venv"
 fi
 
 commit_manifest "run=run\nsite=static\ndomains=example.test\n"
