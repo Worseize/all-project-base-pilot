@@ -322,6 +322,11 @@ if ! bash "$ROOT/deploy/ci/data.sh"; then
   fail "data scenarios"
 fi
 
+echo "== step: project backup"
+if ! bash "$ROOT/deploy/ci/backup.sh"; then
+  fail "backup scenario"
+fi
+
 echo "== step: host state before/after"
 cleanup
 bash "$ROOT/deploy/ci/state.sh" snapshot "$STATE_AFTER"

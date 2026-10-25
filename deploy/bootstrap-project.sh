@@ -54,6 +54,12 @@ if [ "$USER_EXISTED" -eq 0 ]; then
 fi
 usermod --shell "$GIT_SHELL" "$PROJECT"
 install -d -m 0750 -o "$PROJECT" -g "$PROJECT" "/var/lib/$PROJECT"
+bash "$SCRIPT_DIR/project-backup.sh" "$PROJECT" >/dev/null
+bash "$SCRIPT_DIR/project-backup.sh" "$PROJECT" --verify >/dev/null
+if command -v systemctl >/dev/null 2>&1 && [ -d /run/systemd/system ]; then
+  bash "$SCRIPT_DIR/install-backup.sh" >/dev/null
+  systemctl enable --now "proj-backup@$PROJECT.timer"
+fi
 install -d -m 0750 -o "$PROJECT" -g "$PROJECT" "$PROJECT_ROOT"
 install -d -m 0700 -o "$PROJECT" -g "$PROJECT" "$PROJECT_ROOT/.ssh"
 
