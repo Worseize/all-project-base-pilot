@@ -47,6 +47,14 @@ for PROJECT in "${IDS[@]}"; do
     continue
   fi
   if git -c safe.directory="$REPO" --git-dir="$REPO" cat-file -e refs/heads/main:test.sh 2>/dev/null; then
+    for f in run test.sh; do
+      mode="$(git -c safe.directory="$REPO" --git-dir="$REPO" ls-tree "$review" -- "$f" | awk '{print $1}')"
+      if [ "$mode" != "100755" ]; then
+        fail "$PROJECT $f mode ${mode:-missing}, expected 100755"
+        rm -rf "$tmp"
+        continue 2
+      fi
+    done
     git -c safe.directory="$REPO" --git-dir="$REPO" show refs/heads/main:test.sh > "$tmp/.trusted-test.sh"
     if ! (cd "$tmp" && bash .trusted-test.sh) >/dev/null 2>&1; then
       fail "$PROJECT test.sh red at $review"

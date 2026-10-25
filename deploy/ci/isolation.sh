@@ -189,6 +189,9 @@ else
     else
       fail "skeleton review rejected"
     fi
+    runuser -u "$S" -- bash -c "cd '$SWORK' && chmod -x run && git add run && git commit -m noexec" >/dev/null 2>&1
+    expect_reject "non-exec run" "run mode" \
+      runuser -u "$S" -- git -C "$SWORK" push origin HEAD:review
   else
     fail "skeleton clone"
   fi
