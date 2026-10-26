@@ -1,4 +1,5 @@
 import json
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -473,6 +474,18 @@ class VerifyTests(unittest.TestCase):
         for word in ("git-shell", "refs/heads/main", "gate files changed", "CANARY", "sudo -n", "logrotate"):
             self.assertIn(word, script)
         self.assertIn("userdel", cleanup)
+
+    def test_debt_table_message_starts_with_hash(self):
+        root = Path(__file__).resolve().parents[1]
+        result = subprocess.run(
+            [sys.executable, str(root / "deploy" / "debt-table.py")],
+            capture_output=True, text=True, encoding="utf-8", check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        lines = result.stdout.splitlines()
+        self.assertTrue(lines[0].startswith("| # |"), lines[0])
+        for line in lines[2:]:
+            self.assertEqual(line.count("|"), 7, line)
 
     def test_debt_board_and_reply_rule(self):
         root = Path(__file__).resolve().parents[1]
