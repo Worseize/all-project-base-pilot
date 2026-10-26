@@ -474,6 +474,12 @@ class VerifyTests(unittest.TestCase):
             self.assertIn(word, script)
         self.assertIn("userdel", cleanup)
 
+    def test_agents_chat_unfinished_table(self):
+        root = Path(__file__).resolve().parents[1]
+        text = (root / "AGENTS.md").read_text(encoding="utf-8")
+        self.assertIn("## В чате — что не сделано", text)
+        self.assertIn("| Сделано | Не сделано | Осталось |", text)
+
     def test_install_watchdog_does_not_chmod_var_log(self):
         root = Path(__file__).resolve().parents[1]
         text = (root / "deploy" / "install-watchdog.sh").read_text(encoding="utf-8")
