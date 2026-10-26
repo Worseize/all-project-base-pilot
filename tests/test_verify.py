@@ -474,6 +474,12 @@ class VerifyTests(unittest.TestCase):
             self.assertIn(word, script)
         self.assertIn("userdel", cleanup)
 
+    def test_agents_wake_recounts_debts(self):
+        root = Path(__file__).resolve().parents[1]
+        text = (root / "AGENTS.md").read_text(encoding="utf-8")
+        self.assertIn("## Проснулся — пересчитай долги", text)
+        self.assertIn("долги: +N / −M / изменено K", text)
+
     def test_agents_chat_unfinished_table(self):
         root = Path(__file__).resolve().parents[1]
         text = (root / "AGENTS.md").read_text(encoding="utf-8")
