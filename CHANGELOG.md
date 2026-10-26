@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 0.9.46 — 2026-10-26
+
+- `deploy/debt-check.py`: проверка `DEBTS.md` — разделы, семь колонок,
+  теги, «Кому», приоритет, итоги; в гейте — `debt-board`.
+- `tests/test_debt_board.py`: тринадцать случаев, зелёный и красный.
+- AGENTS и `docs/TO-AGENTS-DEBT-BOARD.md`: правило «доска проверяется».
+- `DEBTS.md`: строка `D-MANIFEST-GATE` приведена к факту — гейт читает
+  манифест, открыта приёмка `isolation`.
+
 ## 0.9.45 — 2026-10-26
 
 - `deploy/manifest.py`: действие `entry` — `run`/`test`/`health` из

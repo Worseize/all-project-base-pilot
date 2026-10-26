@@ -327,6 +327,22 @@ def check_debt(gate: Gate) -> None:
     gate.ok("debt", "закрытые долги удаляются")
 
 
+def check_debt_board(gate: Gate) -> None:
+    script = ROOT / "deploy" / "debt-check.py"
+    if not script.is_file():
+        gate.fail("debt-board", "нет deploy/debt-check.py")
+        return
+    result = subprocess.run(
+        [sys.executable, str(script)],
+        cwd=ROOT, text=True, capture_output=True, timeout=60,
+    )
+    if result.returncode != 0:
+        lines = [line for line in result.stderr.splitlines() if line.strip()]
+        gate.fail("debt-board", " | ".join(lines[:3]) or "DEBTS.md не прошёл проверку")
+    else:
+        gate.ok("debt-board", "разделы, 7 колонок, теги, итоги")
+
+
 ISOLATION_ACTIONS = [
     "Читать свой код",
     "Читать чужой проект",
@@ -907,6 +923,7 @@ def main() -> int:
         check_journal,
         check_logs,
         check_debt,
+        check_debt_board,
         check_isolation,
         check_projects,
         check_no_product,
