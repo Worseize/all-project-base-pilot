@@ -474,6 +474,17 @@ class VerifyTests(unittest.TestCase):
             self.assertIn(word, script)
         self.assertIn("userdel", cleanup)
 
+    def test_debt_board_and_reply_rule(self):
+        root = Path(__file__).resolve().parents[1]
+        agents = (root / "AGENTS.md").read_text(encoding="utf-8")
+        self.assertIn("## Каждый ответ закрывает долг", agents)
+        self.assertIn("## Доска долгов", agents)
+        board = (root / "DEBTS.md").read_text(encoding="utf-8")
+        for section in ("## Открытые", "## Отложено владельцем", "## Ждём владельца"):
+            self.assertIn(section, board)
+        self.assertIn("| # | Долг | Почему открыт | Что разблокирует | Приоритет | С какой версии |", board)
+        self.assertNotIn("## Закрытые", board)
+
     def test_agents_wake_recounts_debts(self):
         root = Path(__file__).resolve().parents[1]
         text = (root / "AGENTS.md").read_text(encoding="utf-8")
@@ -508,6 +519,9 @@ class VerifyTests(unittest.TestCase):
         good = "Аудитория: агент проекта\n\nконнектор\n"
         for name in ("skeleton/AGENT-CONNECTOR.md", "skeleton/project/AGENT-CONNECTOR.md"):
             (root / name).write_text(good, encoding="utf-8")
+        (root / "TO-AGENTS-BUS.md").write_text(
+            "Аудитория: агенты проекта\n\nшина\n", encoding="utf-8"
+        )
         gate = verify.Gate()
         verify.check_handoffs(gate)
         self.assertEqual(gate.failed, 0)
