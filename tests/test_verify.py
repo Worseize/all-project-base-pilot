@@ -504,7 +504,7 @@ class VerifyTests(unittest.TestCase):
         lines = result.stdout.splitlines()
         self.assertTrue(lines[0].startswith("| # |"), lines[0])
         for line in lines[2:]:
-            self.assertEqual(line.count("|"), 7, line)
+            self.assertEqual(line.count("|"), 8, line)
 
     def test_debt_board_and_reply_rule(self):
         root = Path(__file__).resolve().parents[1]
@@ -514,7 +514,7 @@ class VerifyTests(unittest.TestCase):
         board = (root / "DEBTS.md").read_text(encoding="utf-8")
         for section in ("## Открытые", "## Отложено владельцем", "## Ждём владельца"):
             self.assertIn(section, board)
-        self.assertIn("| # | Долг | Почему открыт | Что разблокирует | Приоритет | С какой версии |", board)
+        self.assertIn("| # | Долг | Кому | Почему открыт | Что разблокирует | Приоритет | С какой версии |", board)
         self.assertNotIn("## Закрытые", board)
 
     def test_agents_wake_recounts_debts(self):

@@ -8,7 +8,7 @@ if hasattr(sys.stdout, "reconfigure"):
 
 ROOT = Path(__file__).resolve().parents[1]
 BOARD = ROOT / "DEBTS.md"
-HEADER = "| # | Долг | Почему открыт | Что разблокирует | Приоритет | С какой версии |"
+HEADER = "| # | Долг | Кому | Почему открыт | Что разблокирует | Приоритет | С какой версии |"
 
 
 def main() -> int:
@@ -16,7 +16,7 @@ def main() -> int:
         print("DEBTS.md missing", file=sys.stderr)
         return 1
     print(HEADER)
-    print("| --- | --- | --- | --- | --- | --- |")
+    print("| --- | --- | --- | --- | --- | --- | --- |")
     in_open = False
     rows = 0
     for line in BOARD.read_text(encoding="utf-8").splitlines():
@@ -29,7 +29,7 @@ def main() -> int:
             print(line)
             rows += 1
     if rows == 0:
-        print("| — | долгов нет | — | — | — | — |")
+        print("| — | долгов нет | — | — | — | — | — |")
     return 0
 
 
