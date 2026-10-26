@@ -8,6 +8,7 @@ ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 A="proj-a"
 B="proj-b"
 S="proj-s"
+M="proj-m"
 WORK="/srv/$A/work"
 FAILED=0
 TMP_KEY="$(mktemp -d)"
@@ -22,7 +23,7 @@ ok() { printf 'ok: %s\n' "$*"; }
 
 cleanup() {
   rm -rf "$TMP_KEY"
-  bash "$SCRIPT_DIR/isolation-cleanup.sh" "$A" "$B" "$S" >/dev/null 2>&1 || true
+  bash "$SCRIPT_DIR/isolation-cleanup.sh" "$A" "$B" "$S" "$M" >/dev/null 2>&1 || true
 }
 
 on_exit() {
@@ -61,7 +62,7 @@ for PROJECT in "$A" "$B"; do
 done
 ok "bootstrap: $A, $B"
 
-export STATE_IGNORE="$A $B $S"
+export STATE_IGNORE="$A $B $S $M"
 bash "$ROOT/deploy/ci/state.sh" snapshot "$STATE_BEFORE"
 
 echo "== step: checks"

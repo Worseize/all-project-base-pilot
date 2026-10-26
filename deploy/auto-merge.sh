@@ -46,16 +46,40 @@ for PROJECT in "${IDS[@]}"; do
     rm -rf "$tmp"
     continue
   fi
-  if git -c safe.directory="$REPO" --git-dir="$REPO" cat-file -e refs/heads/main:test.sh 2>/dev/null; then
-    for f in run test.sh health; do
-      mode="$(git -c safe.directory="$REPO" --git-dir="$REPO" ls-tree "$review" -- "$f" | awk '{print $1}')"
+  RUN_PATH="run"
+  TEST_PATH="test.sh"
+  HEALTH_PATH="health"
+  manifest="$tmp/project.conf"
+  if [ -f "$manifest" ]; then
+    manifest_py="/etc/git-hooks/$PROJECT/manifest.py"
+    [ -f "$manifest_py" ] || manifest_py="$SCRIPT_DIR/manifest.py"
+    if ! entries="$(python3 "$manifest_py" entry "$manifest" 2>&1)"; then
+      fail "$PROJECT invalid project.conf: $entries"
+      rm -rf "$tmp"
+      continue
+    fi
+    IFS=$'\t' read -r RUN_PATH TEST_PATH HEALTH_PATH <<< "$entries"
+  fi
+  trusted_test=0
+  if [ -n "$TEST_PATH" ] &&
+    git -c safe.directory="$REPO" --git-dir="$REPO" cat-file -e "refs/heads/main:$TEST_PATH" 2>/dev/null; then
+    trusted_test=1
+  fi
+  if [ "$trusted_test" -eq 1 ]; then
+    bad=0
+    for f in "$RUN_PATH" "$TEST_PATH" "$HEALTH_PATH"; do
+      mode="$(git -c safe.directory="$REPO" --git-dir="$REPO" ls-tree "$review" -- "$f" | awk '{print $1}' || true)"
       if [ "$mode" != "100755" ]; then
         fail "$PROJECT $f mode ${mode:-missing}, expected 100755"
-        rm -rf "$tmp"
-        continue 2
+        bad=1
+        break
       fi
     done
-    git -c safe.directory="$REPO" --git-dir="$REPO" show refs/heads/main:test.sh > "$tmp/.trusted-test.sh"
+    if [ "$bad" -ne 0 ]; then
+      rm -rf "$tmp"
+      continue
+    fi
+    git -c safe.directory="$REPO" --git-dir="$REPO" show "refs/heads/main:$TEST_PATH" > "$tmp/.trusted-test.sh"
     if ! (cd "$tmp" && bash .trusted-test.sh) >/dev/null 2>&1; then
       fail "$PROJECT test.sh red at $review"
       rm -rf "$tmp"

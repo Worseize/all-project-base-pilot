@@ -19,6 +19,7 @@ DEFAULTS = {
 }
 SITES = {"none", "static", "proxy"}
 SITE_PREFIX = ("static:", "proxy:")
+ENTRY_KEYS = ("run", "test", "health")
 MEMORY = re.compile(r"^[0-9]+[KMG]?$")
 CPU = re.compile(r"^[0-9]+%$")
 PORT = re.compile(r"^[0-9]+$")
@@ -65,9 +66,26 @@ def check(path: Path) -> list[str]:
     return errors
 
 
+def entry(path: Path) -> list[str]:
+    """Return run, test, health from a valid manifest; test may be empty."""
+    errors = check(path)
+    if errors:
+        raise ValueError("; ".join(errors))
+    data = parse(path)
+    values: list[str] = []
+    for key in ENTRY_KEYS:
+        value = data[key]
+        if key != "test" and not value:
+            raise ValueError(f"{key} must not be empty")
+        if value.startswith("/") or ".." in value.split("/"):
+            raise ValueError(f"{key} must be a relative path without '..': {value}")
+        values.append(value)
+    return values
+
+
 def main(argv: list[str]) -> int:
     if len(argv) < 3:
-        print("usage: manifest.py get|check <project.conf> [key]", file=sys.stderr)
+        print("usage: manifest.py get|check|entry <project.conf> [key]", file=sys.stderr)
         return 2
     action, path = argv[1], Path(argv[2])
     if action == "check":
@@ -81,6 +99,16 @@ def main(argv: list[str]) -> int:
             return 2
         try:
             print(parse(path).get(argv[3], ""))
+        except ValueError as exc:
+            print(str(exc), file=sys.stderr)
+            return 1
+        return 0
+    if action == "entry":
+        if len(argv) != 3:
+            print("usage: manifest.py entry <project.conf>", file=sys.stderr)
+            return 2
+        try:
+            print("\t".join(entry(path)))
         except ValueError as exc:
             print(str(exc), file=sys.stderr)
             return 1

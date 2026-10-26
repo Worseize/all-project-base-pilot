@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 0.9.45 — 2026-10-26
+
+- `deploy/manifest.py`: действие `entry` — `run`/`test`/`health` из
+  `project.conf`, отказ на абсолютный путь и `..`.
+- `pre-receive` и `auto-merge`: гейт читает объявленные точки входа и
+  требует режим `100755`; `bootstrap` ставит валидатор в хуки.
+- `deploy/ci/manifest.sh`: отдельный проект `proj-m` из скелета и сценарии
+  `run=app`, `health` без `+x`, неизвестный ключ.
+- `tests/test_manifest.py`: девять тестов валидатора; D-MANIFEST-GATE снят.
+
 ## 0.9.44 — 2026-10-26
 
 - `DEBTS.md`: колонка «Кому», семь колонок, итоги по разделам.

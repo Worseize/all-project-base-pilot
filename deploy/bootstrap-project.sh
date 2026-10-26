@@ -107,6 +107,7 @@ git -c safe.directory="$REPO" --git-dir="$REPO" symbolic-ref HEAD refs/heads/mai
 install -d -m 0755 -o root -g root "$HOOKS"
 install -m 0755 -o root -g root "$SCRIPT_DIR/git/pre-receive" "$HOOKS/pre-receive"
 install -m 0755 -o root -g root "$SCRIPT_DIR/git/post-receive" "$HOOKS/post-receive"
+install -m 0755 -o root -g root "$SCRIPT_DIR/manifest.py" "$HOOKS/manifest.py"
 allowed="${ALLOWED_PATHS:-*}"
 if [ -f "$PROJECTS_FILE" ]; then
   allowed="$(python3 - "$PROJECTS_FILE" "$PROJECT" 2>/dev/null <<'PY' || true

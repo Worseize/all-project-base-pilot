@@ -11,8 +11,11 @@ export PATH
 
 ZERO=0000000000000000000000000000000000000000
 PROJECT="$(basename "$(dirname "$0")")"
-REPO="/srv/$PROJECT/repo.git"
-LOG="/var/log/git/$PROJECT.log"
+REPO="${PROJ_REPO:-/srv/$PROJECT/repo.git}"
+LOG="${PROJ_LOG:-/var/log/git/$PROJECT.log}"
+HOOKS="${PROJ_HOOKS:-/etc/git-hooks/$PROJECT}"
+MANIFEST_PY="$HOOKS/manifest.py"
+PYTHON="${PROJ_PYTHON:-python3}"
 CURRENT_REF=""
 CURRENT_OLD=""
 CURRENT_NEW=""
@@ -87,12 +90,39 @@ while read -r old new ref; do
   tmp="$(mktemp -d)"
   trap 'rm -rf "$tmp"' EXIT
   git --git-dir="$REPO" archive "$new" | tar -x -C "$tmp"
-  if git --git-dir="$REPO" cat-file -e refs/heads/main:test.sh 2>/dev/null; then
-    for f in run test.sh health; do
-      mode="$(git --git-dir="$REPO" ls-tree "$new" -- "$f" | awk '{print $1}')"
+
+  RUN_PATH="run"
+  TEST_PATH="test.sh"
+  HEALTH_PATH="health"
+  manifest="$tmp/project.conf"
+  if [ -f "$manifest" ]; then
+    manifest_py="$MANIFEST_PY"
+    if [ ! -f "$manifest_py" ]; then
+      if git --git-dir="$REPO" cat-file -e refs/heads/main:deploy/manifest.py 2>/dev/null; then
+        git --git-dir="$REPO" show refs/heads/main:deploy/manifest.py > "$tmp/.manifest.py" ||
+          reject "cannot load manifest validator from main"
+        manifest_py="$tmp/.manifest.py"
+      else
+        reject "manifest validator missing; re-run bootstrap for $PROJECT"
+      fi
+    fi
+    if ! entries="$("$PYTHON" "$manifest_py" entry "$manifest" 2>&1)"; then
+      reject "invalid project.conf: $entries"
+    fi
+    IFS=$'\t' read -r RUN_PATH TEST_PATH HEALTH_PATH <<< "$entries"
+  fi
+
+  trusted_test=0
+  if [ -n "$TEST_PATH" ] &&
+    git --git-dir="$REPO" cat-file -e "refs/heads/main:$TEST_PATH" 2>/dev/null; then
+    trusted_test=1
+  fi
+  if [ "$trusted_test" -eq 1 ]; then
+    for f in "$RUN_PATH" "$TEST_PATH" "$HEALTH_PATH"; do
+      mode="$(git --git-dir="$REPO" ls-tree "$new" -- "$f" | awk '{print $1}' || true)"
       [ "$mode" = "100755" ] || reject "$f mode ${mode:-missing}, expected 100755"
     done
-    git --git-dir="$REPO" show refs/heads/main:test.sh > "$tmp/.trusted-test.sh"
+    git --git-dir="$REPO" show "refs/heads/main:$TEST_PATH" > "$tmp/.trusted-test.sh"
     if ! (cd "$tmp" && bash .trusted-test.sh); then
       reject "test.sh failed for $new"
     fi

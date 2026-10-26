@@ -1,7 +1,7 @@
 {
   "name": "all-project-base",
-  "version": "0.9.44",
-  "date": "22.10.2026",
+  "version": "0.9.45",
+  "date": "26.10.2026",
   "commands": {
     "build": "go build ./cmd/...",
     "test": "go test ./cmd/...",
@@ -101,7 +101,8 @@
     "docs/BACKUP.md",
     "docs/MIGRATIONS.md",
     "docs/SECRETS.md",
-    "tests/test_verify.py"
+    "tests/test_verify.py",
+    "tests/test_manifest.py"
   ],
   "rules_count": 10,
   "adr_min": 2,

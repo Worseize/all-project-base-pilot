@@ -1,6 +1,6 @@
 # Изоляция проектов и агентов
 
-Версия 0.9.44 · 22.10.2026
+Версия 0.9.45 · 26.10.2026
 
 Один хост — несколько проектов — несколько агентов. Root — единственный,
 у кого полные права. Агент проекта получает только git-push в `review`.
@@ -55,7 +55,8 @@
 (разрешено всё), если проект не ограничен в реестре.
 
 `auto-merge.timer` раз в 5 минут проходит реестр: если `review` впереди
-`main`, запускает гейт из `main` (`test.sh`, иначе `verify.py`), пишет
+`main`, запускает гейт из `main` (`test` из `project.conf`, иначе
+`verify.py`), пишет
 метку гейта в `/var/lib/proj-base/gate/<id>.json` и двигает `main` только
 при зелёном гейте. Нет гейта в `main` — отказ, а не «здоров». После
 успешной доставки `review` выравнивается на `main`; при сбое `main`
@@ -159,7 +160,12 @@ ReadWritePaths=/var/lib/%i
 ## Манифест проекта
 
 `project.conf` в корне проекта — `ключ=значение`; неизвестный ключ —
-ошибка. `deploy-project.sh` выполняет `deps`, `build`, `migrate` от
+ошибка. Гейт и deploy читают `run`/`test`/`health` одним валидатором:
+`deploy/manifest.py` (на узле — копия `/etc/git-hooks/<id>/manifest.py`,
+ставит bootstrap), поэтому нестандартное имя точки входа не требует правки
+хука. Объявленные файлы обязаны лежать в пушимом дереве с режимом `100755`,
+иначе `pre-receive` отклоняет push. `deploy-project.sh` выполняет `deps`,
+`build`, `migrate` от
 пользователя проекта до рестарта; `site-config.sh` генерирует Caddy-блок
 из `site`/`domains`/`redirects`; `timezone`/`memory`/`cpu` уходят в
 drop-in `proj@<id>.service.d/manifest.conf`.
@@ -202,8 +208,10 @@ sudo deploy/deploy-project.sh proj-a
 
 ## Доверенный gate
 
-`pre-receive` не запускает `verify.py` из пушимого дерева. Он берёт
-`verify.py` из `refs/heads/main` и запускает его на pushed tree. Изменения
+`pre-receive` не запускает `verify.py` из пушимого дерева. Гейт проекта —
+файл из `refs/heads/main`, имя которого объявлено в `project.conf`
+(`test`, по умолчанию `test.sh`); нет его в main — берётся `verify.py` из
+main, иначе отказ. Изменения
 `verify.py`, `project.json`, `tests/`, `cmd/schemes` и `cmd/deadcode`
 отклоняются до запуска. Так агент не может ослабить проверку тем же пушем.
 
