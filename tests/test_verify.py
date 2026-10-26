@@ -475,6 +475,19 @@ class VerifyTests(unittest.TestCase):
             self.assertIn(word, script)
         self.assertIn("userdel", cleanup)
 
+    def test_agents_size_budget_and_archive(self):
+        root = verify.ROOT
+        (root / "AGENTS.md").write_text("rules\n", encoding="utf-8")
+        (root / "docs").mkdir()
+        (root / "docs" / "AGENTS-ARCHIVE.md").write_text("archive\n", encoding="utf-8")
+        gate = verify.Gate()
+        verify.check_agents_size(gate)
+        self.assertEqual(gate.failed, 0)
+        (root / "AGENTS.md").write_text("x" * (14 * 1024 + 1), encoding="utf-8")
+        gate = verify.Gate()
+        verify.check_agents_size(gate)
+        self.assertEqual(gate.failed, 1)
+
     def test_site_config_rejects_symlink_escape(self):
         root = Path(__file__).resolve().parents[1]
         text = (root / "deploy" / "site-config.sh").read_text(encoding="utf-8")

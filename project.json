@@ -1,6 +1,6 @@
 {
   "name": "all-project-base",
-  "version": "0.9.42",
+  "version": "0.9.43",
   "date": "22.10.2026",
   "commands": {
     "build": "go build ./cmd/...",
@@ -74,6 +74,7 @@
     "skeleton/AGENT-CONNECTOR.md",
     "skeleton/project/AGENT-CONNECTOR.md",
     "docs/ROLES.md",
+    "docs/AGENTS-ARCHIVE.md",
     "skeleton/project/run",
     "skeleton/project/test.sh",
     "skeleton/project/health",

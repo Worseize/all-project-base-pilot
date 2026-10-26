@@ -596,6 +596,20 @@ def check_fixtures(gate: Gate) -> None:
         gate.ok("fixtures", "правило фикстур в трёх документах")
 
 
+def check_agents_size(gate: Gate) -> None:
+    path = ROOT / "AGENTS.md"
+    archive = ROOT / "docs" / "AGENTS-ARCHIVE.md"
+    if not archive.is_file():
+        gate.fail("agents-size", "нет docs/AGENTS-ARCHIVE.md")
+        return
+    size = path.stat().st_size
+    limit = 14 * 1024
+    if size > limit:
+        gate.fail("agents-size", f"AGENTS.md {size} > {limit} Б")
+    else:
+        gate.ok("agents-size", f"AGENTS.md {size} Б ≤ {limit}, архив есть")
+
+
 def check_handoffs(gate: Gate) -> None:
     files = [ROOT / "skeleton" / "AGENT-CONNECTOR.md", ROOT / "skeleton" / "project" / "AGENT-CONNECTOR.md"]
     files += sorted(ROOT.glob("TO-AGENT*.md"))
@@ -901,6 +915,7 @@ def main() -> int:
         check_process,
         check_fixtures,
         check_handoffs,
+        check_agents_size,
         check_stop_rule,
         check_ci,
         check_versions,
