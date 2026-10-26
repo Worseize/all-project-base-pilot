@@ -475,6 +475,12 @@ class VerifyTests(unittest.TestCase):
             self.assertIn(word, script)
         self.assertIn("userdel", cleanup)
 
+    def test_site_config_rejects_symlink_escape(self):
+        root = Path(__file__).resolve().parents[1]
+        text = (root / "deploy" / "site-config.sh").read_text(encoding="utf-8")
+        self.assertIn("realpath -m", text)
+        self.assertIn("site path escapes project", text)
+
     def test_debt_table_message_starts_with_hash(self):
         root = Path(__file__).resolve().parents[1]
         result = subprocess.run(
