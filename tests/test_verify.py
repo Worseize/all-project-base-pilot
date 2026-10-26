@@ -480,6 +480,15 @@ class VerifyTests(unittest.TestCase):
         self.assertIn("install -d -m 0750 -o root -g root /var/lib/watchdog", text)
         self.assertNotIn("0750 -o root -g root /var/lib/watchdog /var/log", text)
 
+    def test_watchdog_service_root_hardening(self):
+        root = Path(__file__).resolve().parents[1]
+        text = (root / "deploy" / "systemd" / "watchdog-health.service").read_text(encoding="utf-8")
+        for line in ("ProtectSystem=strict", "ReadWritePaths=/var/lib/watchdog",
+                     "PrivateTmp=yes", "NoNewPrivileges=yes",
+                     "EnvironmentFile=-/etc/app/watchdog.env"):
+            self.assertIn(line, text)
+        self.assertNotIn("User=app", text)
+
     def test_handoffs_requires_audience_and_no_owner_tasks(self):
         root = verify.ROOT
         (root / "skeleton").mkdir()
