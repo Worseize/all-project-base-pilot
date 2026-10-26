@@ -29,6 +29,14 @@ if [ -n "$site_arg" ]; then
     /*|*..*|*[[:space:]]*) echo "invalid site path: $site_arg" >&2; exit 1 ;;
   esac
 fi
+if [ "$site_type" = "static" ] && [ -n "$site_arg" ]; then
+  root_real="$(realpath -m -- "$WORK")"
+  target_real="$(realpath -m -- "$WORK/$site_arg")"
+  case "$target_real" in
+    "$root_real"/*) ;;
+    *) echo "site path escapes project: $site_arg" >&2; exit 1 ;;
+  esac
+fi
 if [ "$site_type" = "proxy" ] && [ -n "$site_arg" ] &&
   ! printf '%s' "$site_arg" | grep -Eq '^[0-9]+$'; then
   echo "invalid proxy port: $site_arg" >&2
