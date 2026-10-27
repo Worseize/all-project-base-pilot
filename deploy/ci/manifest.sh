@@ -105,7 +105,7 @@ rm -f "$WORK/run"
 write_sleeper app
 accept_manifest "run=app\ntest=check.sh\nhealth=health\n" app check.sh run &&
   expect_deploy_ok "run=app accepted from project.conf" &&
-  grep -q "^ExecStart=$WORK/app$" /etc/systemd/system/"proj@$A.service.d"/manifest.conf &&
+  grep -q "^ExecStart=\"$WORK/app\"$" /etc/systemd/system/"proj@$A.service.d"/manifest.conf &&
   ok "unit starts run=app" ||
   { cat "$OUT" >&2; fail "gate or unit ignored run=app from project.conf"; }
 

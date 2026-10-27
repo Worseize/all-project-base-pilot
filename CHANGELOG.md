@@ -3,7 +3,8 @@
 ## 0.9.49 — 2026-10-27
 
 - `deploy-project.sh`: `ExecStart` берётся из `project.conf` (drop-in с
-  `run=app`), фикстура проверяет юнит; `D-RUN-UNIT` снят.
+  `run=app`), перед `restart` — `reset-failed`; фикстура сверяет юнит;
+  `D-RUN-UNIT` снят.
 - `deploy/check-reply.py`: первая строка «почта:», доска — последний
   раздел, семь колонок и итог «моих N, у владельца M»; 12 тестов.
 - `docs/REQUESTS.md` + гейт `requests`: строка без пути, issue или вывода

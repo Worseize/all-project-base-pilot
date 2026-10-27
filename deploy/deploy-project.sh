@@ -101,6 +101,7 @@ if [ ! -x "$WORK/$RUN_PATH" ]; then
 fi
 
 if command -v systemctl >/dev/null 2>&1 && [ -d /run/systemd/system ]; then
+  systemctl reset-failed "proj@$PROJECT.service" >/dev/null 2>&1 || true
   systemctl restart "proj@$PROJECT.service"
   if ! systemctl is-active --quiet "proj@$PROJECT.service"; then
     echo "service failed to start: proj@$PROJECT.service" >&2
