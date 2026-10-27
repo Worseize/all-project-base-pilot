@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 0.9.47 — 2026-10-26
+
+- `docs/RULES-TESTS.md`: карта «правило → проверка», десять строк, три
+  ручные; `deploy/rules-check.py`, проверка `rules-tests` в гейте.
+- `deploy/check-reply.py`: «не сделано» — только строки доски, обе стороны;
+  `tests/test_reply_format.py`, десять случаев.
+- `tests/test_rules_map.py`: восемь случаев; правило в AGENTS.
+- Сняты `D-RULES-TESTS` и `D-REPLY-BOARD`.
+
 ## 0.9.46 — 2026-10-26
 
 - `deploy/debt-check.py`: проверка `DEBTS.md` — разделы, семь колонок,

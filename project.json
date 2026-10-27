@@ -1,6 +1,6 @@
 {
   "name": "all-project-base",
-  "version": "0.9.46",
+  "version": "0.9.47",
   "date": "26.10.2026",
   "commands": {
     "build": "go build ./cmd/...",
@@ -68,6 +68,9 @@
     "deploy/check-backups.sh",
     "deploy/debt-table.py",
     "deploy/debt-check.py",
+    "deploy/check-reply.py",
+    "deploy/rules-check.py",
+    "docs/RULES-TESTS.md",
     "deploy/install-watchdog.sh",
     "deploy/systemd/watchdog-health.service",
     "deploy/systemd/watchdog-health.timer",
@@ -104,7 +107,9 @@
     "docs/SECRETS.md",
     "tests/test_verify.py",
     "tests/test_manifest.py",
-    "tests/test_debt_board.py"
+    "tests/test_debt_board.py",
+    "tests/test_reply_format.py",
+    "tests/test_rules_map.py"
   ],
   "rules_count": 10,
   "adr_min": 2,

@@ -230,6 +230,22 @@ def check_sections(gate: Gate, path: str, sections: list[str], name: str) -> Non
         gate.ok(name, f"{len(sections)} разделов")
 
 
+def check_rules_tests(gate: Gate) -> None:
+    script = ROOT / "deploy" / "rules-check.py"
+    if not script.is_file():
+        gate.fail("rules-tests", "нет deploy/rules-check.py")
+        return
+    result = subprocess.run(
+        [sys.executable, str(script)],
+        cwd=ROOT, text=True, capture_output=True, timeout=60,
+    )
+    if result.returncode != 0:
+        lines = [line for line in result.stderr.splitlines() if line.strip()]
+        gate.fail("rules-tests", " | ".join(lines[:3]) or "карта не прошла проверку")
+    else:
+        gate.ok("rules-tests", "десять правил, у каждого проверка")
+
+
 def check_project(gate: Gate) -> None:
     check_sections(gate, "PROJECT.md", list(CONFIG.get("project_sections", [])), "project")
     check_sections(gate, "FEATURE.md", list(CONFIG.get("feature_sections", [])), "feature")
@@ -918,6 +934,7 @@ def main() -> int:
         check_junk,
         check_schemes,
         check_rules,
+        check_rules_tests,
         check_project,
         check_readme,
         check_journal,
