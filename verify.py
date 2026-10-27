@@ -246,6 +246,44 @@ def check_rules_tests(gate: Gate) -> None:
         gate.ok("rules-tests", "десять правил, у каждого проверка")
 
 
+RULE_HEADING_RE = re.compile(r"^###\s+\d+\.\s+(.+)$")
+ROOT_WORD_RE = re.compile(r"[a-zа-я0-9]+")
+
+
+def rule_roots(title: str) -> set[str]:
+    text = title.lower().replace("ё", "е")
+    return {word[:5] for word in ROOT_WORD_RE.findall(text) if len(word) >= 4}
+
+
+def rule_similarity(left: str, right: str) -> float:
+    first, second = rule_roots(left), rule_roots(right)
+    if not first or not second:
+        return 0.0
+    return len(first & second) / len(first | second)
+
+
+def check_rules_dupes(gate: Gate) -> None:
+    text = (ROOT / "RULES.md").read_text(encoding="utf-8", errors="replace")
+    titles: list[str] = []
+    for line in text.splitlines():
+        match = RULE_HEADING_RE.match(line)
+        if match:
+            titles.append(match.group(1).strip())
+    problems: list[str] = []
+    for left in range(len(titles)):
+        for right in range(left + 1, len(titles)):
+            if titles[left].casefold() == titles[right].casefold():
+                problems.append(f"одинаковые заголовки: «{titles[left]}»")
+            elif rule_similarity(titles[left], titles[right]) >= 0.7:
+                problems.append(
+                    f"похожие правила: «{titles[left]}» / «{titles[right]}»"
+                )
+    if problems:
+        gate.fail("rules-dupes", " | ".join(problems[:2]))
+    else:
+        gate.ok("rules-dupes", f"{len(titles)} правил без дублей")
+
+
 def check_project(gate: Gate) -> None:
     check_sections(gate, "PROJECT.md", list(CONFIG.get("project_sections", [])), "project")
     check_sections(gate, "FEATURE.md", list(CONFIG.get("feature_sections", [])), "feature")
@@ -935,6 +973,7 @@ def main() -> int:
         check_schemes,
         check_rules,
         check_rules_tests,
+        check_rules_dupes,
         check_project,
         check_readme,
         check_journal,

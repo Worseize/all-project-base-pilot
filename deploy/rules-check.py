@@ -66,6 +66,15 @@ def check_map(path: Path) -> list[str]:
             for item in paths:
                 if not (ROOT / item).exists():
                     errors.append(f"строка {number}: файл проверки не найден: {item}")
+            tests = [item for item in paths if item.startswith("tests/")]
+            if not tests:
+                errors.append(f"строка {number}: у авто-проверки нет теста в tests/")
+            for item in tests:
+                target = ROOT / item
+                if target.is_file() and "def test_" not in target.read_text(
+                    encoding="utf-8", errors="replace"
+                ):
+                    errors.append(f"строка {number}: в {item} нет тестов")
         rows[index] = row
     missing = [str(index) for index in range(1, 11) if index not in rows]
     if missing:

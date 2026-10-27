@@ -1,4 +1,5 @@
 import json
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -711,6 +712,80 @@ class VerifyTests(unittest.TestCase):
     def test_close_task_rejects_unrelated_docs(self):
         files = ["cmd/app/main.go", "README.md"]
         self.assertIsNotNone(verify.close_task_violation(files))
+
+
+class RulesBaseTests(unittest.TestCase):
+    def setUp(self):
+        self.old_root = verify.ROOT
+        self.old_config = verify.CONFIG
+        self.repo = Path(self.old_root)
+        self.tmp = tempfile.TemporaryDirectory()
+        verify.ROOT = Path(self.tmp.name)
+        verify.CONFIG = {"rules_count": 10}
+        (verify.ROOT / "tests").mkdir()
+        (verify.ROOT / "tests" / "test_x.py").write_text(
+            "def test_one():\n    pass\n", encoding="utf-8"
+        )
+
+    def tearDown(self):
+        verify.ROOT = self.old_root
+        verify.CONFIG = self.old_config
+        self.tmp.cleanup()
+
+    def rules(self, titles):
+        body = "\n".join(
+            f"### {index}. {title}" for index, title in enumerate(titles, 1)
+        )
+        (verify.ROOT / "RULES.md").write_text(body + "\n", encoding="utf-8")
+
+    def test_dupes_accept_distinct_titles(self):
+        self.rules([
+            "Чистый код, имена и уборка",
+            "Все новые фичи — в схемах",
+            "Тесты под каждую фичу",
+        ])
+        gate = verify.Gate()
+        verify.check_rules_dupes(gate)
+        self.assertEqual(gate.failed, 0)
+
+    def test_dupes_reject_identical_titles(self):
+        self.rules(["Чистый код", "Чистый код"])
+        gate = verify.Gate()
+        verify.check_rules_dupes(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_dupes_reject_similar_roots(self):
+        self.rules(["Тесты под каждую фичу", "Тесты под каждую фичу и схему"])
+        gate = verify.Gate()
+        verify.check_rules_dupes(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_rules_tests_rejects_missing_script(self):
+        gate = verify.Gate()
+        verify.check_rules_tests(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_rules_tests_rejects_auto_row_without_test(self):
+        (verify.ROOT / "deploy").mkdir()
+        shutil.copy(
+            self.repo / "deploy" / "rules-check.py",
+            verify.ROOT / "deploy" / "rules-check.py",
+        )
+        (verify.ROOT / "docs").mkdir()
+        (verify.ROOT / "verify.py").write_text("", encoding="utf-8")
+        rows = ["| 1 | правило | `verify.py` — x | авто |"]
+        rows += [
+            f"| {index} | правило | `verify.py` — x; `tests/test_x.py` | авто |"
+            for index in range(2, 11)
+        ]
+        (verify.ROOT / "docs" / "RULES-TESTS.md").write_text(
+            "| # | Правило | Проверка | Тип |\n| --- | --- | --- | --- |\n"
+            + "\n".join(rows) + "\n",
+            encoding="utf-8",
+        )
+        gate = verify.Gate()
+        verify.check_rules_tests(gate)
+        self.assertEqual(gate.failed, 1)
 
 
 if __name__ == "__main__":
