@@ -125,6 +125,11 @@ class ReplyFormatTests(unittest.TestCase):
         errors = self.check(text, board(*tags))
         self.assertTrue(any("D-ONE" in error for error in errors))
 
+    def test_bom_prefix_passes(self):
+        tags = ("D-ONE",)
+        text = "\ufeff" + reply("`D-ONE`", tags)
+        self.assertEqual(self.check(text, board(*tags)), [])
+
     def test_broken_board_fails(self):
         errors = self.check(reply("`D-ONE`", ("D-ONE",)), "# доска без разделов\n")
         self.assertTrue(any("доска" in error for error in errors))

@@ -126,6 +126,7 @@ def check_order(text: str, board: Path) -> list[str]:
 
 
 def check_reply(text: str, board: Path = DEFAULT_BOARD) -> list[str]:
+    text = text.lstrip("\ufeff")
     debt_check = load_debt_check()
     board_errors = debt_check.check_board(board)
     if board_errors:
