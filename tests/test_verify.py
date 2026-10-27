@@ -788,5 +788,50 @@ class RulesBaseTests(unittest.TestCase):
         self.assertEqual(gate.failed, 1)
 
 
+class RequestsTests(unittest.TestCase):
+    def setUp(self):
+        self.old_root = verify.ROOT
+        self.tmp = tempfile.TemporaryDirectory()
+        verify.ROOT = Path(self.tmp.name)
+        (verify.ROOT / "docs").mkdir()
+        (verify.ROOT / "DEBTS.md").write_text("board\n", encoding="utf-8")
+
+    def tearDown(self):
+        verify.ROOT = self.old_root
+        self.tmp.cleanup()
+
+    def write(self, evidence):
+        body = (
+            "| # | Запрос | Что сделано | Доказательство |\n"
+            "| --- | --- | --- | --- |\n"
+            f"| findings#32 | правило | сделано | {evidence} |\n"
+        )
+        (verify.ROOT / "docs" / "REQUESTS.md").write_text(body, encoding="utf-8")
+
+    def test_issue_reference_passes(self):
+        self.write("`DEBTS.md`, CI `ee01cf3`")
+        gate = verify.Gate()
+        verify.check_requests(gate)
+        self.assertEqual(gate.failed, 0)
+
+    def test_missing_evidence_fails(self):
+        self.write("")
+        gate = verify.Gate()
+        verify.check_requests(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_missing_path_fails(self):
+        self.write("`no/such/file.md`")
+        gate = verify.Gate()
+        verify.check_requests(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_missing_file_fails(self):
+        (verify.ROOT / "docs" / "REQUESTS.md").unlink(missing_ok=True)
+        gate = verify.Gate()
+        verify.check_requests(gate)
+        self.assertEqual(gate.failed, 1)
+
+
 if __name__ == "__main__":
     unittest.main()

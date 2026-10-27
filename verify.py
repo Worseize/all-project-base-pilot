@@ -285,6 +285,42 @@ def check_rules_dupes(gate: Gate) -> None:
         gate.ok("rules-dupes", f"{len(titles)} правил без дублей")
 
 
+REQUESTS_HEADER = ["#", "Запрос", "Что сделано", "Доказательство"]
+REQUESTS_EVIDENCE_RE = re.compile(r"findings#\d+")
+
+
+def check_requests(gate: Gate) -> None:
+    path = ROOT / "docs" / "REQUESTS.md"
+    if not path.is_file():
+        gate.fail("requests", "нет docs/REQUESTS.md")
+        return
+    errors: list[str] = []
+    rows = 0
+    for number, raw in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        if not raw.startswith("|"):
+            continue
+        parts = [part.strip() for part in raw.strip().strip("|").split("|")]
+        if parts == REQUESTS_HEADER or set(parts) == {"---"}:
+            continue
+        if len(parts) != 4:
+            errors.append(f"строка {number}: {len(parts)} полей, нужно 4")
+            continue
+        evidence = parts[3]
+        paths = [item for item in evidence.split("`")[1::2]]
+        has_path = any((ROOT / item).exists() for item in paths)
+        if not evidence or not (
+            REQUESTS_EVIDENCE_RE.search(evidence) or has_path or "verify.py" in evidence
+        ):
+            errors.append(f"строка {number}: нет пути, issue или вывода verify.py")
+        rows += 1
+    if rows == 0:
+        errors.append("нет ни одной строки запроса")
+    if errors:
+        gate.fail("requests", " | ".join(errors[:3]))
+    else:
+        gate.ok("requests", f"{rows} запросов с доказательством")
+
+
 def check_project(gate: Gate) -> None:
     check_sections(gate, "PROJECT.md", list(CONFIG.get("project_sections", [])), "project")
     check_sections(gate, "FEATURE.md", list(CONFIG.get("feature_sections", [])), "feature")
@@ -976,6 +1012,7 @@ def main() -> int:
         check_rules,
         check_rules_tests,
         check_rules_dupes,
+        check_requests,
         check_project,
         check_readme,
         check_journal,

@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 0.9.49 — 2026-10-27
+
+- `deploy-project.sh`: `ExecStart` берётся из `project.conf` (drop-in с
+  `run=app`), фикстура проверяет юнит; `D-RUN-UNIT` снят.
+- `deploy/check-reply.py`: первая строка «почта:», доска — последний
+  раздел, семь колонок и итог «моих N, у владельца M»; 12 тестов.
+- `docs/REQUESTS.md` + гейт `requests`: строка без пути, issue или вывода
+  `verify.py` краснеет; 4 теста.
+- Коммиты привязаны к `findings#32` (rules-base).
+
 ## 0.9.48 — 2026-10-27
 
 - `verify.py`: `rules-dupes` — одинаковые заголовки правил и схожесть

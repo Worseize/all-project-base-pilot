@@ -22,6 +22,8 @@ TAG_RE = re.compile(r"\b([DWLN][A-Z0-9-]*[A-Z0-9])\b")
 EMPTY_WORDS = {"пусто", "долгов нет", "ничего", "—", "-", "нет"}
 HEADING_RE = re.compile(r"(?im)^#{2,4}\s*(?:что\s+)?не\s+сделано\s*:?\s*$")
 TABLE_COLUMNS = ["сделано", "не сделано", "осталось"]
+MAIL_LINE_RE = re.compile(r"^почта:\s*(?:EMPTY|PENDING\s+\d+)\s+—\s+разобрано\s+\d+")
+TOTAL_LINE_RE = re.compile(r"(?m)^Итого:\s*моих\s*(\d+),\s*у владельца\s*(\d+)\s*$")
 
 
 def load_debt_check():
@@ -86,6 +88,43 @@ def board_tags(path: Path) -> list[str]:
     return tags
 
 
+def check_order(text: str, board: Path) -> list[str]:
+    """Reply starts with the mail line and ends with the debt board section."""
+    errors: list[str] = []
+    lines = text.splitlines()
+    first = next((line.strip() for line in lines if line.strip()), "")
+    if not MAIL_LINE_RE.match(first):
+        errors.append("первая строка — «почта: EMPTY|PENDING n — разобрано k»")
+    headings = [
+        (index, line) for index, line in enumerate(lines)
+        if re.match(r"^#{2,4}\s", line)
+    ]
+    board_positions = [
+        index for index, line in headings if "Доска долгов" in line
+    ]
+    if not board_positions:
+        return [*errors, "нет раздела «Доска долгов» — доска обязана быть последней"]
+    board_pos = board_positions[-1]
+    if headings[-1][0] != board_pos:
+        errors.append("после «Доска долгов» есть ещё раздел")
+    rows = [line for line in lines[board_pos:] if line.startswith("|")]
+    if not rows or any(len(cells(line)) != 7 for line in rows):
+        errors.append("доска в ответе — семь колонок")
+    total = TOTAL_LINE_RE.search(text)
+    if not total:
+        errors.append("нет строки «Итого: моих N, у владельца M»")
+        return errors
+    tags = board_tags(board)
+    mine = sum(1 for tag in tags if tag.startswith("D"))
+    owner = sum(1 for tag in tags if tag.startswith(("W", "L")))
+    if (int(total.group(1)), int(total.group(2))) != (mine, owner):
+        errors.append(
+            f"итог в ответе {total.group(1)}/{total.group(2)}, "
+            f"на доске {mine}/{owner}"
+        )
+    return errors
+
+
 def check_reply(text: str, board: Path = DEFAULT_BOARD) -> list[str]:
     debt_check = load_debt_check()
     board_errors = debt_check.check_board(board)
@@ -93,9 +132,11 @@ def check_reply(text: str, board: Path = DEFAULT_BOARD) -> list[str]:
         return [f"доска: {error}" for error in board_errors[:3]]
     known = set(board_tags(board))
     items = not_done_items(text)
+    errors: list[str] = check_order(text, board)
     if not items:
-        return ["нет раздела «не сделано» или он пуст, а на доске есть долги"] if known else []
-    errors: list[str] = []
+        if known:
+            errors.append("нет раздела «не сделано» или он пуст, а на доске есть долги")
+        return errors
     reply: set[str] = set()
     for item in items:
         found = TAG_RE.findall(item)

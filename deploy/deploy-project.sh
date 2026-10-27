@@ -77,6 +77,8 @@ bash "$SCRIPT_DIR/site-config.sh" "$PROJECT" "$WORK"
 install -d -m 0755 /etc/systemd/system/"proj@$PROJECT.service.d"
 cat > /etc/systemd/system/"proj@$PROJECT.service.d"/manifest.conf <<EOF
 [Service]
+ExecStart=
+ExecStart="$WORK/$RUN_PATH"
 $( [ -n "$TIMEZONE" ] && printf 'Environment=TZ=%s\n' "$TIMEZONE" )
 Environment=PROJECT_PORT=$PORT
 MemoryMax=$MEMORY

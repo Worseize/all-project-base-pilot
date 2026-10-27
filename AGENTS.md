@@ -45,6 +45,8 @@ powershell -File "C:\Users\User\Documents\deepseek-harness\default-workspace\fir
 
 Карта `docs/RULES-TESTS.md`; `verify.py` → `rules-tests` (нет строки, файла,
 теста — красный) и `rules-dupes` (одинаковые заголовки, корни ≥ 0.7).
+Указание «сделать правило/тест» — в том же шаге; строка в
+`docs/REQUESTS.md`, гейт `requests`.
 
 ## Проснулся — пересчитай долги
 
@@ -95,8 +97,7 @@ powershell -File "C:\Users\User\Documents\deepseek-harness\default-workspace\fir
   владельцем (только чат); `N…` — задача узла.
 - Приоритет только `P0`/`P1`/`P2`; «Что разблокирует» не пустое.
 - Раздела «Закрытые» нет: снятое удаляется, история в git.
-- Проверка: `python deploy/debt-check.py` — разделы, семь колонок, теги,
-  итоги; красная проверка `verify.py` (`debt-board`) не пускает диф.
+- Проверка: `deploy/debt-check.py`; гейт `debt-board`.
 
 ## Долги в сообщении — с колонкой #
 

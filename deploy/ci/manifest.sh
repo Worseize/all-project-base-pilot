@@ -21,6 +21,13 @@ write_entry() {
   chmod 0755 "$WORK/$name"
 }
 
+write_sleeper() {
+  local name="$1"
+  printf '#!/usr/bin/env python3\nimport time\ntime.sleep(300)\n' > "$WORK/$name"
+  chown "$A:$A" "$WORK/$name"
+  chmod 0755 "$WORK/$name"
+}
+
 stage_manifest() {
   printf '%b\n' "$1" > "$WORK/project.conf"
   chown "$A:$A" "$WORK/project.conf"
@@ -88,22 +95,21 @@ BASE_REVIEW="$(git_r rev-parse refs/heads/review 2>/dev/null || git_r rev-parse 
 runuser -u "$A" -- git -C "$WORK" fetch -q origin main
 runuser -u "$A" -- git -C "$WORK" checkout -q -B main origin/main
 
-accept_manifest "test=test.sh\nhealth=health\n" &&
-  expect_deploy_ok "default run accepted" || fail "default run rejected"
-
 write_entry check.sh
-accept_manifest "test=test.sh\nhealth=health\n" check.sh ||
+write_sleeper run
+accept_manifest "test=test.sh\nhealth=health\n" check.sh run ||
   fail "custom test file push"
+expect_deploy_ok "default run accepted"
 
 rm -f "$WORK/run"
-write_entry app
+write_sleeper app
 accept_manifest "run=app\ntest=check.sh\nhealth=health\n" app check.sh run &&
-  ok "run=app accepted from project.conf" ||
-  fail "gate ignored run=app from project.conf"
+  expect_deploy_ok "run=app accepted from project.conf" &&
+  grep -q "^ExecStart=$WORK/app$" /etc/systemd/system/"proj@$A.service.d"/manifest.conf &&
+  ok "unit starts run=app" ||
+  { cat "$OUT" >&2; fail "gate or unit ignored run=app from project.conf"; }
 
-git -C "$WORK" show "$BASE_MAIN:run" > "$WORK/run"
-chown "$A:$A" "$WORK/run"
-chmod 0755 "$WORK/run"
+write_sleeper run
 accept_manifest "run=run\ntest=test.sh\nhealth=health\n" run app ||
   fail "restore default run"
 
