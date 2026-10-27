@@ -237,10 +237,11 @@ def check_rules_tests(gate: Gate) -> None:
         return
     result = subprocess.run(
         [sys.executable, str(script)],
-        cwd=ROOT, text=True, capture_output=True, timeout=60,
+        cwd=ROOT, text=True, encoding="utf-8", errors="replace",
+        capture_output=True, timeout=60,
     )
     if result.returncode != 0:
-        lines = [line for line in result.stderr.splitlines() if line.strip()]
+        lines = [line for line in (result.stderr or "").splitlines() if line.strip()]
         gate.fail("rules-tests", " | ".join(lines[:3]) or "карта не прошла проверку")
     else:
         gate.ok("rules-tests", "десять правил, у каждого проверка")
@@ -388,10 +389,11 @@ def check_debt_board(gate: Gate) -> None:
         return
     result = subprocess.run(
         [sys.executable, str(script)],
-        cwd=ROOT, text=True, capture_output=True, timeout=60,
+        cwd=ROOT, text=True, encoding="utf-8", errors="replace",
+        capture_output=True, timeout=60,
     )
     if result.returncode != 0:
-        lines = [line for line in result.stderr.splitlines() if line.strip()]
+        lines = [line for line in (result.stderr or "").splitlines() if line.strip()]
         gate.fail("debt-board", " | ".join(lines[:3]) or "DEBTS.md не прошёл проверку")
     else:
         gate.ok("debt-board", "разделы, 7 колонок, теги, итоги")
