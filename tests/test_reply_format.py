@@ -28,11 +28,11 @@ def board(*tags: str) -> str:
 
 
 def board_block(tags) -> str:
-    rows = [f"| {tag} | я | долг | действие |" for tag in tags]
+    rows = [f"| {tag} | я | долг | {'Узел' if tag.startswith('D') else 'Владелец'} |" for tag in tags]
     mine = sum(1 for tag in tags if tag.startswith("D"))
     owner = sum(1 for tag in tags if tag.startswith(("W", "L")))
     table = "\n".join(
-        ["| # | Кому | Долг | Что разблокирует |", "| --- | --- | --- | --- |", *rows]
+        ["| # | Кому | Долг | Кто замедляет |", "| --- | --- | --- | --- |", *rows]
     )
     return f"## Доска долгов\n\n{table}\n\nИтого: моих {mine}, у владельца {owner}\n"
 
@@ -134,9 +134,21 @@ class ReplyFormatTests(unittest.TestCase):
 
     def test_seven_column_board_fails(self):
         tags = ("D-ONE",)
-        text = reply("`D-ONE`", tags).replace("| # | Кому | Долг | Что разблокирует |", HEADER)
+        text = reply("`D-ONE`", tags).replace("| # | Кому | Долг | Кто замедляет |", HEADER)
         errors = self.check(text, board(*tags))
         self.assertTrue(any("четыре колонки" in error for error in errors))
+
+    def test_unknown_slower_fails(self):
+        tags = ("D-ONE",)
+        text = reply("`D-ONE`", tags).replace("| Узел |", "| Кто-то |")
+        errors = self.check(text, board(*tags))
+        self.assertTrue(any("Кто замедляет" in error for error in errors))
+
+    def test_slower_must_match_tag(self):
+        tags = ("D-ONE",)
+        text = reply("`D-ONE`", tags).replace("| Узел |", "| Владелец |")
+        errors = self.check(text, board(*tags))
+        self.assertTrue(any("замедляет" in error for error in errors))
 
     def test_long_cell_fails(self):
         tags = ("D-ONE",)

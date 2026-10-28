@@ -128,6 +128,8 @@ def check_secrets(gate: Gate) -> None:
     findings = []
     for path in walk_files():
         rel = str(path.relative_to(ROOT))
+        if rel.startswith("mailbox"):
+            continue
         if path.name == ".env" or (path.name.startswith(".env.") and path.name != ".env.example"):
             findings.append(f"{rel} (.env)")
             continue

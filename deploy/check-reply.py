@@ -24,9 +24,10 @@ HEADING_RE = re.compile(r"(?im)^#{2,4}\s*(?:что\s+)?не\s+сделано\s*:
 TABLE_COLUMNS = ["сделано", "не сделано", "осталось"]
 MAIL_LINE_RE = re.compile(r"^почта:\s*(?:EMPTY|PENDING\s+\d+)\s+—\s+разобрано\s+\d+")
 TOTAL_LINE_RE = re.compile(r"(?m)^Итого:\s*моих\s*(\d+),\s*у владельца\s*(\d+)\s*$")
-BOARD_COLUMNS = ["#", "кому", "долг", "что разблокирует"]
-COLUMN_LIMITS = (8, 18, 50, 60)
+BOARD_COLUMNS = ["#", "кому", "долг", "кто замедляет"]
+COLUMN_LIMITS = (8, 18, 50, 14)
 ROW_LIMIT = 149
+SLOWERS = {"узел", "владелец"}
 
 
 def load_debt_check():
@@ -149,6 +150,13 @@ def check_board_section(lines: list[str], board: Path) -> list[str]:
                 errors.append(f"«{parts[0]}»: колонка {index + 1} длиннее {limit}")
         if len(row) > ROW_LIMIT:
             errors.append(f"«{parts[0]}»: строка {len(row)} > {ROW_LIMIT}")
+        slower = parts[3].lower()
+        if slower not in SLOWERS:
+            errors.append(f"«{parts[0]}»: «Кто замедляет» — Узел или Владелец")
+        elif TAG_RE.fullmatch(parts[0]):
+            expected = "узел" if parts[0].startswith("D") else "владелец"
+            if slower != expected:
+                errors.append(f"«{parts[0]}»: замедляет «{parts[3]}», ожидалось «{expected.capitalize()}»")
         if TAG_RE.fullmatch(parts[0]):
             seen.add(parts[0])
     known = set(board_tags(board))
