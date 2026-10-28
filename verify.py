@@ -405,6 +405,85 @@ def check_wake_debts(gate: Gate) -> None:
         gate.ok("wake-debts", f"{len(rows)} пробуждений, долг закрыт")
 
 
+DAILY_LIMIT_RE = re.compile(r"(?i)\b(?:20|60)\b\s*(?:сообщени\w*\s*)?(?:в|/)\s*сут\w*")
+INFRA_PREFIXES = ("deploy/", "docs/", "cmd/", "skeleton/", "tests/", ".github/")
+DOC_CONTRACTS = (
+    ("bus-limits", "docs/BUS.md", (), ("без суточных лимитов",)),
+    ("infra-map", "docs/INFRA-MAP.md", (), ()),
+    ("rotation", "docs/ROTATION.md",
+     ("## Перед переходом", "## Передача состояния", "## Новая сессия", "## Проверка"),
+     ("TO-AGENTS-ONBOARDING", "wake-debts")),
+    ("external-data", "docs/EXTERNAL-DATA.md",
+     ("## Проверка",), ("снимок до записи", "подтверждение", "откат")),
+)
+
+
+def read_doc(gate: Gate, name: str, path: str) -> str | None:
+    file = ROOT / path
+    if not file.is_file():
+        gate.fail(name, f"нет {path}")
+        return None
+    return file.read_text(encoding="utf-8", errors="replace")
+
+
+def check_doc_contract(gate: Gate, name: str, path: str,
+                       sections: tuple[str, ...], phrases: tuple[str, ...]) -> None:
+    text = read_doc(gate, name, path)
+    if text is None:
+        return
+    missing = [section for section in sections if section not in text]
+    missing += [phrase for phrase in phrases if phrase.lower() not in text.lower()]
+    if missing:
+        gate.fail(name, "нет: " + ", ".join(missing[:3]))
+    else:
+        gate.ok(name, "разделы и формулировки на месте")
+
+
+def check_bus_limits(gate: Gate) -> None:
+    check_doc_contract(gate, *DOC_CONTRACTS[0])
+    hits: list[str] = []
+    for path in sorted((ROOT / "docs").glob("*.md")) + [ROOT / "AGENTS.md"]:
+        if not path.is_file() or path.name.startswith("TO-AGENTS-"):
+            continue
+        for number, line in enumerate(
+            path.read_text(encoding="utf-8", errors="replace").splitlines(), 1
+        ):
+            low = line.lower()
+            if "без" in low or "нет" in low:
+                continue
+            if DAILY_LIMIT_RE.search(line):
+                hits.append(f"{path.name}:{number}")
+    if hits:
+        gate.fail("bus-limits", "суточный счёт: " + ", ".join(hits[:3]))
+
+
+def check_infra_map(gate: Gate) -> None:
+    text = read_doc(gate, "infra-map", "docs/INFRA-MAP.md")
+    if text is None:
+        return
+    tokens = re.findall(r"`([^`]+)`", text)
+    paths = [
+        token for token in tokens
+        if token.startswith(INFRA_PREFIXES) or token.endswith((".md", ".sh", ".py"))
+    ]
+    if not paths:
+        gate.fail("infra-map", "в карте нет путей")
+        return
+    missing = [path for path in paths if not (ROOT / path).exists()]
+    if missing:
+        gate.fail("infra-map", "нет путей: " + ", ".join(missing[:3]))
+    else:
+        gate.ok("infra-map", f"{len(paths)} путей существуют")
+
+
+def check_rotation(gate: Gate) -> None:
+    check_doc_contract(gate, *DOC_CONTRACTS[2])
+
+
+def check_external_data(gate: Gate) -> None:
+    check_doc_contract(gate, *DOC_CONTRACTS[3])
+
+
 def check_readme(gate: Gate) -> None:
     text = (ROOT / "README.md").read_text(encoding="utf-8", errors="replace")
     if "## Быстрый старт" not in text:
@@ -1094,6 +1173,10 @@ def main() -> int:
         check_requests,
         check_personal_data,
         check_wake_debts,
+        check_bus_limits,
+        check_infra_map,
+        check_rotation,
+        check_external_data,
         check_project,
         check_readme,
         check_journal,

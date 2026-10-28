@@ -1,6 +1,6 @@
 {
   "name": "all-project-base",
-  "version": "0.9.51",
+  "version": "0.9.52",
   "date": "28.10.2026",
   "commands": {
     "build": "go build ./cmd/...",
@@ -75,6 +75,10 @@
     "docs/REQUESTS.md",
     "docs/PERSONAL-DATA.md",
     "docs/WAKE-LOG.md",
+    "docs/BUS.md",
+    "docs/INFRA-MAP.md",
+    "docs/ROTATION.md",
+    "docs/EXTERNAL-DATA.md",
     "deploy/install-watchdog.sh",
     "deploy/systemd/watchdog-health.service",
     "deploy/systemd/watchdog-health.timer",

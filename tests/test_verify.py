@@ -916,5 +916,83 @@ class WakeDebtsTests(unittest.TestCase):
         self.assertEqual(gate.failed, 1)
 
 
+class DocsContractsTests(unittest.TestCase):
+    def setUp(self):
+        self.old_root = verify.ROOT
+        self.tmp = tempfile.TemporaryDirectory()
+        verify.ROOT = Path(self.tmp.name)
+        (verify.ROOT / "docs").mkdir()
+        (verify.ROOT / "AGENTS.md").write_text("# AGENTS\n", encoding="utf-8")
+
+    def tearDown(self):
+        verify.ROOT = self.old_root
+        self.tmp.cleanup()
+
+    def write(self, name, text):
+        path = verify.ROOT / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+
+    def test_bus_doc_passes(self):
+        self.write("docs/BUS.md", "Шина без суточных лимитов. Размер 16 КБ.\n")
+        gate = verify.Gate()
+        verify.check_bus_limits(gate)
+        self.assertEqual(gate.failed, 0)
+
+    def test_bus_daily_limit_line_fails(self):
+        self.write("docs/BUS.md", "Шина без суточных лимитов.\n")
+        self.write("docs/OTHER.md", "лимит 20 сообщений в сутки\n")
+        gate = verify.Gate()
+        verify.check_bus_limits(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_infra_map_checks_paths(self):
+        self.write("docs/BUS.md", "x\n")
+        self.write("docs/INFRA-MAP.md", "| Почта | `docs/BUS.md` |\n")
+        gate = verify.Gate()
+        verify.check_infra_map(gate)
+        self.assertEqual(gate.failed, 0)
+
+    def test_infra_map_missing_path_fails(self):
+        self.write("docs/INFRA-MAP.md", "| Нет | `docs/NO-SUCH.md` |\n")
+        gate = verify.Gate()
+        verify.check_infra_map(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_rotation_missing_phrase_fails(self):
+        self.write(
+            "docs/ROTATION.md",
+            "## Перед переходом\n## Передача состояния\n## Новая сессия\n## Проверка\n",
+        )
+        gate = verify.Gate()
+        verify.check_rotation(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_rotation_full_passes(self):
+        self.write(
+            "docs/ROTATION.md",
+            "## Перед переходом\n## Передача состояния\n## Новая сессия\n"
+            "Старт по docs/TO-AGENTS-ONBOARDING.md и wake-debts.\n## Проверка\n",
+        )
+        gate = verify.Gate()
+        verify.check_rotation(gate)
+        self.assertEqual(gate.failed, 0)
+
+    def test_external_data_missing_step_fails(self):
+        self.write("docs/EXTERNAL-DATA.md", "## Проверка\nснимок до записи\n")
+        gate = verify.Gate()
+        verify.check_external_data(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_external_data_full_passes(self):
+        self.write(
+            "docs/EXTERNAL-DATA.md",
+            "## Проверка\nСнимок до записи, подтверждение, откат.\n",
+        )
+        gate = verify.Gate()
+        verify.check_external_data(gate)
+        self.assertEqual(gate.failed, 0)
+
+
 if __name__ == "__main__":
     unittest.main()
