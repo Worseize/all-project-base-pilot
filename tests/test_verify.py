@@ -833,5 +833,88 @@ class RequestsTests(unittest.TestCase):
         self.assertEqual(gate.failed, 1)
 
 
+class WakeDebtsTests(unittest.TestCase):
+    def setUp(self):
+        self.old_root = verify.ROOT
+        self.tmp = tempfile.TemporaryDirectory()
+        verify.ROOT = Path(self.tmp.name)
+        (verify.ROOT / "docs").mkdir()
+        (verify.ROOT / "evidence.md").write_text("x\n", encoding="utf-8")
+
+    def tearDown(self):
+        verify.ROOT = self.old_root
+        self.tmp.cleanup()
+
+    def board(self, rows=("D28-1",)):
+        body = "\n".join(
+            f"| {tag} | долг | я | причина | действие | P2 | 0.9.51 |" for tag in rows
+        )
+        text = (
+            "| # | Долг | Кому | Почему открыт | Что разблокирует | Приоритет | С какой версии |\n"
+            "| --- | --- | --- | --- | --- | --- | --- |\n"
+            + body + "\n"
+        )
+        (verify.ROOT / "DEBTS.md").write_text(text, encoding="utf-8")
+
+    def wake(self, closed="D28-1", evidence="`evidence.md`"):
+        text = (
+            "| Дата | Почта | Закрыт долг | Доказательство |\n"
+            "| --- | --- | --- | --- |\n"
+            f"| 28.10 12:00 | EMPTY | {closed} | {evidence} |\n"
+        )
+        (verify.ROOT / "docs" / "WAKE-LOG.md").write_text(text, encoding="utf-8")
+
+    def test_closed_debt_with_evidence_passes(self):
+        self.board()
+        self.wake()
+        gate = verify.Gate()
+        verify.check_wake_debts(gate)
+        self.assertEqual(gate.failed, 0)
+
+    def test_no_debts_word_with_open_board_fails(self):
+        self.board()
+        self.wake(closed="долгов нет", evidence="—")
+        gate = verify.Gate()
+        verify.check_wake_debts(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_empty_board_allows_no_debts(self):
+        self.board(rows=())
+        self.wake(closed="долгов нет", evidence="—")
+        gate = verify.Gate()
+        verify.check_wake_debts(gate)
+        self.assertEqual(gate.failed, 0)
+
+    def test_missing_tag_fails(self):
+        self.board()
+        self.wake(closed="сделано", evidence="`evidence.md`")
+        gate = verify.Gate()
+        verify.check_wake_debts(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_missing_evidence_fails(self):
+        self.board()
+        self.wake(evidence="—")
+        gate = verify.Gate()
+        verify.check_wake_debts(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_empty_log_passes(self):
+        self.board()
+        (verify.ROOT / "docs" / "WAKE-LOG.md").write_text(
+            "| Дата | Почта | Закрыт долг | Доказательство |\n| --- | --- | --- | --- |\n",
+            encoding="utf-8",
+        )
+        gate = verify.Gate()
+        verify.check_wake_debts(gate)
+        self.assertEqual(gate.failed, 0)
+
+    def test_missing_log_fails(self):
+        self.board()
+        gate = verify.Gate()
+        verify.check_wake_debts(gate)
+        self.assertEqual(gate.failed, 1)
+
+
 if __name__ == "__main__":
     unittest.main()

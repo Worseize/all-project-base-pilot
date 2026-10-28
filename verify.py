@@ -343,6 +343,68 @@ def check_project(gate: Gate) -> None:
     check_sections(gate, "FEATURE.md", list(CONFIG.get("feature_sections", [])), "feature")
 
 
+WAKE_HEADER = ["Дата", "Почта", "Закрыт долг", "Доказательство"]
+NO_DEBTS = {"долгов нет", "—", "-", "нет"}
+DEBT_TAG_RE = re.compile(r"\bD[A-Z0-9-]+\b")
+
+
+def open_debt_tags() -> list[str]:
+    path = ROOT / "DEBTS.md"
+    if not path.is_file():
+        return []
+    tags: list[str] = []
+    for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        if not line.startswith("|"):
+            continue
+        first = line.strip().strip("|").split("|")[0].strip()
+        if DEBT_TAG_RE.fullmatch(first):
+            tags.append(first)
+    return tags
+
+
+def evidence_ok(evidence: str) -> bool:
+    if re.search(r"findings#\d+", evidence) or "verify.py" in evidence or "CI " in evidence:
+        return True
+    for token in re.findall(r"`([^`]+)`", evidence):
+        if (ROOT / token).exists():
+            return True
+    return False
+
+
+def check_wake_debts(gate: Gate) -> None:
+    path = ROOT / "docs" / "WAKE-LOG.md"
+    if not path.is_file():
+        gate.fail("wake-debts", "нет docs/WAKE-LOG.md")
+        return
+    errors: list[str] = []
+    rows: list[list[str]] = []
+    for number, raw in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        if not raw.startswith("|"):
+            continue
+        parts = [part.strip() for part in raw.strip().strip("|").split("|")]
+        if parts == WAKE_HEADER or set(parts) == {"---"}:
+            continue
+        if len(parts) != 4:
+            errors.append(f"строка {number}: {len(parts)} полей, нужно 4")
+            continue
+        rows.append(parts)
+    debts = open_debt_tags()
+    for parts in rows:
+        closed, evidence = parts[2], parts[3]
+        if closed.strip("` ").lower() in NO_DEBTS:
+            if debts:
+                errors.append(f"{parts[0]}: на доске {len(debts)} долгов, закрытого нет")
+            continue
+        if not DEBT_TAG_RE.search(closed):
+            errors.append(f"{parts[0]}: нет тега закрытого долга")
+        if not evidence_ok(evidence):
+            errors.append(f"{parts[0]}: нет доказательства")
+    if errors:
+        gate.fail("wake-debts", " | ".join(errors[:3]))
+    else:
+        gate.ok("wake-debts", f"{len(rows)} пробуждений, долг закрыт")
+
+
 def check_readme(gate: Gate) -> None:
     text = (ROOT / "README.md").read_text(encoding="utf-8", errors="replace")
     if "## Быстрый старт" not in text:
@@ -1031,6 +1093,7 @@ def main() -> int:
         check_rules_dupes,
         check_requests,
         check_personal_data,
+        check_wake_debts,
         check_project,
         check_readme,
         check_journal,
