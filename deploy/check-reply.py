@@ -24,6 +24,9 @@ HEADING_RE = re.compile(r"(?im)^#{2,4}\s*(?:что\s+)?не\s+сделано\s*:
 TABLE_COLUMNS = ["сделано", "не сделано", "осталось"]
 MAIL_LINE_RE = re.compile(r"^почта:\s*(?:EMPTY|PENDING\s+\d+)\s+—\s+разобрано\s+\d+")
 TOTAL_LINE_RE = re.compile(r"(?m)^Итого:\s*моих\s*(\d+),\s*у владельца\s*(\d+)\s*$")
+BOARD_COLUMNS = ["#", "кому", "долг", "что разблокирует"]
+COLUMN_LIMITS = (8, 18, 50, 60)
+ROW_LIMIT = 149
 
 
 def load_debt_check():
@@ -107,9 +110,7 @@ def check_order(text: str, board: Path) -> list[str]:
     board_pos = board_positions[-1]
     if headings[-1][0] != board_pos:
         errors.append("после «Доска долгов» есть ещё раздел")
-    rows = [line for line in lines[board_pos:] if line.startswith("|")]
-    if not rows or any(len(cells(line)) != 7 for line in rows):
-        errors.append("доска в ответе — семь колонок")
+    errors.extend(check_board_section(lines[board_pos + 1:], board))
     total = TOTAL_LINE_RE.search(text)
     if not total:
         errors.append("нет строки «Итого: моих N, у владельца M»")
@@ -122,6 +123,39 @@ def check_order(text: str, board: Path) -> list[str]:
             f"итог в ответе {total.group(1)}/{total.group(2)}, "
             f"на доске {mine}/{owner}"
         )
+    return errors
+
+
+def check_board_section(lines: list[str], board: Path) -> list[str]:
+    """Four columns for the chat window, one line per debt, bounded widths."""
+    errors: list[str] = []
+    rows = [line.rstrip() for line in lines if line.startswith("|")]
+    if len(rows) < 2:
+        return ["доска в ответе пуста"]
+    header = [cell.lower() for cell in cells(rows[0])]
+    if header != BOARD_COLUMNS:
+        errors.append("доска в ответе — четыре колонки: #, Кому, Долг, Что разблокирует")
+    data = rows[1:]
+    if data and set(cells(data[0])) == {"---"}:
+        data = data[1:]
+    seen: set[str] = set()
+    for row in data:
+        parts = cells(row)
+        if len(parts) != len(BOARD_COLUMNS):
+            errors.append(f"строка «{parts[0] if parts else '?'}»: {len(parts)} полей, нужно 4")
+            continue
+        for index, limit in enumerate(COLUMN_LIMITS):
+            if len(parts[index]) > limit:
+                errors.append(f"«{parts[0]}»: колонка {index + 1} длиннее {limit}")
+        if len(row) > ROW_LIMIT:
+            errors.append(f"«{parts[0]}»: строка {len(row)} > {ROW_LIMIT}")
+        if TAG_RE.fullmatch(parts[0]):
+            seen.add(parts[0])
+    known = set(board_tags(board))
+    if seen != known:
+        missing = ", ".join(sorted(known - seen)) or "—"
+        extra = ", ".join(sorted(seen - known)) or "—"
+        errors.append(f"доска в ответе не совпадает с файлом: нет {missing}, лишние {extra}")
     return errors
 
 

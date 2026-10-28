@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## 0.9.50 — 2026-10-28
+
+- `deploy/check-reply.py`: доска в ответе — четыре колонки (`#`, `Кому`,
+  `Долг`, `Что разблокирует`), лимиты 8/18/50/60, строка ≤ 149, сверка
+  с файлом доски; 16 тестов.
+- `docs/PERSONAL-DATA.md`: что обезличено, где заполнять, порядок;
+  `deploy/check-personal-data.py` и гейт `personal-data`.
+- `tests/test_personal_data.py`: шесть случаев, заглушки и реальные
+  значения.
+- Запросы `findings#33` и Sheets — в `docs/REQUESTS.md`.
+
 ## 0.9.49 — 2026-10-27
 
 - `deploy-project.sh`: `ExecStart` берётся из `project.conf` (drop-in с

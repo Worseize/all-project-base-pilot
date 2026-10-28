@@ -321,6 +321,23 @@ def check_requests(gate: Gate) -> None:
         gate.ok("requests", f"{rows} запросов с доказательством")
 
 
+def check_personal_data(gate: Gate) -> None:
+    script = ROOT / "deploy" / "check-personal-data.py"
+    if not script.is_file():
+        gate.fail("personal-data", "нет deploy/check-personal-data.py")
+        return
+    result = subprocess.run(
+        [sys.executable, str(script)],
+        cwd=ROOT, text=True, encoding="utf-8", errors="replace",
+        capture_output=True, timeout=120,
+    )
+    if result.returncode != 0:
+        lines = [line for line in (result.stderr or "").splitlines() if line.strip()]
+        gate.fail("personal-data", " | ".join(lines[:3]) or "утечка личных данных")
+    else:
+        gate.ok("personal-data", "заглушки, реальных адресов нет")
+
+
 def check_project(gate: Gate) -> None:
     check_sections(gate, "PROJECT.md", list(CONFIG.get("project_sections", [])), "project")
     check_sections(gate, "FEATURE.md", list(CONFIG.get("feature_sections", [])), "feature")
@@ -1013,6 +1030,7 @@ def main() -> int:
         check_rules_tests,
         check_rules_dupes,
         check_requests,
+        check_personal_data,
         check_project,
         check_readme,
         check_journal,

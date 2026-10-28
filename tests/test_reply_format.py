@@ -28,10 +28,12 @@ def board(*tags: str) -> str:
 
 
 def board_block(tags) -> str:
-    rows = [f"| {tag} | долг | я | причина | действие | P1 | 0.9.49 |" for tag in tags]
+    rows = [f"| {tag} | я | долг | действие |" for tag in tags]
     mine = sum(1 for tag in tags if tag.startswith("D"))
     owner = sum(1 for tag in tags if tag.startswith(("W", "L")))
-    table = "\n".join([HEADER, SEP, *rows])
+    table = "\n".join(
+        ["| # | Кому | Долг | Что разблокирует |", "| --- | --- | --- | --- |", *rows]
+    )
     return f"## Доска долгов\n\n{table}\n\nИтого: моих {mine}, у владельца {owner}\n"
 
 
@@ -129,6 +131,26 @@ class ReplyFormatTests(unittest.TestCase):
         tags = ("D-ONE",)
         text = "\ufeff" + reply("`D-ONE`", tags)
         self.assertEqual(self.check(text, board(*tags)), [])
+
+    def test_seven_column_board_fails(self):
+        tags = ("D-ONE",)
+        text = reply("`D-ONE`", tags).replace("| # | Кому | Долг | Что разблокирует |", HEADER)
+        errors = self.check(text, board(*tags))
+        self.assertTrue(any("четыре колонки" in error for error in errors))
+
+    def test_long_cell_fails(self):
+        tags = ("D-ONE",)
+        text = reply("`D-ONE`", tags).replace(
+            "| D-ONE | я | долг |", "| D-ONE | я | " + "д" * 51 + " |"
+        )
+        errors = self.check(text, board(*tags))
+        self.assertTrue(any("длиннее" in error for error in errors))
+
+    def test_reply_board_must_match_file(self):
+        tags = ("D-ONE",)
+        text = reply("`D-ONE`", tags).replace("| D-ONE |", "| D-TWO |")
+        errors = self.check(text, board(*tags))
+        self.assertTrue(any("не совпадает" in error for error in errors))
 
     def test_broken_board_fails(self):
         errors = self.check(reply("`D-ONE`", ("D-ONE",)), "# доска без разделов\n")
