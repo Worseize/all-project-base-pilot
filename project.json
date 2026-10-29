@@ -79,6 +79,7 @@
     "docs/INFRA-MAP.md",
     "docs/ROTATION.md",
     "docs/EXTERNAL-DATA.md",
+    "docs/SCHEDULES.md",
     "deploy/install-watchdog.sh",
     "deploy/systemd/watchdog-health.service",
     "deploy/systemd/watchdog-health.timer",
