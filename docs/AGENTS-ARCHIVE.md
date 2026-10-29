@@ -43,3 +43,9 @@
 `health-check.sh` делает `runuser`; `User=app` без sudoers не может.
 Решение: root + `ProtectSystem`, `ReadWritePaths`, `NoNewPrivileges`,
 `EnvironmentFile`. ADR 0006. Проверка: unit-тест в `tests/test_verify.py`.
+
+## 2026-10-29 · Расписание — по имени чата
+
+Владелец дважды видел «опрос почты» без идентификатора и не мог понять,
+чей это чат. Правило: `<агент>: что делает`, только свой чат, не задание.
+Проверка: `verify.py` → `schedules`.

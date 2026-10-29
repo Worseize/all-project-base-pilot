@@ -19,5 +19,6 @@
 | 27.10 10:15 | Карта инфраструктуры | `docs/INFRA-MAP.md`, гейт `infra-map` | `docs/INFRA-MAP.md` |
 | 27.10 10:15 | Ротация сессии | `docs/ROTATION.md`, гейт `rotation` | `docs/ROTATION.md` |
 | 28.10 15:32 | Доска: колонка «Кто замедляет» | `deploy/check-reply.py`: колонка, лимит 14, связка тега и значения; 18 тестов | `tests/test_reply_format.py` |
+| 29.10 14:40 | Расписание подписано именем чата | `docs/SCHEDULES.md`, правило в `AGENTS.md`, гейт `schedules`, три теста | `tests/test_verify.py`, `verify.py` |
 
-Версия 0.9.53 · 28.10.2026
+Версия 0.9.55 · 29.10.2026

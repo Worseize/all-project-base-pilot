@@ -993,6 +993,32 @@ class DocsContractsTests(unittest.TestCase):
         verify.check_external_data(gate)
         self.assertEqual(gate.failed, 0)
 
+    def schedules_doc(self):
+        return (
+            "## Правило\n<агент>: <что делает>, свой чат, не задание, "
+            "часовой опрос почты.\n## Проверка\n"
+        )
+
+    def test_schedules_missing_agent_link_fails(self):
+        self.write("docs/SCHEDULES.md", self.schedules_doc())
+        gate = verify.Gate()
+        verify.check_schedules(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_schedules_missing_rule_fails(self):
+        self.write("docs/SCHEDULES.md", "## Проверка\n")
+        self.write("AGENTS.md", "# AGENTS\ndocs/SCHEDULES.md\n")
+        gate = verify.Gate()
+        verify.check_schedules(gate)
+        self.assertEqual(gate.failed, 1)
+
+    def test_schedules_full_passes(self):
+        self.write("docs/SCHEDULES.md", self.schedules_doc())
+        self.write("AGENTS.md", "# AGENTS\ndocs/SCHEDULES.md\n")
+        gate = verify.Gate()
+        verify.check_schedules(gate)
+        self.assertEqual(gate.failed, 0)
+
 
 if __name__ == "__main__":
     unittest.main()

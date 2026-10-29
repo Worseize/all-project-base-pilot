@@ -409,6 +409,11 @@ def check_wake_debts(gate: Gate) -> None:
 
 DAILY_LIMIT_RE = re.compile(r"(?i)\b(?:20|60)\b\s*(?:сообщени\w*\s*)?(?:в|/)\s*сут\w*")
 INFRA_PREFIXES = ("deploy/", "docs/", "cmd/", "skeleton/", "tests/", ".github/")
+SCHEDULES_CONTRACT = (
+    "schedules", "docs/SCHEDULES.md",
+    ("## Правило", "## Проверка"),
+    ("<агент>: <что делает>", "свой чат", "не задание", "часовой опрос почты"),
+)
 DOC_CONTRACTS = (
     ("bus-limits", "docs/BUS.md", (), ("без суточных лимитов",)),
     ("infra-map", "docs/INFRA-MAP.md", (), ()),
@@ -417,6 +422,7 @@ DOC_CONTRACTS = (
      ("TO-AGENTS-ONBOARDING", "wake-debts")),
     ("external-data", "docs/EXTERNAL-DATA.md",
      ("## Проверка",), ("снимок до записи", "подтверждение", "откат")),
+    SCHEDULES_CONTRACT,
 )
 
 
@@ -484,6 +490,22 @@ def check_rotation(gate: Gate) -> None:
 
 def check_external_data(gate: Gate) -> None:
     check_doc_contract(gate, *DOC_CONTRACTS[3])
+
+
+def check_schedules(gate: Gate) -> None:
+    name, path, sections, phrases = SCHEDULES_CONTRACT
+    text = read_doc(gate, name, path)
+    if text is None:
+        return
+    missing = [section for section in sections if section not in text]
+    missing += [phrase for phrase in phrases if phrase.lower() not in text.lower()]
+    agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8", errors="replace")
+    if "docs/SCHEDULES.md" not in agents:
+        missing.append("AGENTS.md: docs/SCHEDULES.md")
+    if missing:
+        gate.fail(name, "нет: " + ", ".join(missing[:3]))
+    else:
+        gate.ok(name, "заголовок, границы и ссылка в AGENTS")
 
 
 def check_readme(gate: Gate) -> None:
@@ -1179,6 +1201,7 @@ def main() -> int:
         check_infra_map,
         check_rotation,
         check_external_data,
+        check_schedules,
         check_project,
         check_readme,
         check_journal,
